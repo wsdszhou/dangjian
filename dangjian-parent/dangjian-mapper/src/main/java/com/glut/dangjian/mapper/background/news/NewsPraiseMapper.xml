@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.news.NewsPraiseMapper">
+	<resultMap id="BaseResultMap" type="xwDzb">
+		<id column="dz_id" property="dzId" />
+		<result column="dz_xwdm" property="dzXwdm" />
+		<result column="dz_yhdm" property="dzYhdm" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		dz_id, dz_xwdm, dz_yhdm
+	</sql>
+	
+	<!--  -->
+	<select id="getNewsPraiseNum" parameterType="string" resultType="int">
+	   select count(dz_id)
+	   from xw_dzb
+	   where dz_xwdm = #{newsId}
+	</select>
+	
+	<!-- 根据新闻id和用户id获取新闻评论对象 -->
+	<select id="getNewsPraiseByNewsidAnuserid" resultType="string">
+	   select dz_id
+        from xw_dzb
+        where dz_xwdm = #{newsId} and dz_yhdm = #{userId}
+	</select>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from xw_dzb
+		where dz_id = #{dzId}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from xw_dzb
+		where dz_id = #{dzId}
+	</delete>
+	
+	<insert id="insert" parameterType="xwDzb">
+		insert into xw_dzb (dz_id, dz_xwdm, dz_yhdm)
+		values (#{dzId}, #{dzXwdm}, #{dzYhdm})
+	</insert>
+	
+	<insert id="insertSelective" parameterType="xwDzb">
+		insert into xw_dzb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="dzId != null">
+				dz_id,
+			</if>
+			<if test="dzXwdm != null">
+				dz_xwdm,
+			</if>
+			<if test="dzYhdm != null">
+				dz_yhdm,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="dzId != null">
+				#{dzId},
+			</if>
+			<if test="dzXwdm != null">
+				#{dzXwdm},
+			</if>
+			<if test="dzYhdm != null">
+				#{dzYhdm},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="xwDzb">
+		update xw_dzb
+		<set>
+			<if test="dzXwdm != null">
+				dz_xwdm = #{dzXwdm},
+			</if>
+			<if test="dzYhdm != null">
+				dz_yhdm = #{dzYhdm},
+			</if>
+		</set>
+		where dz_id = #{dzId}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="xwDzb">
+		update xw_dzb
+		set dz_xwdm = #{dzXwdm},
+		dz_yhdm = #{dzYhdm}
+		where dz_id = #{dzId}
+	</update>
+</mapper>

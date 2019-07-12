@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.ApprovalNodeMapper">
+	<resultMap id="BaseResultMap" type="spSpjdb">
+		<id column="spjd_id"  property="spjdId" />
+        <result column="spjd_mc"  property="spjdMc" />
+        <result column="spjd_xyjdmc" property="spjdXyjdmc" />
+        <result column="spjd_dqspzt" property="spjdDqspzt" />
+        <result column="spjd_isFirst" property="spjdIsFirst" />
+        <association property="spjdLcdm" javaType="spSplcb">
+             <id column="splc_id"  property="splcId" />
+             <result column="splc_state" property="splcState" />
+             <result column="splc_mc" property="splcMc" />
+             <result column="splc_ywdm" jdbcType="VARCHAR" property="splcYwdm" />
+        </association>
+		<association property="spjdGwdm" javaType="spSpgwb">
+            <id column="spgw_id"  property="spgwId" />
+            <result column="spgw_spgwmc"  property="spgwSpgwmc" /> 
+        </association>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+        spjd_id,  spjd_mc,  spjd_dqspzt,  spjd_xyjdmc, spjd_isFirst
+    </sql>
+	
+	<update id="updateAndPrevNode">
+	   <if test="spjdb != null">
+	       update sp_spjdb
+	        <set>
+		          <if test="spjdb.spjdMc != null">
+		            spjd_mc = #{spjdb.spjdMc},
+		          </if>
+		          <if test="spjdb.spjdXyspjddm != null">
+		              <if test="spjdb.spjdXyspjddm.spjdId != null">
+		                spjd_xyspjddm = #{spjdb.spjdXyspjddm.spjdId},
+		              </if>
+		          </if>
+		          <if test="spjdb.spjdXyjdmc != null">
+		               spjd_xyjdmc = #{spjdb.spjdXyjdmc},
+		          </if>
+		          <if test="spjdb.spjdGwdm != null">
+		              <if test="spjdb.spjdGwdm.spgwId != null">
+		                   spjd_gwdm = #{spjdb.spjdGwdm.spgwId},
+		              </if>
+		          </if>
+	        </set>
+	        where spjd_id = #{spjdb.spjdId};
+	   </if>
+	   
+	   <if test="prevNode != null">
+           update sp_spjdb
+            <set>
+	              <if test="prevNode.spjdXyjdmc != null">
+	                   spjd_xyjdmc = #{prevNode.spjdXyjdmc},
+	              </if>
+            </set>
+            where spjd_id = #{prevNode.spjdId};
+       </if>
+	</update>
+	
+	<!-- 删除首节点 -->
+	<delete id="deleteFirstNode">
+	   delete from sp_spjdb  where spjd_id = #{spjdId};
+	   <if test="nextNode != null">
+	       update sp_spjdb 
+	       <set>
+	            <if test="nextNode.spjdIsFirst != null">
+	                spjd_isFirst = #{nextNode.spjdIsFirst},
+	            </if>
+	        </set>
+	        where spjd_id = #{nextNode.spjdId};
+	   </if>
+	</delete>
+	
+	<!-- 删除末节点 -->
+    <delete id="deleteEndNode">
+       delete from sp_spjdb  where spjd_id = #{spjdId};
+       <if test="prevNode != null">
+	       update sp_spjdb 
+	       <set>
+	            <if test="prevNode.spjdXyspjddm != null">
+	                spjd_xyspjddm = #{prevNode.spjdXyspjddm.spjdId},
+	                spjd_xyjdmc = null
+	            </if>
+	        </set>
+	        where spjd_id = #{prevNode.spjdId};
+       </if>
+       
+    </delete>
+    
+    <!-- 删除的是中间节点 -->
+    <delete id="deleteMidNode">
+       delete from sp_spjdb  where spjd_id = #{spjdId};
+       <if test="midNode  != null">
+	       update sp_spjdb 
+	       <set>
+	            <if test="midNode.spjdXyspjddm != null">
+	                spjd_xyspjddm = #{midNode.spjdXyspjddm.spjdId},
+	                spjd_xyjdmc = #{midNode.spjdXyjdmc}
+	            </if>
+	        </set>
+	        where spjd_id = #{midNode.spjdId};
+       </if>
+       
+    </delete>
+	
+	<select id="getApprovalNodeIdById" parameterType="int" resultMap="BaseResultMap">
+	    select spjd_id,  spjd_mc,  spjd_dqspzt,  spjd_xyjdmc, spjd_isFirst, 
+        from sp_spjdb jd, sp_lcxmb xm   
+        where xm.lcxm_dqjddm = jd.spjd_id  and  xm.lcxm_dxId = #{objectId}
+	</select>
+	
+	<!-- 获取下一个审批节点 -->
+	<select id="getNextApprovalNodeByOjbectId" parameterType="string" resultType="int">
+	   select jd.spjd_xyspjddm
+	   from sp_spjdb jd, sp_lcxmb xm   
+	   where xm.lcxm_dqjddm = jd.spjd_id  and xm.lcxm_dqspzt = 0  and xm.lcxm_dxId = #{objectId}
+	</select>
+	
+	<!-- 获取末尾节点 -->
+     <select id="getEndNodeByApprovalProcessId" parameterType="int" resultMap="BaseResultMap" >
+        select spjd_id, spjd_mc, spjd_isFirst
+        from sp_spjdb jd
+        where spjd_xyspjddm = 0 and spjd_lcdm = #{splcId} 
+    </select>
+	
+	<!-- 根据审批节点id获取首 节点 对象 -->
+	 <select id="getFirstNodeByApprovalProcessId" parameterType="int" resultMap="BaseResultMap" >
+        select spjd_id, spjd_mc, spjd_isFirst
+        from sp_spjdb jd
+        where spjd_isFirst = 1 and spjd_lcdm = #{splcId} 
+    </select>
+    
+	<!-- 获取审批节点，根据节点的名称获取 -->
+    <select id="getFirstNodeIdByApprovalProcessId" parameterType="int" resultType="int" >
+        select jd.spjd_id
+        from sp_spjdb jd, sp_splcb lc
+       where lc.splc_id = jd.spjd_lcdm  and  lc.splc_id = #{approvalProcessId} and spjd_isFirst = 1
+    </select>
+	
+	<!-- 获取审批节点，根据节点的名称获取 -->
+    <select id="getApprovalNodeByNodeName" parameterType="string" resultType="spSpjdb" >
+        select <include refid="Base_Column_List"></include>
+        from sp_spjdb 
+        where  spjd_mc = #{spjdMc}
+    </select>
+	
+	<!--获取上一个审批节点 -->
+    <select id="getApprovalPrevNodeById" parameterType="int" resultMap="BaseResultMap" >
+        select <include refid="Base_Column_List"></include>
+        from   sp_spjdb 
+        where  spjd_xyspjddm = #{spjdId} 
+    </select>
+    
+	<!-- 获取审批节点，根据下一审批节点获取 -->
+    <select id="getApprovalNextNodeById" parameterType="int" resultMap="BaseResultMap" >
+        select <include refid="Base_Column_List"></include>
+        from   sp_spjdb 
+        where  spjd_id = (select spjd_xyspjddm from sp_spjdb where spjd_id = #{spjdId}  )  
+    </select>
+	
+	<!-- 查审批节点，通过主键id -->
+	<select id="selectById" parameterType="int" resultMap="BaseResultMap" >
+		select <include refid="Base_Column_List"></include>
+		from   sp_spjdb 
+        where  spjd_id = #{spjdId}
+	</select>
+	
+	<!-- 加载审批流程的所有节点 -->
+	<select id="loadNodeApprovalBySplcId" parameterType="int" resultType="spSpjdb">
+	   select spjd_id, spjd_mc
+	   from sp_spjdb , sp_splcb
+	   where splc_id = spjd_lcdm 
+	   <if test="splcId != null">
+            and splc_id = #{splcId}
+       </if>
+	</select>
+	
+	<!-- 分页查询审批节点 -->
+	<select id="nodePageList" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from   sp_spjdb 
+        where  spjd_id = #{spjdId,jdbcType=INTEGER}
+    </select>
+	
+	<!--删除审批节点  -->
+	<delete id="deleteById" parameterType="int">
+		delete from sp_spjdb
+		where spjd_id = #{spjdId}
+	</delete>
+	
+	<!-- 插入一个节点信息 -->
+	<insert id="insert" parameterType="spSpjdb">
+		insert into sp_spjdb (spjd_id, spjd_mc, spjd_lcdm, 
+        spjd_dqspzt, spjd_xyspjddm, spjd_xyjdmc, spjd_gwdm)
+		values (#{spjdId}, #{spjdMc}, #{spjdLcdm.splcId}, 
+           #{spjdDqspzt}, #{spjdXyspjddm.spjdId}, #{spjdXyjdmc}, #{spjdGwdm.spgwId})
+	</insert>
+	
+	<!-- 插入一个节点信息，并且判断是否为空 -->
+	<insert id="insertSelective" parameterType="spSpjdb">
+		insert into sp_spjdb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spjdId != null">
+		        spjd_id,
+		      </if>
+		      <if test="spjdMc != null">
+		        spjd_mc,
+		      </if>
+		      <if test="spjdLcdm != null">
+                <if test="spjdLcdm.splcId != null">
+                   spjd_lcdm,
+                </if>
+              </if>
+		      <if test="spjdDqspzt != null">
+		        spjd_dqspzt,
+		      </if>
+		      
+		      <if test="spjdXyspjddm != null">
+                 <if test="spjdXyspjddm.spjdId != null">
+                     spjd_xyspjddm,
+                </if>
+              </if>
+		      <if test="spjdXyjdmc != null">
+		        spjd_xyjdmc,
+		      </if>
+		      <if test="spjdGwdm != null">
+                <if test="spjdGwdm.spgwId != null">
+                   spjd_gwdm,
+                </if>
+            </if>
+		      <if test="spjdIsFirst != null">
+	            spjd_isFirst,
+	          </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spjdId != null">
+				#{spjdId},
+			</if>
+			<if test="spjdMc != null">
+	         #{spjdMc},
+	        </if>
+	        <if test="spjdLcdm != null">
+		        <if test="spjdLcdm.splcId != null">
+	               #{spjdLcdm.splcId},
+	            </if>
+	        </if>
+			<if test="spjdDqspzt != null">
+				#{spjdDqspzt},
+			</if>
+			<if test="spjdXyspjddm != null">
+				 <if test="spjdXyspjddm.spjdId != null">
+                     #{spjdXyspjddm.spjdId},
+                </if>
+			</if>
+			<if test="spjdXyjdmc != null">
+				#{spjdXyjdmc},
+			</if>
+			<if test="spjdGwdm != null">
+				<if test="spjdGwdm.spgwId != null">
+	                #{spjdGwdm.spgwId},
+	            </if>
+			</if>
+			<if test="spjdIsFirst != null">
+                #{spjdIsFirst},
+          </if>
+		</trim>
+	</insert>
+	
+	<update id="updateIsFirstNodeById" parameterType="int">
+        update sp_spjdb
+        <set>
+	        <if test="spjdIsFirst != null">
+	            spjd_isFirst = #{spjdIsFirst},
+	        </if>
+        </set>
+        where spjd_id = #{spjdId}
+    </update>
+    
+    <update id="updateprevNodeAndCurrentNodeAndnextNode">
+        <if test="prevNode !=null">
+	        update sp_spjdb
+	        <set>
+	          <if test="prevNode.spjdXyspjddm != null">
+	              <if test="prevNode.spjdXyspjddm.spjdId != null">
+	                spjd_xyspjddm = #{prevNode.spjdXyspjddm.spjdId},
+	              </if>
+	          </if>
+	          <if test="prevNode.spjdXyjdmc != null">
+	            spjd_xyjdmc = #{prevNode.spjdXyjdmc},
+	          </if>
+	          <if test="prevNode.spjdIsFirst != null">
+	            spjd_isFirst = #{prevNode.spjdIsFirst},
+	          </if>
+	        </set>
+	        where spjd_id = #{prevNode.spjdId};
+        </if>
+        
+        <if test="spjdb !=null">
+	        update sp_spjdb
+	        <set>
+	          <if test="spjdb.spjdXyspjddm != null">
+	              <if test="spjdb.spjdXyspjddm.spjdId != null">
+	                spjd_xyspjddm = #{spjdb.spjdXyspjddm.spjdId},
+	              </if>
+	          </if>
+	          <if test="spjdb.spjdXyjdmc != null">
+	            spjd_xyjdmc = #{spjdb.spjdXyjdmc},
+	          </if>
+	          <if test="spjdb.spjdIsFirst != null">
+	            spjd_isFirst = #{spjdb.spjdIsFirst},
+	          </if>
+	        </set>
+	        where spjd_id = #{spjdb.spjdId};
+        </if>
+        
+        <if test="endNode !=null">
+	        update sp_spjdb
+	        <set>
+	          <if test="endNode.spjdXyspjddm != null">
+	              <if test="endNode.spjdXyspjddm.spjdId != null">
+	                spjd_xyspjddm = #{endNode.spjdXyspjddm.spjdId},
+	              </if>
+	          </if>
+	          <if test="endNode.spjdXyjdmc != null">
+	            spjd_xyjdmc = #{endNode.spjdXyjdmc},
+	          </if>
+	          <if test="endNode.spjdIsFirst != null">
+	            spjd_isFirst = #{endNode.spjdIsFirst},
+	          </if>
+	        </set>
+	        where spjd_id = #{endNode.spjdId};
+        </if>
+        
+        <if test="nextNode !=null">
+            <if test="nextNode.spjdIsFirst != null">
+               update sp_spjdb set spjd_isFirst = #{nextNode.spjdIsFirst} where spjd_id = #{nextNode.spjdId};
+             </if>
+        </if>
+    </update>
+    
+	<!-- 修改审批节点，并且判断是否为空 -->
+	<update id="updateByIdSelective" parameterType="spSpjdb">
+		update sp_spjdb
+	    <set>
+	      <if test="spjdMc != null">
+	        spjd_mc = #{spjdMc},
+	      </if>
+	      <if test="spjdLcdm != null">
+		      <if test="spjdLcdm.splcId != null">
+	            spjd_lcdm = #{spjdLcdm.splcId},
+	          </if>
+	      </if>
+	      <if test="spjdDqspzt != null">
+	        spjd_dqspzt = #{spjdDqspzt},
+	      </if>
+	      <if test="spjdXyspjddm != null">
+		      <if test="spjdXyspjddm.spjdId != null">
+	            spjd_xyspjddm = #{spjdXyspjddm.spjdId},
+	          </if>
+	      </if>
+	      <if test="spjdXyjdmc != null">
+	        spjd_xyjdmc = #{spjdXyjdmc},
+	      </if>
+	      <if test="spjdGwdm != null">
+		      <if test="spjdGwdm.spgwId != null">
+	            spjd_gwdm = #{spjdGwdm.spgwId},
+	          </if>
+	      </if>
+	      <if test="spjdIsFirst != null">
+            spjd_isFirst = #{spjdIsFirst},
+          </if>
+	    </set>
+	    where spjd_id = #{spjdId}
+	</update>
+	
+	<!-- 修改审批节点 -->
+	<update id="updateById" parameterType="spSpjdb">
+		update sp_spjdb
+	    set spjd_mc = #{spjdMc},
+	      spjd_lcdm = #{spjdLcdm.splcId},
+	      spjd_dqspzt = #{spjdDqspzt},
+	      spjd_xyspjddm = #{spjdXyspjddm.spjdId},
+	      spjd_xyjdmc = #{spjdXyjdmc},
+	      spjd_gwdm = #{spjdGwdm.spgwId},
+	      spjd_isFirst = #{spjdIsFirst},
+	    where spjd_id = #{spjdId}
+	</update> 
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.news.view.ViewNewsPraiseMapper">
+  <resultMap id="BaseResultMap" type="viewNewsPraise">
+    <result column="xw_id"  property="xwId" />
+    <result column="xw_bt"  property="xwBt" />
+    <result column="xw_fbsj"  property="xwFbsj" />
+    <result column="xw_ydrs"  property="xwYdrs" />
+    <result column="xw_xgsj"  property="xwXgsj" />
+    <result column="xw_sfpl"  property="xwSfpl" />
+    <result column="xw_splc"  property="xwSplc" />
+    <result column="dz_id"  property="dzId" />
+    <result column="dz_userId"  property="dzUserid" />
+    <result column="dz_userName"  property="dzUsername" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="viewNewsPraise">
+    <result column="xw_zw"  property="xwZw" />
+  </resultMap>
+  <sql id="Blob_Column_List">
+    xw_zw
+  </sql>
+  <insert id="insert" parameterType="viewNewsPraise">
+    insert into view_news_praise (xw_id, xw_bt, xw_fbsj, 
+      xw_ydrs, xw_xgsj, xw_sfpl, 
+      xw_splc, dz_id, dz_userId, 
+      dz_userName, xw_zw)
+    values (#{xwId}, #{xwBt}, #{xwFbsj}, 
+      #{xwYdrs}, #{xwXgsj}, #{xwSfpl}, 
+      #{xwSplc}, #{dzId}, #{dzUserid}, 
+      #{dzUsername}, #{xwZw})
+  </insert>
+  <insert id="insertSelective" parameterType="viewNewsPraise">
+    insert into view_news_praise
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="xwId != null">
+        xw_id,
+      </if>
+      <if test="xwBt != null">
+        xw_bt,
+      </if>
+      <if test="xwFbsj != null">
+        xw_fbsj,
+      </if>
+      <if test="xwYdrs != null">
+        xw_ydrs,
+      </if>
+      <if test="xwXgsj != null">
+        xw_xgsj,
+      </if>
+      <if test="xwSfpl != null">
+        xw_sfpl,
+      </if>
+      <if test="xwSplc != null">
+        xw_splc,
+      </if>
+      <if test="dzId != null">
+        dz_id,
+      </if>
+      <if test="dzUserid != null">
+        dz_userId,
+      </if>
+      <if test="dzUsername != null">
+        dz_userName,
+      </if>
+      <if test="xwZw != null">
+        xw_zw,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="xwId != null">
+        #{xwId},
+      </if>
+      <if test="xwBt != null">
+        #{xwBt},
+      </if>
+      <if test="xwFbsj != null">
+        #{xwFbsj},
+      </if>
+      <if test="xwYdrs != null">
+        #{xwYdrs},
+      </if>
+      <if test="xwXgsj != null">
+        #{xwXgsj},
+      </if>
+      <if test="xwSfpl != null">
+        #{xwSfpl},
+      </if>
+      <if test="xwSplc != null">
+        #{xwSplc},
+      </if>
+      <if test="dzId != null">
+        #{dzId},
+      </if>
+      <if test="dzUserid != null">
+        #{dzUserid},
+      </if>
+      <if test="dzUsername != null">
+        #{dzUsername},
+      </if>
+      <if test="xwZw != null">
+        #{xwZw},
+      </if>
+    </trim>
+  </insert>
+</mapper>

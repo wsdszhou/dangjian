@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.system.BugMapper">
+  <resultMap id="BaseResultMap" type="bug">
+    <id column="id"  property="id" />
+    <result column="bt"  property="bt" />
+    <result column="sj"  property="sj" />
+    <result column="sfyd"  property="sfyd" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="bug">
+    <result column="nr" jdbcType="LONGVARCHAR" property="nr" />
+  </resultMap>
+  <sql id="Base_Column_List">
+        id, bt, sj, nr, sfyd
+   </sql>
+  
+  <update id="reading" parameterType="string">
+    update bug set sfyd=1 where id=#{id}
+  </update>
+  
+  <select id="selectByPrimaryKey" parameterType="string" resultMap="ResultMapWithBLOBs">
+    select <include refid="Base_Column_List" />
+    from bug
+    where id = #{id}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="string">
+    delete from bug
+    where id = #{id}
+  </delete>
+  
+  <insert id="insert" parameterType="bug">
+    insert into bug (id, bt, sfyd, sj, yhdm, nr)
+    values (#{id}, #{bt}, #{sfyd}, #{sj}, #{yhdm.userId}, #{nr})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="bug">
+    insert into bug
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="bt != null">
+        bt,
+      </if>
+      <if test="sfyd != null">
+        sfyd,
+      </if>
+      <if test="sj != null">
+        sj,
+      </if>
+      <if test="yhdm != null">
+        yhdm,
+      </if>
+      <if test="nr != null">
+        nr,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id},
+      </if>
+      <if test="bt != null">
+        #{bt},
+      </if>
+      <if test="sfyd != null">
+        #{sfyd},
+      </if>
+      <if test="sj != null">
+        #{sj},
+      </if>
+      <if test="yhdm != null">
+        #{yhdm.userId},
+      </if>
+      <if test="nr != null">
+        #{nr},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="bug">
+    update bug
+    <set>
+      <if test="bt != null">
+        bt = #{bt},
+      </if>
+      <if test="sfyd != null">
+        sfyd = #{sfyd},
+      </if>
+      <if test="sj != null">
+        sj = #{sj},
+      </if>
+      <if test="yhdm != null">
+        yhdm = #{yhdm.userId},
+      </if>
+      <if test="nr != null">
+        nr = #{nr},
+      </if>
+    </set>
+    where id = #{id}
+  </update>
+  
+</mapper>

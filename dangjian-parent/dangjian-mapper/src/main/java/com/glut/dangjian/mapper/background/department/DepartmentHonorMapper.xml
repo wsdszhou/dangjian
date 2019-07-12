@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.department.DepartmentHonorMapper">
+	<resultMap id="BaseResultMap" type="bmry">
+		<id column="bmry_id" property="bmryId" />
+		<result column="bmry_mc" property="bmryMc" />
+		<result column="bmry_hdsj" property="bmryHdsj" />
+		<result column="bmry_js" property="bmryJs" />
+		<result column="bmry_tp" property="bmryTp" />
+		<association property="bmryBmdm" javaType="bmb">
+			<id column="bm_id" property="bmId" />
+	        <result column="bm_mc" property="bmMc" />
+		</association>
+	</resultMap>
+	<sql id="Base_Column_List">
+		bmry_id, bmry_mc, bmry_hdsj, bmry_js, bmry_tp, bm_mc, bm_id
+	</sql>
+	
+	<select id="getHonorIdByName" parameterType="string" resultType="int">
+	    select bmry_id
+        from bmry
+        where bmry_mc = #{bmryMc}
+	</select>
+	
+	<!-- 荣誉详细信息 -->
+	<select id="getDeptHonorByHonorid" parameterType="string" resultMap="BaseResultMap">
+	   select bmry_id, bmry_mc, bmry_hdsj, bmry_js, bmry_tp
+	   from bmry
+	   where bmry_id = #{honorId}
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="getDeptHonorPageList" resultMap="BaseResultMap">
+	   select bmry_id, bmry_mc, bmry_hdsj, bmry_js
+	   from  bmry
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteBratch" >
+	   delete from bmry where 
+	   <foreach collection="honorIds" item="honorId" separator="  or  ">
+	       bmry_id = #{honorId}
+	   </foreach>
+	</delete>
+	
+	<!-- 分页查询 -->
+	<select id="getDeptHonorListPage" parameterType="bmry" resultMap="BaseResultMap">
+	   select <include refid="Base_Column_List" />
+	   from bmry , bmb
+	   <trim prefix=" where " suffixOverrides="and">
+	        bmry.bmry_bmdm = bmb.bm_id and
+	       <if test="bmryId != null">
+                bmry_id = #{bmryId}  and
+            </if>
+            <if test="bmryMc != null">
+                bmry_mc like "%"#{bmryMc}"%"  and
+            </if>
+            <if test="bmryBmdm != null">
+	            <if test="bmryBmdm.bmId != null">
+	                bmry_bmdm = #{bmryBmdm.bmId}  and
+	            </if>
+            </if>
+	   </trim>
+	</select>
+	
+	<!-- 根据主键查询 -->
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from bmry
+		where bmry_id = #{bmryId}
+	</select>
+	
+	<!-- 删除荣誉 -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from bmry
+		where bmry_id = #{bmryId}
+	</delete>
+	
+	<!-- 保存荣誉 -->
+	<insert id="insert" parameterType="bmry">
+		insert into bmry (bmry_id,bmry_mc, bmry_hdsj,bmry_js, bmry_bmdm, bmry_tp)
+		values (#{bmryId},#{bmryMc}, #{bmryHdsj},#{bmryJs}, #{bmryBmdm.bmId}, #{bmryTp})
+	</insert>
+	
+	<!-- 保存荣誉并且判断是否为空 -->
+	<insert id="insertSelective" parameterType="bmry">
+		insert into bmry
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bmryId != null">
+				bmry_id,
+			</if>
+			<if test="bmryMc != null">
+				bmry_mc,
+			</if>
+			<if test="bmryHdsj != null">
+				bmry_hdsj,
+			</if>
+			<if test="bmryJs != null">
+				bmry_js,
+			</if>
+			<if test="bmryBmdm != null">
+				bmry_bmdm,
+			</if>
+			<if test="bmryTp != null">
+				bmry_tp,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bmryId != null">
+				#{bmryId},
+			</if>
+			<if test="bmryMc != null">
+				#{bmryMc},
+			</if>
+			<if test="bmryHdsj != null">
+				#{bmryHdsj},
+			</if>
+			<if test="bmryJs != null">
+				#{bmryJs},
+			</if>
+			<if test="bmryBmdm != null">
+				#{bmryBmdm.bmId},
+			</if>
+			<if test="bmryTp != null">
+				#{bmryTp},
+			</if>
+		</trim>
+	</insert>
+	
+	<!-- 修改荣誉信息，并且判断是否为空 -->
+	<update id="updateByPrimaryKeySelective" parameterType="bmry">
+		update bmry
+		<set>
+			<if test="bmryMc != null">
+				bmry_mc = #{bmryMc},
+			</if>
+			<if test="bmryHdsj != null">
+				bmry_hdsj = #{bmryHdsj},
+			</if>
+			<if test="bmryJs != null">
+				bmry_js = #{bmryJs},
+			</if>
+			<if test="bmryBmdm != null">
+				bmry_bmdm = #{bmryBmdm.bmId},
+			</if>
+			<if test="bmryTp != null">
+				bmry_tp = #{bmryTp},
+			</if>
+		</set>
+		where bmry_id = #{bmryId}
+	</update>
+	<!-- 修改荣誉信息 -->
+	<update id="updateByPrimaryKey" parameterType="bmry">
+		update bmry
+		set
+		bmry_mc = #{bmryMc},
+		bmry_hdsj = #{bmryHdsj},
+		bmry_js = #{bmryJs},
+		bmry_bmdm = #{bmryBmdm.bmId},
+		bmry_tp = #{bmryTp}
+		where bmry_id = #{bmryId}
+	</update>
+</mapper>

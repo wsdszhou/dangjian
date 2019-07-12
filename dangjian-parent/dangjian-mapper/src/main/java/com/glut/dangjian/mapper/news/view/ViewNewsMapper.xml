@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.news.view.ViewNewsMapper">
+	<resultMap id="BaseResultMap" type="viewNews">
+		<result column="xw_id" property="xwId" />
+		<result column="xw_slt" property="xwSlt" />
+		<result column="xw_bt" property="xwBt" />
+		<result column="xw_fbsj" property="xwFbsj" />
+		<result column="xw_ydrs" property="xwYdrs" />
+		<result column="xw_xgsj" property="xwXgsj" />
+		<result column="xw_sfpl" property="xwSfpl" />
+		<result column="xw_splc" property="xwSplc" />
+		<result column="fbr_userId" property="fbrUserid" />
+		<result column="fbr_userName" property="fbrUsername" />
+		<result column="xwzt_id" property="xwztId" />
+		<result column="xwzt_mc" property="xwztMc" />
+		<result column="lm_id" property="lmId" />
+		<result column="lm_mc" property="lmMc" />
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="xw_zw"  property="xwZw" />
+	</resultMap>
+	
+	<!-- 所有的字段 -->
+	<sql id="all_Column_List">
+		xw_id,xw_bt, xw_slt,xw_fbsj, xw_ydrs, xw_xgsj, xw_sfpl, xw_splc, fbr_userId,
+        fbr_userName, xwzt_id, xwzt_mc, lm_id, lm_mc, bm_id, bm_mc, xw_zw
+	</sql>
+	
+	<!-- 根据通知id查询指定的新闻 -->
+	<select id="geSingletNewsByNoticeId" parameterType="string" resultMap="BaseResultMap">
+       select xw_id,xw_bt, xw_slt, xw_ydrs, xw_xgsj, fbr_userId, fbr_userName, lm_mc, bm_mc, xw_zw
+       from view_news
+       where xw_id = ( select lcxm_dxId from sp_lcxmb where  lcxm_id = (select tz_spId from tz_tzb where tz_id =#{noticeId}));
+    </select>
+	
+	<!-- 全局搜索新闻分页查询列表  -->
+    <select id="getEntireSearchPageListByNewstitle" parameterType="string" resultMap="BaseResultMap">
+       select <include refid="all_Column_List"></include>
+       from view_news
+       where xw_bt like "%"#{newsTitle}"%"
+       order by xw_xgsj desc
+    </select>
+    
+	<!-- 根据新闻栏目id搜索分页查询列表  -->
+    <select id="getSearchPageListByColumnidAndNewstitle" resultMap="BaseResultMap">
+       select <include refid="all_Column_List"></include>
+       from view_news
+       where lm_id = #{columnId} and xw_bt like "%"#{newsTitle}"%"
+       order by xw_xgsj desc
+    </select>
+	
+	<!-- 根据新闻栏目id分页查询列表  -->
+	<select id="getPageListByColumnId" parameterType="int" resultMap="BaseResultMap">
+	   select xw_id,xw_bt, xw_slt,xw_fbsj, xw_ydrs, xw_xgsj, fbr_userId, fbr_userName, lm_mc, bm_mc
+       from view_news
+       where lm_id = #{columnId} and xwzt_id = 3
+       order by xw_xgsj desc
+	</select>
+	
+	<!-- 根据新闻id查询指定的新闻 -->
+	<select id="geSingletNewsByNewsId" parameterType="string" resultMap="BaseResultMap">
+	   select xw_id,xw_bt, xw_slt, xw_ydrs, xw_xgsj, fbr_userId, fbr_userName, lm_mc, bm_mc, xw_zw
+	   from view_news
+	   where xw_id = #{id};
+	   update  xwb set
+	       xw_ydrs = xw_ydrs +1
+	   where  xw_id = #{id};  
+	</select>
+	
+	<insert id="insert" parameterType="viewNews">
+		insert into view_news (xw_id,xw_slt,
+		xw_bt, xw_fbsj,
+		xw_ydrs, xw_xgsj, xw_sfpl,
+		xw_splc, fbr_userId,
+		fbr_userName,
+		xwzt_id, xwzt_mc, lm_id,
+		lm_mc, bm_id, bm_mc, xw_zw
+		)
+		values (#{xwId}, #{xwSlt}, #{xwBt}, #{xwFbsj},
+		#{xwYdrs}, #{xwXgsj}, #{xwSfpl},
+		#{xwSplc}, #{fbrUserid}, #{fbrUsername},
+		#{xwztId}, #{xwztMc}, #{lmId},
+		#{lmMc}, #{bmId}, #{bmMc}, #{xwZw}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="viewNews">
+		insert into view_news
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="xwId != null">
+				xw_id,
+			</if>
+			<if test="xwSlt != null">
+                xw_slt,
+            </if>
+			<if test="xwBt != null">
+				xw_bt,
+			</if>
+			<if test="xwFbsj != null">
+				xw_fbsj,
+			</if>
+			<if test="xwYdrs != null">
+				xw_ydrs,
+			</if>
+			<if test="xwXgsj != null">
+				xw_xgsj,
+			</if>
+			<if test="xwSfpl != null">
+				xw_sfpl,
+			</if>
+			<if test="xwSplc != null">
+				xw_splc,
+			</if>
+			<if test="fbrUserid != null">
+				fbr_userId,
+			</if>
+			<if test="fbrUsername != null">
+				fbr_userName,
+			</if>
+			<if test="xwztId != null">
+				xwzt_id,
+			</if>
+			<if test="xwztMc != null">
+				xwzt_mc,
+			</if>
+			<if test="lmId != null">
+				lm_id,
+			</if>
+			<if test="lmMc != null">
+				lm_mc,
+			</if>
+			<if test="bmId != null">
+				bm_id,
+			</if>
+			<if test="bmMc != null">
+				bm_mc,
+			</if>
+			<if test="xwZw != null">
+				xw_zw,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="xwId != null">
+				#{xwId},
+			</if>
+			<if test="xwSlt != null">
+                #{xwSlt},
+            </if>
+			<if test="xwBt != null">
+				#{xwBt},
+			</if>
+			<if test="xwFbsj != null">
+				#{xwFbsj},
+			</if>
+			<if test="xwYdrs != null">
+				#{xwYdrs},
+			</if>
+			<if test="xwXgsj != null">
+				#{xwXgsj},
+			</if>
+			<if test="xwSfpl != null">
+				#{xwSfpl},
+			</if>
+			<if test="xwSplc != null">
+				#{xwSplc},
+			</if>
+			<if test="fbrUserid != null">
+				#{fbrUserid},
+			</if>
+			<if test="fbrUsername != null">
+				#{fbrUsername},
+			</if>
+			<if test="xwztId != null">
+				#{xwztId},
+			</if>
+			<if test="xwztMc != null">
+				#{xwztMc},
+			</if>
+			<if test="lmId != null">
+				#{lmId},
+			</if>
+			<if test="lmMc != null">
+				#{lmMc},
+			</if>
+			<if test="bmId != null">
+				#{bmId},
+			</if>
+			<if test="bmMc != null">
+				#{bmMc},
+			</if>
+			<if test="xwZw != null">
+				#{xwZw},
+			</if>
+		</trim>
+	</insert>
+</mapper>

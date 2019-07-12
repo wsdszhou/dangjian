@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.authority.UserRoleMapper">
+    
+    <!-- 根据用户id删除角色用户表对象  -->
+    <delete id="deleteRoleUserByUserId" parameterType="string">
+        delete from yh_jsb where yh_id = #{userId}
+    </delete>
+    
+    <!-- 根据用户id删除角色用户表对象  -->
+    <delete id="deleteRoleuserByRoleId" parameterType="int">
+        delete from yh_jsb   where js_id = #{roleId}
+    </delete>
+  
+    <!-- 插入一个用户角色数据 -->
+    <insert id="addUserRoleBatch" parameterType="userRole">
+        insert into yh_jsb(yh_id, js_id)
+        values 
+        <foreach collection="roleIds" item="roleId" separator=",">
+            ( #{userId} ,#{roleId} )
+        </foreach>
+    </insert>
+   
+  
+   
+    
+</mapper>

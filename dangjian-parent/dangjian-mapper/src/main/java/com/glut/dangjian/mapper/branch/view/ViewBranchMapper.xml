@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.branch.view.ViewBranchMapper">
+	<resultMap id="BaseResultMap" type="viewBranch">
+		<result column="zb_id" property="zbId" />
+		<result column="zb_mc" property="zbMc" />
+		<result column="zb_ms" property="zbMs" />
+		<result column="zb_xgsj" property="zbXgsj" />
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="zblx_id" property="zblxId" />
+		<result column="zblx_mc" property="zblxMc" />
+		<result column="sjId" property="sjid" />
+		<result column="sjXm" property="sjxm" />
+		<result column="zzwyId" property="zzwyid" />
+		<result column="zzwyXm" property="zzwyxm" />
+		<result column="xcwyId" property="xcwyid" />
+		<result column="xcwyXm" property="xcwyxm" />
+	</resultMap>
+
+	<sql id="all_column">
+		zb_id, zb_mc, zb_ms, zb_xgsj, bm_id, bm_mc, zblx_id, zblx_mc, sjId, sjXm, zzwyId, zzwyXm, xcwyId, xcwyXm
+	</sql>
+	
+	<!-- 获取支部信息 -->
+	<select id="getBranchInfoByUserid" parameterType="string" resultMap="BaseResultMap">
+	   select zb_id, zb_mc, zb_ms, zb_xgsj, bm_mc, zblx_mc, sjXm, zzwyXm, xcwyXm
+	   from view_branch
+	   where  zb_id in (select view_yhxx.zb_id from view_yhxx where user_id =#{userId})
+	</select>
+
+	<select id="getBranchPageList" parameterType="zbb" resultMap="BaseResultMap">
+		select <include refid="all_column"></include>
+		from view_branch
+		<trim prefix="where"  suffixOverrides="and">
+			<if test="zbMc != null">
+				zb_mc like "%"#{zbMc}"%" and
+			</if>
+			<if test="zbSsbmdm != null">
+				<if test="zbSsbmdm.bmId != null">
+					bm_id = #{zbSsbmdm.bmId} and
+				</if>
+			</if>
+			<if test="zbLxdm != null">
+				<if test="zbLxdm.zblxId != null">
+					zblx_id = #{zbLxdm.zblxId} and
+				</if>
+			</if>
+		</trim>
+	</select>
+
+	<insert id="insert" parameterType="viewBranch">
+		insert into view_branch
+		(zb_id, zb_mc, zb_ms,
+		zb_xgsj, bm_id, bm_mc,
+		zblx_id, zblx_mc, sjId,
+		sjXm, zzwyId, zzwyXm,
+		xcwyId, xcwyXm)
+		values (#{zbId}, #{zbMc}, #{zbMs},
+		#{zbXgsj,jdbcType=TIMESTAMP}, #{bmId}, #{bmMc},
+		#{zblxId}, #{zblxMc},
+		#{sjid},
+		#{sjxm}, #{zzwyid}, #{zzwyxm},
+		#{xcwyid}, #{xcwyxm})
+	</insert>
+	<insert id="insertSelective" parameterType="viewBranch">
+		insert into view_branch
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="zbId != null">
+				zb_id,
+			</if>
+			<if test="zbMc != null">
+				zb_mc,
+			</if>
+			<if test="zbMs != null">
+				zb_ms,
+			</if>
+			<if test="zbXgsj != null">
+				zb_xgsj,
+			</if>
+			<if test="bmId != null">
+				bm_id,
+			</if>
+			<if test="bmMc != null">
+				bm_mc,
+			</if>
+			<if test="zblxId != null">
+				zblx_id,
+			</if>
+			<if test="zblxMc != null">
+				zblx_mc,
+			</if>
+			<if test="sjid != null">
+				sjId,
+			</if>
+			<if test="sjxm != null">
+				sjXm,
+			</if>
+			<if test="zzwyid != null">
+				zzwyId,
+			</if>
+			<if test="zzwyxm != null">
+				zzwyXm,
+			</if>
+			<if test="xcwyid != null">
+				xcwyId,
+			</if>
+			<if test="xcwyxm != null">
+				xcwyXm,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="zbId != null">
+				#{zbId},
+			</if>
+			<if test="zbMc != null">
+				#{zbMc},
+			</if>
+			<if test="zbMs != null">
+				#{zbMs},
+			</if>
+			<if test="zbXgsj != null">
+				#{zbXgsj,jdbcType=TIMESTAMP},
+			</if>
+			<if test="bmId != null">
+				#{bmId},
+			</if>
+			<if test="bmMc != null">
+				#{bmMc},
+			</if>
+			<if test="zblxId != null">
+				#{zblxId},
+			</if>
+			<if test="zblxMc != null">
+				#{zblxMc},
+			</if>
+			<if test="sjid != null">
+				#{sjid},
+			</if>
+			<if test="sjxm != null">
+				#{sjxm},
+			</if>
+			<if test="zzwyid != null">
+				#{zzwyid},
+			</if>
+			<if test="zzwyxm != null">
+				#{zzwyxm},
+			</if>
+			<if test="xcwyid != null">
+				#{xcwyid},
+			</if>
+			<if test="xcwyxm != null">
+				#{xcwyxm},
+			</if>
+		</trim>
+	</insert>
+</mapper>

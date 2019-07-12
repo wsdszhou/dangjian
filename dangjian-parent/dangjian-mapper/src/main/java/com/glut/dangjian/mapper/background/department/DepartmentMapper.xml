@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.department.DepartmentMapper">
+	<resultMap id="BaseResultMap" type="bmb">
+		<id column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="bm_js" property="bmJs" />
+		<result column="bm_cjsj" property="bmCjsj" />
+		<result column="bm_xgsj" property="bmXgsj" />
+		<result column="bm_logo" property="bmLogo" />
+		<association property="bmYz" javaType="viewYhxx">
+			<result column="user_id" property="userId" />
+			<result column="yhxx_xm" property="yhxxXm" />
+		</association>
+		<association property="bmSj" javaType="viewYhxx">
+            <result column="user_id" property="userId" />
+            <result column="yhxx_xm" property="yhxxXm" />
+        </association>
+	</resultMap>
+
+	<resultMap id="ViewBmwhResultMap" type="bmb">
+		<id column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="bm_js" property="bmJs" />
+		<result column="bm_cjsj" property="bmCjsj" />
+		<result column="bm_xgsj" property="bmXgsj" />
+		<result column="bm_logo" property="bmLogo" />
+		<result column="bmYz_id" property="bmYz.yhxxId" />
+		<result column="bmYz" property="bmYz.yhxxXm"/>
+		<result column="bmSj_id" property="bmSj.yhxxId" />
+		<result column="bmSj" property="bmSj.yhxxXm"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		bm_id, bm_mc, bm_js, bm_yz, bm_sj, bm_cjsj, bm_xgsj,bm_logo
+	</sql>
+	
+	<!-- 通过部门获取id -->
+	<select id="getIdByName" parameterType="string" resultType="int">
+	   select bm_id
+	   from bmb
+	   where bm_mc =#{bmMc}
+	</select>
+
+	<!-- 通过主键查询部门对象 -->
+	<select id="selectByPrimaryKey"
+		parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from bmb
+		where bm_id = #{bmId}
+	</select>
+	
+    <!-- 通过所有的部门 -->
+    <select id="loadBranchList" resultMap="BaseResultMap">
+        select bmb.bm_id, bmb.bm_mc
+        from bmb
+    </select>
+    
+    <!-- 加载所有部门 --> 
+    <select id="getDepartMentList" resultType="bmb">
+        select bmb.bm_id, bmb.bm_mc
+        from bmb
+    </select>
+    
+	<!-- 通过用户的所有的部门 -->
+	<select id="loadBmList" resultMap="ViewBmwhResultMap">
+		SELECT
+			distinct(bmb.bm_id),
+			bmb.bm_mc,
+			bmb.bm_js,
+			bmb.bm_yz,
+			yhxx1.user_id bmSj_id,
+			yhxx1.yhxx_xm bmSj,
+			bmb.bm_sj,
+			yhxx2.user_id bmYz_id,
+			yhxx2.yhxx_xm bmYz,
+			bmb.bm_cjsj,
+			bmb.bm_xgsj,
+			bmb.bm_logo
+		FROM
+			bmb
+			left join
+			view_yhxx yhxx1 on bmb.bm_sj = yhxx1.user_id
+			left join
+			view_yhxx yhxx2 on bmb.bm_yz = yhxx2.user_id
+	</select>
+
+	<delete id="deleteByPrimaryKey" >
+		delete from bmb where
+		<foreach collection="ids" item="bmId" separator=" or ">
+		  bm_id = #{bmId}
+		</foreach>
+	</delete>
+	<insert id="insert" parameterType="bmb">
+		insert into bmb (bm_id, bm_mc)
+		values (#{bmId}, #{bmMc})
+	</insert>
+	<insert id="insertSelective" parameterType="bmb">
+		insert into bmb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bmId != null">
+				bm_id,
+			</if>
+			<if test="bmMc != null">
+				bm_mc,
+			</if>
+			<if test="bmJs != null">
+                bm_js,
+            </if>
+			<if test="bmYz != null">
+				bm_yz,
+			</if>
+			<if test="bmSj != null">
+				bm_sj,
+			</if>
+			<if test="bmCjsj != null">
+				bm_cjsj,
+			</if>
+			<if test="bmXgsj != null">
+				bm_xgsj,
+			</if>
+			<if test="bmLogo != null">
+				bm_logo,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bmId != null">
+				#{bmId},
+			</if>
+			<if test="bmMc != null">
+				#{bmMc},
+			</if>
+			<if test="bmJs != null">
+				#{bmJs},
+			</if>
+			<if test="bmYz != null">
+				#{bmYz.userId},
+			</if>
+			<if test="bmSj != null">
+				#{bmSj.userId},
+			</if>
+			<if test="bmCjsj != null">
+				#{bmCjsj},
+			</if>
+			<if test="bmXgsj != null">
+				#{bmXgsj},
+			</if>
+			<if test="bmLogo != null">
+				#{bmLogo},
+			</if>
+		</trim>;
+	   update yh_xxb 
+	   set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%学院党委书记" and dnzw_jb=2)
+	   where yhxx_id = (select user_yhxxdm from yhb where user_id = #{bmSj.userId} );
+	   update yh_xxb 
+       set yhxx_xzzwdm = (select xzzw_id from xzzwb where xzzw_mc like "%学院院长" and  xzzw_jb=2)
+       where yhxx_id = (select user_yhxxdm from yhb where user_id = #{bmYz.userId} );
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="bmb">
+		update bmb
+		<set>
+			<if test="bmMc != null">
+				bm_mc = #{bmMc},
+			</if>
+			<if test="bmYz != null">
+				bm_yz = #{bmYz.userId},
+			</if>
+			<if test="bmJs != null">
+                bm_js = #{bmJs},
+            </if>
+			<if test="bmSj != null">
+				bm_sj = #{bmSj.userId},
+			</if>
+			<if test="bmCjsj != null">
+				bm_cjsj = #{bmCjsj},
+			</if>
+			<if test="bmXgsj != null">
+				bm_xgsj = #{bmXgsj},
+			</if>
+			<if test="bmLogo != null">
+				bm_logo = #{bmLogo},
+			</if>
+		</set>
+		where bm_id = #{bmId};
+		update yh_xxb 
+        set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%学院党委书记" and dnzw_jb=2)
+        where yhxx_id = (select user_yhxxdm from yhb where user_id = #{bmSj.userId} );
+        update yh_xxb 
+        set yhxx_xzzwdm = (select xzzw_id from xzzwb where xzzw_mc like "%学院院长" and  xzzw_jb=2)
+        where yhxx_id = (select user_yhxxdm from yhb where user_id = #{bmYz.userId} );
+	</update>
+	<update id="updateByPrimaryKey" parameterType="bmb">
+		update bmb
+		set
+		bm_mc = #{bmMc},
+		bm_yz = #{bmYz.userId},
+		bm_sj = #{bmSj.userId},
+		bm_cjsj = #{bmCjsj},
+		bm_xgsj = #{bmXgsj},
+		bm_logo = #{bmLogo}
+		where bm_id = #{bmId};
+		update yh_xxb 
+       set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%学院党委书记" and dnzw_jb=2)
+       where yhxx_id = (select user_yhxxdm from yhb where user_id = #{bmSj.userId} );
+       update yh_xxb 
+       set yhxx_xzzwdm = (select xzzw_id from xzzwb where xzzw_mc like "%学院院长" and  xzzw_jb=2)
+       where yhxx_id = (select user_yhxxdm from yhb where user_id = #{bmYz.userId} );
+	</update>
+</mapper>

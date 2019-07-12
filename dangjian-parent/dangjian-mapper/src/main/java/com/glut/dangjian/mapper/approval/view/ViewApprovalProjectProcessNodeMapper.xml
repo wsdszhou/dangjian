@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.view.ViewApprovalProjectProcessNodeMapper">
+	<resultMap id="BaseResultMap" type="viewApprovalProjectProcessNode">
+	    <result column="lcxm_id" property="lcxmId" />
+	    <result column="lcxm_mc" property="lcxmMc" />
+	    <result column="lcxm_xmms" property="lcxmXmms" />
+	    <result column="lcxm_dqspzt" property="lcxmDqspzt" />
+	    <result column="lcxm_resulte" property="lcxmResulte" />
+	    <result column="lcxm_xgsj" property="lcxmXgsj" />
+	    <result column="spjd_id" property="spjdId" />
+	    <result column="spjd_mc" property="spjdMc" />
+	    <result column="spjd_dqspzt" property="spjdDqspzt" />
+	    <result column="spjd_xyspjddm" property="spjdXyspjddm" />
+	    <result column="spjd_xyjdmc" property="spjdXyjdmc" />
+	    <result column="spjd_isFirst" property="spjdIsfirst" />
+	    <result column="splc_id" property="splcId" />
+	    <result column="splc_mc" property="splcMc" />
+	    <result column="splc_state" property="splcState" />
+	    <result column="splc_ywdm" property="splcYwdm" />
+	    <result column="spgw_id" property="spgwId" />
+	    <result column="spgw_spgwmc" property="spgwSpgwmc" />
+  </resultMap>
+	
+	<!-- 所有字段 -->
+	<sql id="AllColumn">
+	   lcxm_id, lcxm_mc, lcxm_xmms, lcxm_dqspzt, lcxm_resulte, lcxm_xgsj
+	   spjd_id, spjd_mc, spjd_dqspzt, spjd_xyspjddm, spjd_xyjdmc, spjd_isFirst,
+	   splc_id, splc_mc, splc_state, splc_ywdm, spgw_id, spgw_spgwmc
+	</sql>
+	
+	<sql id="pageListColumn">
+	   lcxm_id, lcxm_mc, lcxm_xmms, lcxm_dqspzt, lcxm_resulte, spjd_id, spjd_mc, lcxm_xgsj
+	   spjd_xyspjddm, spjd_xyjdmc, splc_id, splc_mc, splc_ywdm, spgw_id, spgw_spgwmc
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getApprovalProjectPageList" parameterType="viewApprovalProjectProcessNode" resultType="viewApprovalProjectProcessNode">
+	   select <include refid="pageListColumn"></include>
+	   from view_approval_project_process_node
+	   <trim suffixOverrides="and ">
+	   where
+	        lcxm_xmms like '%${lcxmXmms}%' and 
+	        <if test="lcxmMc != null">
+	          lcxm_mc like '%${lcxmMc}%' and  
+	        </if>
+	        <if test="lcxmDqspzt != null">
+	          lcxm_dqspzt = #{lcxmDqspzt}  and
+	        </if>
+	        <if test="lcxmResulte != null">
+	          lcxm_resulte = #{lcxmResulte} and
+	        </if>
+	        <if test="spjdMc != null">
+	          spjd_mc = #{spjdMc} and 
+	        </if>
+	        <if test="spjdId != null">
+	          spjd_id = #{spjdId} and 
+	        </if>
+	        <if test="splcId != null">
+	          #{splcId} =  #{splcId} and 
+	        </if>
+	        <if test="spjdIsfirst != null">
+	          spjd_isFirst = #{spjdIsfirst},
+	        </if>
+	        <if test="splcMc != null">
+	          splc_mc like '%${splcMc}%' and 
+	        </if>
+	        <if test="splcYwdm != null">
+	          splc_ywdm = #{splcYwdm} and
+	        </if>
+	        <if test="spgwSpgwmc != null">
+	          spgw_spgwmc like '%${spgwSpgwmc}%' and
+	        </if>
+	   </trim>
+	   order by lcxm_resulte asc, lcxm_id desc, lcxm_xgsj asc, lcxm_dqspzt asc
+	</select>
+	
+	
+	<!-- 插入一条视图 -->
+	<insert id="insert" parameterType="viewApprovalProjectProcessNode">
+	    insert into view_approval_project_process_node (lcxm_id, lcxm_mc, lcxm_xmms, 
+	      lcxm_dqspzt, lcxm_resulte, lcxm_xgsj, 
+	      spjd_id, spjd_mc, spjd_dqspzt, 
+	      spjd_xyspjddm, spjd_xyjdmc, spjd_isFirst, 
+	      splc_id, splc_mc, splc_state, 
+	      splc_ywdm, spgw_id, spgw_spgwmc
+	      )
+	    values (#{lcxmId}, #{lcxmMc}, #{lcxmXmms}, 
+	      #{lcxmDqspzt}, #{lcxmResulte}, #{lcxmXgsj}, 
+	      #{spjdId}, #{spjdMc}, #{spjdDqspzt}, 
+	      #{spjdXyspjddm}, #{spjdXyjdmc}, #{spjdIsfirst}, 
+	      #{splcId}, #{splcMc}, #{splcState}, 
+	      #{splcYwdm}, #{spgwId}, #{spgwSpgwmc}
+	      )
+	  </insert>
+	  
+	<!-- 插入一条视图,并且判断是否为空  -->  
+    <insert id="insertSelective" parameterType="viewApprovalProjectProcessNode">
+	  insert into view_approval_project_process_node
+	  <trim prefix="(" suffix=")" suffixOverrides=",">
+	    <if test="lcxmId != null">
+	      lcxm_id,
+	    </if>
+	    <if test="lcxmMc != null">
+	      lcxm_mc,
+	    </if>
+	    <if test="lcxmXmms != null">
+	      lcxm_xmms,
+	    </if>
+	    <if test="lcxmDqspzt != null">
+	      lcxm_dqspzt,
+	    </if>
+	    <if test="lcxmResulte != null">
+	      lcxm_resulte,
+	    </if>
+	    <if test="lcxmXgsj != null">
+	      lcxm_xgsj,
+	    </if>
+	    <if test="spjdId != null">
+	      spjd_id,
+	    </if>
+	    <if test="spjdMc != null">
+	      spjd_mc,
+	    </if>
+	    <if test="spjdDqspzt != null">
+	      spjd_dqspzt,
+	    </if>
+	    <if test="spjdXyspjddm != null">
+	      spjd_xyspjddm,
+	    </if>
+	    <if test="spjdXyjdmc != null">
+	      spjd_xyjdmc,
+	    </if>
+	    <if test="spjdIsfirst != null">
+	      spjd_isFirst,
+	    </if>
+	    <if test="splcId != null">
+	      splc_id,
+	    </if>
+	    <if test="splcMc != null">
+	      splc_mc,
+	    </if>
+	    <if test="splcState != null">
+	      splc_state,
+	    </if>
+	    <if test="splcYwdm != null">
+	      splc_ywdm,
+	    </if>
+	    <if test="spgwId != null">
+	      spgw_id,
+	    </if>
+	    <if test="spgwSpgwmc != null">
+	      spgw_spgwmc,
+	    </if>
+	  </trim>
+	  <trim prefix="values (" suffix=")" suffixOverrides=",">
+	    <if test="lcxmId != null">
+	      #{lcxmId},
+	    </if>
+	    <if test="lcxmMc != null">
+	      #{lcxmMc},
+	    </if>
+	    <if test="lcxmXmms != null">
+	      #{lcxmXmms},
+	    </if>
+	    <if test="lcxmDqspzt != null">
+	      #{lcxmDqspzt},
+	    </if>
+	    <if test="lcxmResulte != null">
+	      #{lcxmResulte},
+	    </if>
+	    <if test="lcxmXgsj != null">
+	      #{lcxmXgsj},
+	    </if>
+	    <if test="spjdId != null">
+	      #{spjdId},
+	    </if>
+	    <if test="spjdMc != null">
+	      #{spjdMc},
+	    </if>
+	    <if test="spjdDqspzt != null">
+	      #{spjdDqspzt},
+	    </if>
+	    <if test="spjdXyspjddm != null">
+	      #{spjdXyspjddm},
+	    </if>
+	    <if test="spjdXyjdmc != null">
+	      #{spjdXyjdmc},
+	    </if>
+	    <if test="spjdIsfirst != null">
+	      #{spjdIsfirst},
+	    </if>
+	    <if test="splcId != null">
+	      #{splcId},
+	    </if>
+	    <if test="splcMc != null">
+	      #{splcMc},
+	    </if>
+	    <if test="splcState != null">
+	      #{splcState},
+	    </if>
+	    <if test="splcYwdm != null">
+	      #{splcYwdm},
+	    </if>
+	    <if test="spgwId != null">
+	      #{spgwId},
+	    </if>
+	    <if test="spgwSpgwmc != null">
+	      #{spgwSpgwmc},
+	    </if>
+	  </trim>
+	</insert>
+</mapper>

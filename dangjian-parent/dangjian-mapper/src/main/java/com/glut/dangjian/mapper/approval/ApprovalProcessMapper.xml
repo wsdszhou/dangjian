@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.ApprovalProcessMapper">
+
+	<resultMap id="BaseResultMap" type="spSplcb">
+	    <id column="splc_id" jdbcType="INTEGER" property="splcId" />
+	    <result column="splc_mc" jdbcType="VARCHAR" property="splcMc" />
+	    <result column="splc_state" jdbcType="INTEGER" property="splcState" />
+	    <result column="splc_ywdm" jdbcType="VARCHAR" property="splcYwdm" />
+    </resultMap>
+    
+	<sql id="Base_Column_List">
+		splc_id, splc_state, splc_mc, splc_ywdm
+	</sql>
+	
+	<select id="getSpprovalProcessMapperIdByName" parameterType="string" resultMap="BaseResultMap">
+        select splc_id, splc_mc
+        from sp_splcb
+        where splc_mc like "%"#{newsapproval}"%"
+    </select>
+	
+	<select id="loadApprovalProcess" resultType="spSplcb">
+	   select splc_id, splc_mc
+	   from sp_splcb 
+	</select>
+	
+	<!-- 通过id删除审批流程 -->
+	<select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from sp_splcb
+		where splc_id = #{splcId}
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="approvalList" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from sp_splcb
+    </select>
+	
+	<!-- 删除一条审批流程 -->
+	<delete id="deleteBrantch" >
+	    delete from sp_spjdb where
+        <foreach collection="ids" item="id" separator=" or ">
+             spjd_lcdm = #{id}
+        </foreach>;
+	
+		delete from sp_splcb where
+		<foreach collection="ids" item="id" separator=" or ">
+    		 splc_id = #{id}
+		</foreach>;
+		
+		
+	</delete>
+	
+	<!-- 插入一条审批流程，并且判断是否为空 -->
+	<insert id="insert" parameterType="spSplcb">
+		insert into sp_splcb (splc_id, splc_mc, splc_state, 
+	      splc_ywdm)
+	    values (#{splcId}, #{splcMc}, #{splcState}, 
+	      #{splcYwdm})
+	</insert>
+	
+	<!-- 通过主键Id查询审批流程 -->
+	<insert id="insertSelective" parameterType="spSplcb">
+	   insert into sp_splcb
+	    <trim prefix="(" suffix=")" suffixOverrides=",">
+	      <if test="splcId != null">
+	        splc_id,
+	      </if>
+	      <if test="splcMc != null">
+	        splc_mc,
+	      </if>
+	      <if test="splcState != null">
+	        splc_state,
+	      </if>
+	      <if test="splcYwdm != null">
+	        splc_ywdm,
+	      </if>
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="splcId != null">
+	        #{splcId},
+	      </if>
+	      <if test="splcMc != null">
+	        #{splcMc},
+	      </if>
+	      <if test="splcState != null">
+	        #{splcState},
+	      </if>
+	      <if test="splcYwdm != null">
+	        #{splcYwdm},
+	      </if>
+	    </trim>
+	</insert>
+	
+	<!--修改审批流程信息，并且判断是否为空  -->
+	<update id="updateByIdSelective" parameterType="spSplcb">
+		update sp_splcb
+	    <set>
+	      <if test="splcMc != null">
+	        splc_mc = #{splcMc},
+	      </if>
+	      <if test="splcState != null">
+	        splc_state = #{splcState},
+	      </if>
+	      <if test="splcYwdm != null">
+	        splc_ywdm = #{splcYwdm},
+	      </if>
+	    </set>
+	    where splc_id = #{splcId}
+	</update>
+	
+	<!-- 修改审批流程信息 -->
+	<update id="updateById" parameterType="spSplcb">
+		update sp_splcb
+	    set splc_mc = #{splcMc},
+	      splc_state = #{splcState},
+	      splc_ywdm = #{splcYwdm}
+	    where splc_id = #{splcId}
+	</update>
+</mapper>

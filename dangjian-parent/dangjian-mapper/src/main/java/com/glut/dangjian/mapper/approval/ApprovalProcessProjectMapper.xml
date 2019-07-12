@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.ApprovalProcessProjectMapper">
+	
+	<resultMap id="BaseResultMap" type="spLcxmb">
+		<id column="lcxm_id"  property="lcxmId" />
+	    <result column="lcxm_mc"  property="lcxmMc" />
+		<result column="lcxm_xmms" property="lcxmXmms" />
+	    <result column="splb_dqspzt"  property="splbDqspzt" />
+	    <result column="splb_resulte"  property="splbResulte" />
+	    <result column="splb_xgsj" property="splbXgsj" />
+	    <result column="lcxm_dxId" property="lcxmDxId" />
+	    <association property="splbDqjddm" javaType="spSpjdb">
+	        <id column="spjd_id"  property="spjdId" />
+	        <result column="spjd_mc"  property="spjdMc" />
+	        <result column="spjd_dqlcxmmc"  property="spjdDqlcxmmc" />
+	        <result column="spjd_xyjdmc" property="spjdXyjdmc" />
+	        <result column="spjd_dqspzt"  property="spjdDqspzt" />
+	    </association>
+		<association property="lcxmSplcdm" javaType="spSplcb">
+		     <id column="splc_id"  property="splcId" />
+	        <result column="splc_mc"  property="splcMc" />
+	        <result column="splc_state"  property="splcState" />
+		</association> 
+    </resultMap>
+    
+	<sql id="Base_Column_List">
+		lcxm_id, lcxm_mc, lcxm_splcdm, lcxm_xmms,lcxm_dqjddm, lcxm_dqspzt, lcxm_resulte, lcxm_dxId
+	</sql>
+	
+	<select id="getApprovalNumByUserId" parameterType="string" resultType="int">
+	   select count(tz_spId)
+	   from tz_tzb, tz_tzdxb
+	   where tzdx_tzdm = tz_id and tzdx_btzyhdm = #{userId} and tzdx_sfyd =0 and tzdx_ydsj is null
+	</select>
+	
+	<!-- 根据通知id获取审批对象id -->
+	<select id="getApprovalObjectIdByNoticeId" parameterType="string" resultType="string">
+	   select lcxm_dxId
+	   from sp_lcxmb
+	   where lcxm_id = (select tz_spId from tz_tzb where tz_id = #{noticeId})
+	</select>
+	
+	<!-- 删除审批 -->
+	<delete id="cancelApply" parameterType="string">
+	   <!-- 删除通知对象表数据 -->
+	   delete from tz_tzdxb where tzdx_tzdm = (select tz_spId from tz_tzb where tz_spId = #{partyInfoId});
+	   <!-- 删除通知表数据 -->
+       delete from tz_tzb where tz_spId = #{partyInfoId};
+       <!-- 删除审批项目表数据 -->
+       delete from sp_lcxmb where lcxm_id =  #{partyInfoId};
+	</delete>
+	
+	<delete id="deleteBySpLcxmbId" parameterType="string">
+	   delete from sp_lcxmb where lcxm_id = #{id}
+	</delete>
+	
+	<select id="getNoApprovalPartByObjectId" resultMap="BaseResultMap">
+	   select lcxm_id, lcxm_mc, lcxm_xmms
+	   from sp_lcxmb
+	   where lcxm_dxId = #{id} and lcxm_dqspzt = 0 
+	</select>
+	
+	<!-- 根据需要提交审批对象id获取审批对象 -->
+	<select id="getApprovalProjectByObjectId" parameterType="string" resultMap="BaseResultMap">
+        select lcxm_id, lcxm_mc, lcxm_xmms,lcxm_dqjddm, lcxm_dqspzt, lcxm_resulte, lcxm_dxId, splc_id, splc_mc
+        from sp_lcxmb, sp_splcb
+        where lcxm_splcdm = splc_id and splc_state = 1 and lcxm_dxId = #{lcxmDxId}
+        order by lcxm_xgsj asc
+        limit 1
+    </select> 
+	
+	<!-- 根据id获取审批项目 -->
+	<select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from sp_lcxmb
+		where lcxm_id = #{lcxmId}
+	</select> 
+	
+	<!-- 根据id删除审批对象 -->
+	<delete id="deleteBatchById">
+	   <foreach collection="ids" item="id" separator="; ">
+	       <!-- 删除审批 -->
+           delete from sp_lcxmb where lcxm_id = #{id};
+           <!-- 删除通知对象 -->
+           delete from tz_tzdxb where tzdx_tzdm = (select tz_id from tz_tzb where tz_spId = #{id} );
+           <!-- 删除通知 -->
+            delete from tz_tzb where tz_spId = #{id};
+	   </foreach>
+	</delete>
+	
+	<insert id="insert" parameterType="spLcxmb">
+		insert into sp_lcxmb (lcxm_id, lcxm_mc, lcxm_splcdm, lcxm_xmms, lcxm_dqjddm, lcxm_dqspzt, lcxm_xgsj, lcxm_dxId)
+		values
+		(#{lcxmId}, #{lcxmMc}, #{lcxmSplcdm.splc_id}, #{lcxmXmms},#{splbDqjddm.spjdId}, #{splbDqspzt},  #{splbXgsj}, #{lcxmDxId} )
+	</insert> 
+	
+	 <insert id="insertSelective" parameterType="spLcxmb">
+		insert into sp_lcxmb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="lcxmId != null">
+				lcxm_id,
+			</if>
+			<if test="lcxmMc != null">
+				lcxm_mc,
+			</if>
+			<if test="lcxmSplcdm != null">
+				lcxm_splcdm,
+			</if>
+			<if test="lcxmXmms != null">
+				lcxm_xmms,
+			</if>
+			<if test="splbDqjddm != null">
+                lcxm_dqjddm,
+            </if>
+			<if test="splbDqspzt != null">
+				lcxm_dqspzt ,
+			</if>
+			<if test="splbXgsj != null">
+                lcxm_xgsj ,
+            </if>
+            <if test="lcxmDxId != null">
+                lcxm_dxId ,
+            </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="lcxmId != null">
+				#{lcxmId},
+			</if>
+			<if test="lcxmMc != null">
+				#{lcxmMc},
+			</if>
+			<if test="lcxmSplcdm != null">
+				#{lcxmSplcdm.splcId},
+			</if>
+			<if test="lcxmXmms != null">
+				#{lcxmXmms},
+			</if>
+			<if test="splbDqjddm != null">
+                #{splbDqjddm.spjdId},
+            </if>
+			<if test="splbDqspzt != null">
+				#{splbDqspzt},
+			</if>
+			<if test="splbXgsj != null">
+                #{splbXgsj} ,
+            </if>
+            <if test="lcxmDxId != null">
+                #{lcxmDxId} ,
+            </if>
+		</trim>
+	</insert>
+	
+	
+	<update id="updateByIdSelective" parameterType="spLcxmb">
+		update sp_lcxmb
+		<set>
+			<if test="splbDqjddm != null">
+				lcxm_dqjddm = #{splbDqjddm.spjdId},
+            </if>
+			<if test="lcxmMc != null">
+				lcxm_mc = #{lcxmMc},
+			</if>
+			<if test="lcxmXmms != null">
+				lcxm_xmms = #{lcxmXmms},
+			</if>
+			<if test="splbDqspzt != null">
+				lcxm_dqspzt = #{splbDqspzt},
+			</if>
+			<if test="splbResulte != null">
+                lcxm_resulte = #{splbResulte},
+            </if>
+			<if test="lcxmDxId != null">
+                lcxm_dxId = #{lcxmDxId} ,
+            </if>
+		</set>
+		where lcxm_id = #{lcxmId}
+	</update>
+	
+	
+	<update id="updateById" parameterType="spLcxmb">
+		update sp_lcxmb set
+		lcxm_dqjddm = #{splbDqjddm.spjdId},
+		lcxm_mc = #{lcxmMc},
+		lcxm_xmms = #{lcxmXmms},
+		lcxm_dqspzt = #{splbDqspzt},
+		lcxm_resulte = #{splbResulte},
+		lcxm_dxId = #{lcxmDxId}
+		where lcxm_id = #{lcxmId}
+	</update>   
+</mapper>

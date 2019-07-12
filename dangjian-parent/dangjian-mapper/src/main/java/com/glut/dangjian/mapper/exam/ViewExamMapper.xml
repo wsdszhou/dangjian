@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.exam.ViewExamMapper">
+
+    <insert id="insertKszxYhsj" parameterType="com.glut.dangjian.entity.kszx.KszxYhsj">
+        insert into kszx_yhsj (yhid, sjid, st,ksdjsj,jsdjsj) values (#{userId},#{testpaperId},#{questions},#{startTime},#{endTime})
+    </insert>
+
+    <insert id="modifyKszxYhda">
+        <foreach collection="list" item="item" separator=";" close="" open="" index="index">
+            INSERT INTO kszx_yhda (yhid,sjid,stid,xsda) VALUES (#{userId},#{testpaperId},#{item.questionId},#{item.studentAnswer})
+            ON DUPLICATE KEY UPDATE xsda=#{item.studentAnswer}
+        </foreach>
+    </insert>
+
+    <update id="updateYhsjXscj" parameterType="com.glut.dangjian.entity.kszx.KszxYhsj">
+        update kszx_yhsj set xscj=#{studentScore} where yhid=#{userId} and sjid=#{testpaperId}
+    </update>
+
+    <select id="selectViewExamTestPaper" resultType="viewExamTestPaper">
+      select
+        id,
+        sjbt `name`,
+        kssm description,
+        stzs questionNumber,
+        jgfs passScore,
+        kssj startTime,
+        jssj endTime,
+        djsj examTime
+      from kszx_sj where sjzt=1
+
+    </select>
+    <select id="selectViewExamTestPaperById" resultType="viewExamTestPaper">
+      SELECT
+        id,
+        sjbt `name`,
+        kssm description,
+        zjfs generateWay,
+        stzs questionNumber,
+        sjzf totalScore,
+        jgfs passScore,
+        dxtssl multipleNum,
+        dxtsl singleNum,
+        pdtsl judgementNum,
+        dxtfs singleScore,
+        dxtsfs multipleScore,
+        pdtfs judgementScore,
+        djsj examTime,
+        kssj startTime,
+        jssj endTime,
+        sjzt `status`
+      from kszx_sj where id=#{id}
+  </select>
+
+    <resultMap id="ViewExamQuestionFixNoAnswer" type="com.glut.dangjian.entity.kszx.view.ViewExamQuestion">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <collection property="options" ofType="com.glut.dangjian.entity.kszx.view.ViewExamQuestionOption">
+            <result property="num" column="num"/>
+            <result property="value" column="value"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectViewExamQuestionFixNoAnswer" resultMap="ViewExamQuestionFixNoAnswer">
+        select
+        st.id,
+        st.stmc `name`,
+        st.stlx `type`,
+        stxx.xx num,
+        stxx.xxz `value`
+        from kszx_st st
+        LEFT JOIN kszx_stxx stxx on st.id=stxx.stid
+        where st.id in(select st from kszx_sj_gdst where sj=#{id})
+    </select>
+    <select id="selectJudgementId" resultType="java.lang.Integer">
+        select id from kszx_st where stlx='判断题'
+    </select>
+    <select id="selectSingleId" resultType="java.lang.Integer">
+        select id from kszx_st where stlx='单选题'
+    </select>
+    <select id="selectMultipleId" resultType="java.lang.Integer">
+        select id from kszx_st where stlx='多选题'
+    </select>
+    <select id="selectViewExamQuestionFixNoAnswerByIdList" resultMap="ViewExamQuestionFixNoAnswer">
+        select
+        st.id,
+        st.stmc `name`,
+        st.stlx `type`,
+        stxx.xx num,
+        stxx.xxz `value`
+        from kszx_st st
+        LEFT JOIN kszx_stxx stxx on st.id=stxx.stid
+        where st.id in
+        <foreach collection="list" open="(" close=")" item="qid" separator=",">
+            #{qid}
+        </foreach>
+    </select>
+
+    <select id="selectYhsj" resultType="com.glut.dangjian.entity.kszx.KszxYhsj">
+        select
+        id,
+        yhid userId,
+        sjid testpaperId,
+        st questions,
+        xscj studentScore,
+        ksdjsj startTime,
+        jsdjsj endTime
+        from kszx_yhsj where yhid=#{userId} and sjid=#{testpaperId}
+    </select>
+
+    <resultMap id="ViewExamQuestionWithUserAnswer" type="com.glut.dangjian.entity.kszx.view.ViewExamQuestion">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="answer" column="answer"/>
+        <collection property="options" ofType="com.glut.dangjian.entity.kszx.view.ViewExamQuestionOption">
+            <result property="num" column="num"/>
+            <result property="value" column="value"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectViewExamQuestionWithUserAnswer" resultMap="ViewExamQuestionWithUserAnswer" parameterType="com.glut.dangjian.entity.kszx.KszxYhsj">
+        SELECT
+        st.id,
+        st.stmc `name`,
+        st.stlx `type`,
+        yhda.xsda answer,
+        stxx.xx num,
+        stxx.xxz `value`
+        FROM
+        kszx_st st
+        LEFT JOIN kszx_yhda yhda ON st.id = yhda.stid AND yhda.yhid = #{userId} and yhda.sjid=#{testpaperId}
+        LEFT JOIN kszx_stxx stxx on st.id=stxx.stid
+        WHERE
+        st.id IN (
+        <foreach collection="questions.split(',')" separator="," item="item" index="index">
+            #{item}
+        </foreach>
+        )
+    </select>
+
+
+    <select id="selectViewExamTestPaperByUserId" resultType="viewExamTestPaper">
+      select
+        id,
+        sjbt `name`,
+        kssm description,
+        stzs questionNumber,
+        jgfs passScore,
+        kssj startTime,
+        jssj endTime,
+        djsj examTime,
+        pdtsl judgementNum,
+        dxtsl singleNum,
+        dxtssl multipleNum
+      from kszx_sj sj
+			where sj.sjzt=1 and sj.id not in (select yhsj.sjid from kszx_yhsj yhsj where yhsj.yhid = #{userId}) and now() &lt; sj.jssj
+    </select>
+
+    <select id="selectViewExamTestPaperTestedByUserId"
+            resultType="viewExamTestPaper">
+        SELECT
+	sj.id,
+	sj.sjbt `name`,
+	sj.stzs questionNumber,
+	sj.jgfs passScore,
+	sj.kssj startTime,
+	sj.jssj endTime,
+	sj.sjzf totalScore,
+	yhsj1.xscj studentScore
+FROM
+	kszx_sj sj
+	LEFT JOIN kszx_yhsj yhsj1 ON sj.id = yhsj1.sjid
+WHERE
+	sj.sjzt = 1
+	AND sj.id IN ( SELECT yhsj.sjid FROM kszx_yhsj yhsj WHERE yhsj.yhid = #{userId} )
+	AND ( yhsj1.xscj IS NOT NULL OR ( yhsj1.xscj IS NULL AND now( ) > yhsj1.jsdjsj ) )
+    </select>
+
+    <select id="selectViewExamTestPaperTestingByUserId" resultType="viewExamTestPaper">
+        SELECT
+        sj.id,
+        sj.sjbt `name`,
+        sj.kssm description,
+        sj.stzs questionNumber,
+        sj.jgfs passScore,
+        sj.kssj startTime,
+        sj.jssj endTime,
+        sj.djsj examTime,
+        sj.pdtsl judgementNum,
+        sj.dxtsl singleNum,
+        sj.dxtssl multipleNum
+        FROM
+        kszx_sj sj
+        WHERE
+        sj.sjzt = 1
+        AND sj.id IN (
+        SELECT
+        yhsj.sjid
+        FROM
+        kszx_yhsj yhsj
+        WHERE
+        yhsj.yhid = #{userId}
+        AND
+          NOW() &lt; yhsj.jsdjsj and yhsj.xscj is null and now() &lt; sj.jssj)
+    </select>
+
+    <select id="selectUserAnswerAndTestpaperQuestionAnswer" resultType="map">
+        SELECT
+        st.id questionId,
+        st.stlx questionType,
+        st.stda questionAnswer,
+        yhda.xsda studentAnswer
+        FROM
+        kszx_st st
+        left join kszx_yhda yhda on yhda.stid=st.id and yhda.yhid=#{userId}
+        WHERE
+        st.id IN (
+        <foreach collection="questions.split(',')" separator="," item="item" index="index">
+            #{item}
+        </foreach>
+        )
+    </select>
+</mapper>

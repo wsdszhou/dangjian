@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxSjGdstMapper">
+
+    <insert id="insert">
+        insert into kszx_sj_gdst (stlx, sj, st, fs)
+        VALUES
+        <foreach collection="gdsts" item="item" index="index" separator="," >
+            (#{item.stlx},#{sjid},#{item.id},#{item.fs})
+        </foreach>
+    </insert>
+
+    <insert id="insertOne" parameterType="kszxSjGdst">
+        insert into kszx_sj_gdst (stlx, sj, st) values (#{stlx},#{sj},#{st});
+    </insert>
+
+    <delete id="deleteOne">
+        delete from kszx_sj_gdst where sj=#{sj} and st=#{st}
+    </delete>
+
+    <delete id="deleteBySjid">
+        delete from kszx_sj_gdst where sj=#{sjid}
+    </delete>
+
+    <select id="selectBySjid" resultType="kszxSjGdst">
+        select g.id,g.stlx,g.sj,g.st,s.stmc question,g.fs,s.stnd,t.`name` stfl from kszx_sj_gdst g,kszx_st s,kszx_tmfl t where g.sj=#{sjid} and g.st=s.id and t.id=s.stfl
+    </select>
+
+    <select id="selectQuestionView1" resultType="java.util.Map">
+        select gdst.st id,st.stmc stmc,tmfl.`name` stfl,st.stfl stflid,gdst.stlx stlx,gdst.fs stfs,st.stnd stnd from kszx_sj_gdst gdst
+        LEFT JOIN kszx_st st on gdst.st=st.id
+        LEFT JOIN kszx_tmfl tmfl on tmfl.id=st.stfl
+        where gdst.sj=#{sjid}
+    </select>
+    <select id="countQuestionType" resultType="map">
+      SELECT stlx,count(stlx) number from kszx_sj_gdst where sj=#{sjid}
+      GROUP BY stlx
+    </select>
+</mapper>

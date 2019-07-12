@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.authority.FunctionMapper">
+	<resultMap id="BaseResultMap" type="function">
+		<id column="mk_id" property="mkId" />
+		<result column="mk_mc" property="mkMc" />
+		<result column="mk_code" property="mkCode" />
+		<result column="mk_f_id" property="mkFId" />
+		<result column="mk_sfsccd" property="mkSfsccd" />
+		<result column="mk_px" property="mkPx" />
+		<result column="mk_url" property="mkUrl" />
+		<result column="mk_ms" property="mkMs" />
+		<result column="mk_icon" property="mkIcon" />
+		<result column="mk_xgsj" property="mkXgsj" />
+	</resultMap>
+	
+	<resultMap id="FunctionRoleMap" type="functionRole">
+        <result column="js_id" property="roleId" />
+        <result column="mk_id" property="functionId" />
+    </resultMap>
+	
+	<sql id="Base_Column_List">
+		mk_id, mk_mc, mk_code, mk_f_id, mk_sfsccd, mk_px, mk_url, mk_ms, mk_icon, mk_xgsj 
+	</sql>
+	<!-- 通过角色id加载模块 -->
+	<select id="loadFunctonListByRoleId" parameterType="int" resultMap="FunctionRoleMap">
+        select distinct(js_id), mk_id
+        from js_mk
+        where  js_id = #{roleId}
+    </select>
+    
+	<!-- 获取所有的模块 -->
+	<select id="getFunctionAllList"  resultType="function">
+        <!-- select mk_id, mk_mc, mk_f_id
+        from mkb  -->
+        select mk_id, mk_mc, mk_f_id,mk_code
+        from mkb
+    </select>
+	
+	<!-- 分页查询模块 -->
+	<select id="getFunctionPageList" parameterType="function"  resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from mkb
+        where 
+        <trim prefix="(" suffix=")" suffixOverrides="and ">
+            <if test="mkMc == null">
+                mk_mc  like '%%'  and
+            </if>
+            <if test="mkMc != null">
+                mk_mc  like '%${mkMc}%'  and
+            </if>
+            <if test="mkCode != null">
+                mk_code like '%${mkCode}%'  and
+            </if>
+            <if test="mkFId != null">
+                mk_f_id = #{mkFId}  and
+            </if>
+            <if test="mkSfsccd != null">
+                mk_sfsccd =  #{mkSfsccd}  and
+            </if>
+            <if test="mkPx != null">
+                mk_px = #{mkPx}  and
+            </if>
+            <if test="mkMs != null">
+                mk_ms  like '%${mkMs}%'  and 
+            </if>
+        </trim>
+        order by mk_xgsj desc, mk_f_id desc, mk_px asc, mk_id asc
+    </select>
+    
+	<!-- 根据用户userid获取功能模块 -->
+    <select id="getFunctionCodeListByuserId" parameterType="string"  resultMap="BaseResultMap">
+        select distinct(mk_id), mk_mc,mk_code
+        from view_user_role_function
+        where  user_id = #{userId}
+    </select>
+    
+	<!-- 获取功能模块 -->
+	<select id="getFunctionList"  resultMap="BaseResultMap">
+        select distinct(mk_id), mk_mc, mk_url, mk_icon, mk_f_id 
+        from mkb
+        where mk_sfsccd = 1
+    </select>
+    
+    <!-- 根据获取功能模块 -->
+    <select id="getFunctionListByuserId" parameterType="string"  resultMap="BaseResultMap">
+        select distinct(mk_id), mk_mc, mk_url, mk_icon, mk_f_id 
+        from view_user_role_function
+        where mk_sfsccd = 1 and user_id = #{userId}
+    </select>
+    
+    
+	
+	<!-- 根据id查询模块信息 -->
+	<select id="selectById" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from mkb
+		where mk_id = #{mkId}
+	</select>
+	
+	<!-- 删除模块信息 -->
+	<delete id="deleteById" parameterType="java.lang.Integer">
+		delete from mkb
+		where mk_id = #{mkId}
+	</delete>
+	
+	<!-- 添加模块信息 -->
+	<insert id="insert" parameterType="function">
+		insert into mkb (mk_id, mk_mc, mk_code,
+		mk_f_id, mk_sfsccd, mk_px,
+		mk_url, mk_ms, mk_icon,
+		mk_xgsj)
+		values (#{mkId}, #{mkMc}, #{mkCode},
+		#{mkFId}, #{mkSfsccd}, #{mkPx},
+		#{mkUrl}, #{mkMs}, #{mkIcon},
+		#{mkXgsj})
+	</insert>
+	
+	<!-- 添加模块信息，并且判断是否为空 -->
+	<insert id="insertSelective" parameterType="function">
+		insert into mkb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="mkId != null">
+				mk_id,
+			</if>
+			<if test="mkMc != null">
+				mk_mc,
+			</if>
+			<if test="mkCode != null">
+				mk_code,
+			</if>
+			<if test="mkFId != null">
+				mk_f_id,
+			</if>
+			<if test="mkSfsccd != null">
+				mk_sfsccd,
+			</if>
+			<if test="mkPx != null">
+				mk_px,
+			</if>
+			<if test="mkUrl != null">
+				mk_url,
+			</if>
+			<if test="mkMs != null">
+				mk_ms,
+			</if>
+			<if test="mkIcon != null">
+				mk_icon,
+			</if>
+			<if test="mkXgsj != null">
+				mk_xgsj,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="mkId != null">
+				#{mkId},
+			</if>
+			<if test="mkMc != null">
+				#{mkMc},
+			</if>
+			<if test="mkCode != null">
+				#{mkCode},
+			</if>
+			<if test="mkFId != null">
+				#{mkFId},
+			</if>
+			<if test="mkSfsccd != null">
+				#{mkSfsccd},
+			</if>
+			<if test="mkPx != null">
+				#{mkPx},
+			</if>
+			<if test="mkUrl != null">
+				#{mkUrl},
+			</if>
+			<if test="mkMs != null">
+				#{mkMs},
+			</if>
+			<if test="mkIcon != null">
+				#{mkIcon},
+			</if>
+			<if test="mkXgsj != null">
+				#{mkXgsj},
+			</if>
+		</trim>
+	</insert>
+	
+	<!-- 修改模块信息，并且判断是否为空 -->
+	<update id="updateByIdSelective" parameterType="function">
+		update mkb
+		<set>
+			<if test="mkMc != null">
+				mk_mc = #{mkMc},
+			</if>
+			<if test="mkCode != null">
+				mk_code = #{mkCode},
+			</if>
+			<if test="mkFId != null">
+				mk_f_id = #{mkFId},
+			</if>
+			<if test="mkSfsccd != null">
+				mk_sfsccd = #{mkSfsccd},
+			</if>
+			<if test="mkPx != null">
+				mk_px = #{mkPx},
+			</if>
+			<if test="mkUrl != null">
+				mk_url = #{mkUrl},
+			</if>
+			<if test="mkMs != null">
+				mk_ms = #{mkMs},
+			</if>
+			<if test="mkIcon != null">
+				mk_icon = #{mkIcon},
+			</if>
+			<if test="mkXgsj != null">
+				mk_xgsj = #{mkXgsj},
+			</if>
+		</set>
+		where mk_id = #{mkId}
+	</update>
+	
+	<!-- 修改模块信息 -->
+	<update id="updateById" parameterType="function">
+		update mkb
+		set mk_mc = #{mkMc},
+		mk_code = #{mkCode},
+		mk_f_id = #{mkFId},
+		mk_sfsccd = #{mkSfsccd},
+		mk_px = #{mkPx},
+		mk_url = #{mkUrl},
+		mk_ms = #{mkMs},
+		mk_icon = #{mkIcon},
+		mk_xgsj = #{mkXgsj}
+		where mk_id = #{mkId}
+	</update>
+</mapper>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.news.NewsCommentMapper">
+  <resultMap id="BaseResultMap" type="xwPlb">
+    <id column="id"  property="id" />
+    <result column="xwdm"  property="xwdm" />
+    <result column="zw"  property="zw" />
+    <result column="sj"  property="sj" />
+    <result column="flag"  property="flag" />
+    <association property="yhdm" javaType="yhb">
+	    <id column="user_id" property="userId"/>
+            <association property="useryhxxdm" javaType="yhXxb">
+                 <id column="yhxx_id" property="yhxxId" />
+                 <result column="yhxx_xm"  property="yhxxXm" />
+            </association> 
+	</association>
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    xw_plb.id, xw_plb.xwdm, xw_plb.zw, sj, xw_plb.yhdm, xw_plb.flag
+  </sql>
+  
+  <select id="getCommentuseridByCommentid" parameterType="string" resultType="string">
+    select yhdm
+    from xw_plb
+    where id = #{commentId}
+  </select>
+  
+  <!-- 查询单一的评论 -->
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from xw_plb
+    where id = #{id}
+  </select>
+  
+  <!-- 删除一天评论 -->
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <!-- 删除评论点赞 -->
+    delete from xw_pldzb where pldz_pldm =  #{id};
+    <!-- 删除评论 -->
+    delete from xw_plb where id = #{id}
+  </delete>
+  
+  <insert id="insert" parameterType="xwPlb">
+    insert into xw_plb (id, xwdm, zw, sj, yhdm, flag)
+    values (#{id}, #{xwdm}, #{zw}, #{sj}, #{yhdm}, #{flag})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="xwPlb">
+    insert into xw_plb
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="xwPlb.id != null">
+        id,
+      </if>
+      <if test="xwPlb.xwdm != null">
+        xwdm,
+      </if>
+      <if test="xwPlb.zw != null">
+        zw,
+      </if>
+      <if test="xwPlb.sj != null">
+        sj,
+      </if>
+      <if test="xwPlb.yhdm != null">
+        yhdm,
+      </if>
+      <if test="xwPlb.flag != null">
+        flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="xwPlb.id != null">
+        #{xwPlb.id},
+      </if>
+      <if test="xwPlb.xwdm != null">
+        #{xwPlb.xwdm},
+      </if>
+      <if test="xwPlb.zw != null">
+        #{xwPlb.zw},
+      </if>
+      <if test="xwPlb.sj != null">
+        #{xwPlb.sj},
+      </if>
+      <if test="xwPlb.yhdm != null">
+	      #{xwPlb.yhdm},
+      </if>
+      <if test="xwPlb.flag != null">
+        #{xwPlb.flag},
+      </if>
+    </trim>;
+     insert into xw_pldzb (pldz_id, pldz_pldm, pldz_yhdm)
+     values (#{xwPldzb.pldzId}, #{xwPldzb.pldzPldm}, 0);
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="xwPlb" >
+    update xw_plb
+    <set>
+      <if test="xwdm != null">
+        xwdm = #{xwdm},
+      </if>
+      <if test="zw != null">
+        zw = #{zw},
+      </if>
+      <if test="sj != null">
+        sj = #{sj},
+      </if>
+      <if test="yhdm != null">
+        yhdm = #{yhdm},
+      </if>
+      <if test="flag != null">
+        flag = #{flag},
+      </if>
+    </set>
+    where id = #{id};
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="xwPlb">
+    update xw_plb
+    set xwdm = #{xwdm},
+      zw = #{zw},
+      sj = #{sj},
+      yhdm = #{yhdm},
+      flag = #{flag}
+    where id = #{id}
+  </update>
+</mapper>

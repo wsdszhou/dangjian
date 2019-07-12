@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.other.PoliticsStateMapper">
+
+    <!-- 加载所有的政治面貌 -->
+    <select id="loadPoliticsStateAll" resultType="zzmmb">
+        select zzmm_id, zzmm_mc
+        from zzmmb
+    </select>
+    
+
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.approval.view.ViewJobUserMapper">
+	<resultMap id="BaseResultMap" type="viewJobUser">
+		<result column="spgw_id" property="spgwId" />
+		<result column="spgw_spgwmc" property="spgwSpgwmc" />
+		<result column="spry_id" property="spryId" />
+		<result column="user_id" property="userId" />
+		<result column="user_mc" property="userMc" />
+		<result column="yhxx_xm" property="yhxxXm" />
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+	</resultMap>
+	
+	<select id="jobUserPageList" parameterType="viewJobUser" resultMap="BaseResultMap">
+	   select spgw_id, spgw_spgwmc, spry_id,  user_id, user_mc,  yhxx_xm, bm_id, bm_mc
+	   from view_job_user
+	   where 
+	   <trim suffixOverrides="and">
+            <if test="spgwId != null">
+                spgw_id = #{spgwId} and 
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm like '%${yhxxXm}%' and 
+            </if>
+            <if test="bmId != null">
+                bm_id = #{bmId} and
+            </if>
+        </trim>
+	</select>
+	
+	<insert id="insert" parameterType="viewJobUser">
+		insert into view_job_user (spgw_id, spgw_spgwmc, spry_id,
+		user_id, user_mc, yhxx_xm,
+		bm_id, bm_mc)
+		values (#{spgwId}, #{spgwSpgwmc}, #{spryId},
+		#{userId}, #{userMc}, #{yhxxXm},
+		#{bmId}, #{bmMc})
+	</insert>
+	<insert id="insertSelective" parameterType="viewJobUser">
+		insert into view_job_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spgwId != null">
+				spgw_id,
+			</if>
+			<if test="spgwSpgwmc != null">
+				spgw_spgwmc,
+			</if>
+			<if test="spryId != null">
+				spry_id,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="userMc != null">
+				user_mc,
+			</if>
+			<if test="yhxxXm != null">
+				yhxx_xm,
+			</if>
+			<if test="bmId != null">
+				bm_id,
+			</if>
+			<if test="bmMc != null">
+				bm_mc,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spgwId != null">
+				#{spgwId},
+			</if>
+			<if test="spgwSpgwmc != null">
+				#{spgwSpgwmc},
+			</if>
+			<if test="spryId != null">
+				#{spryId},
+			</if>
+			<if test="userId != null">
+				#{userId},
+			</if>
+			<if test="userMc != null">
+				#{userMc},
+			</if>
+			<if test="yhxxXm != null">
+				#{yhxxXm},
+			</if>
+			<if test="bmId != null">
+				#{bmId},
+			</if>
+			<if test="bmMc != null">
+				#{bmMc},
+			</if>
+		</trim>
+	</insert>
+</mapper>

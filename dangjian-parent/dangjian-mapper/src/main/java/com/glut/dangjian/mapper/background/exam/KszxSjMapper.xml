@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxSjMapper">
+
+    <insert id="addKszxSj" useGeneratedKeys="true" keyProperty="id" parameterType="viewKszxTestPaper">
+        insert into kszx_sj (sjbt,sjlb,kssm,zjfs,jgfs,djsj,kssj,jssj,zdjj,cjrq,pdtfs,dxtfs,dxtsfs)
+        values (#{sjbt},#{sjlb},#{kssm},#{zjfs},#{jgfs},#{djsj},#{kssj},#{jssj},#{zdjj},#{cjrq},#{pdtfs},#{dxtfs},#{dxtsfs})
+    </insert>
+
+    <update id="updateQuestionInfo">
+        update kszx_sj
+        set pdtsl=#{pdtsl},dxtsl=#{dxtsl},dxtssl=#{dxtssl},stzs=#{stzs},sjzf=#{sjzf}
+        where id=#{id}
+    </update>
+
+    <update id="updateTestPaperBaseInfo" parameterType="viewKszxTestPaper">
+        update kszx_sj
+        set sjbt=#{sjbt},
+        sjlb=#{sjlb},
+        kssm=#{kssm},
+        jgfs=#{jgfs},
+        djsj=#{djsj},
+        kssj=#{kssj},
+        jssj=#{jssj},
+        pdtfs=#{pdtfs},
+        zdjj=#{zdjj},
+        dxtfs=#{dxtfs},
+        dxtsfs=#{dxtsfs}
+        where id=#{id}
+    </update>
+    <update id="updateTestPaperStatus">
+        update kszx_sj set sjzt=#{status} where id=#{testpaperId}
+    </update>
+
+    <delete id="delete">
+        delete from kszx_sj where id=#{id};
+        delete from kszx_yhsj where sjid=#{id};
+        delete from kszx_yhda where sjid=#{id};
+    </delete>
+
+    <select id="selectAll" resultType="viewKszxTestPaper">
+        SELECT sj.id,sj.sjbt,sj.sjlb,fl.`name` sjlbmc,sj.kssm,sj.zjfs,sj.stzs,sj.sjzf,sj.jgfs,sj.djsj,sj.kssj,sj.jssj,sj.zdjj,sj.cjrq,sj.sjzt
+        from kszx_sj sj
+        left join kszx_sjfl fl on sj.sjlb=fl.id
+    </select>
+
+    <select id="selectOneById" resultType="com.glut.dangjian.entity.kszx.KszxSj">
+        select id,sjbt,sjlb,kssm,zjfs,stzs,sjzf,jgfs,dxtfs,dxtsfs,pdtfs,dxtsl,dxtssl,pdtsl,djsj,kssj,jssj,sjzt,zdjj,cjrq from kszx_sj where id=#{sjid}
+    </select>
+
+    <select id="selectStudentScore" resultType="com.glut.dangjian.entity.kszx.view.ViewKszxXscj">
+        select
+        sj.id testPaperId,
+        sj.sjbt testPaperName,
+        y.user_id userId,
+        y.user_mc userName,
+        sj.sjzf totalScore,
+        (FLOOR(sj.jgfs/100*sj.sjzf)) passScore,
+        yhsj.xscj studentScore,
+        yhsj.ksdjsj startTime
+        from kszx_yhsj yhsj,kszx_sj sj,yhb y
+        where yhsj.xscj is not null and yhsj.yhid=y.user_id and sj.id=yhsj.sjid
+    </select>
+</mapper>

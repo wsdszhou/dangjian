@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.news.NewsMapper">
+
+    <resultMap id="BaseResultMap" type="xwb">
+		<id column="xw_id"  property="xwId" />
+		<result column="xw_bt"  property="xwBt" />
+		<result column="xw_slt" property="xwSlt" />
+		<result column="xw_fbsj" property="xwFbsj" />
+		<result column="xw_ydrs"  property="xwYdrs" />
+		<result column="xw_yhm"  property="xwYhm" />
+		<result column="xw_bmmc"  property="xwBmmc" />
+		<result column="xw_xgsj" property="xwXgsj" />
+		<result column="xw_sfpl" property="xwSfpl" />
+		<association property="splc" javaType="spSplcb">
+            <id column="splc_id"  property="splcId" />
+            <result column="splc_mc"  property="splcMc" />
+        </association>
+		<association property="xwXwztdm" javaType="xwZtb">
+            <id column="xwzt_id"  property="xwztId" />
+            <result column="xwzt_mc"  property="xwztMc" />
+        </association>
+        <association property="xwLmdm" javaType="lmb">
+            <id column="lm_id"  property="lmId" />
+            <result column="lm_mc"  property="lmMc" />   
+        </association>
+        <collection property="dzbs" ofType="xwDzb">
+            <id column="dz_id" property="dzId" />
+        </collection>
+        <collection property="plbs" ofType="xwPlb">
+            <id column="pl_id" property="plId" />
+		    <result column="pl_zw" property="plZw" />
+		    <result column="pl_plsj" property="plPlsj" />
+        </collection> 
+    </resultMap>
+    
+    <resultMap id="BasePageListMap" type="xwb">
+        <id column="xw_id"  property="xwId" />
+        <result column="xw_bt"  property="xwBt" />
+        <result column="xw_fbsj" property="xwFbsj" />
+        <result column="xw_ydrs"  property="xwYdrs" />
+        <result column="xw_yhm"  property="xwYhm" />
+        <result column="xw_bmmc"  property="xwBmmc" />
+        <result column="xw_slt" property="xwSlt" />
+        <result column="xw_xgsj" property="xwXgsj" />
+        <result column="xw_sfpl" property="xwSfpl" />
+        <association property="splc" javaType="spSplcb">
+            <id column="splc_id"  property="splcId" />
+            <result column="splc_mc"  property="splcMc" />
+        </association>
+        <association property="xwXwztdm" javaType="xwZtb">
+            <id column="xwzt_id"  property="xwztId" />
+            <result column="xwzt_mc"  property="xwztMc" />
+        </association>
+        <association property="xwLmdm" javaType="lmb">
+            <id column="lm_id"  property="lmId" />
+            <result column="lm_mc"  property="lmMc" />   
+        </association>
+    </resultMap>
+    
+	  <!-- 所有字段映射  -->
+	  <resultMap extends="BasePageListMap" id="PageListMap" type="xwb">
+          <result column="xw_zw" jdbcType="LONGVARBINARY" property="xwZw" />
+      </resultMap>
+	 
+	 <!-- 只返回新闻的id与标题 -->
+	 <resultMap id="XwIdAndXwBt" type="xwb">
+        <id column="xw_id"  property="xwId" />
+        <result column="xw_bt"  property="xwBt" />
+     </resultMap>
+     
+    <sql id="Base_Column_List">
+		xw_id, xw_bt, xw_slt, xw_zw, xw_fbrdm, xw_fbsj, xw_ydrs, xw_xwztdm, xw_yhm, 
+		xw_bmdm, xw_bmmc, xw_xgsj, xw_sfpl, xw_splc
+	</sql>
+	
+	<!-- 根据评论id，获取新闻发布人id -->
+	<select id="getFbrIdByCommentId" parameterType="string" resultType="string">
+	   select xw_fbrdm
+	   from xwb
+	   where xw_id = (select xwdm from xw_plb where id =#{commentId})
+	</select>
+	
+	<!-- 获取发布者id根据新闻id -->
+	<select id="getFbrIdByNewsId" parameterType="string" resultType="string">
+	   select xw_fbrdm from xwb where xw_id = #{newsId}
+	</select>
+	
+	<!--  通过通知id获取新闻对象 -->
+	<select id="getNewsByNoticeId" parameterType="string" resultMap="PageListMap">
+       select <include refid="Base_Column_List"></include>
+       from xwb
+       where xw_id in (
+            select lcxm_dxId from sp_lcxmb where lcxm_id in(
+                select tz_spId from tz_tzb where tz_id = #{id} )  )
+    </select>
+	
+	<!-- 是否审批 -->
+	<select id="isApproval" parameterType="string" resultType="noticeObject">
+	   select tzdx_id, tzdx_sfyd, tzdx_ydsj
+	   from tz_tzdxb
+	   where  tzdx_tzdm in (select tz_id from tz_tzb where tz_spId in 
+	       (select lcxm_id from sp_lcxmb where lcxm_dxId = #{xwId})
+	   )
+	</select>
+	
+	<!-- 根据id获取新闻对象 -->
+	<select id="getNewsById" parameterType="string" resultMap="PageListMap">
+	   select <include refid="Base_Column_List"></include>
+	   from xwb
+	   where xw_id = #{id}
+	</select>
+	
+	<!-- 开启评论 -->
+	<update id="openCommentByNewId" parameterType="string">
+	   update xwb set xw_sfpl = 1 where xw_id= #{newId}
+	</update>
+	
+	<!-- 关闭评论 -->
+    <update id="closeComment" parameterType="string">
+       update xwb set xw_sfpl = 0 where xw_id= #{newId}
+    </update>
+
+    <!-- 分页查询新闻信息 -->
+    <select id="getNewsPageList" parameterType="xwb" resultMap="PageListMap">
+        select xw.xw_id, xw.xw_bt, xw.xw_slt, xw.xw_bt, xw.xw_fbsj, xw.xw_ydrs, xw.xw_yhm, xw.xw_bmmc, xw.xw_xgsj, xw.xw_zw, 
+        xw.xw_sfpl, zt.xwzt_id, zt.xwzt_mc, lm.lm_id, lm.lm_mc, splc.splc_id, splc.splc_mc
+        from  xwb xw, xw_ztb zt, lmb lm, sp_splcb splc
+        where 
+        xw.xw_xwztdm = zt.xwzt_id and 
+        lm.lm_id =  xw.xw_lmdm and
+        splc.splc_id =  xw.xw_splc and
+        <trim  suffixOverrides="and">
+           <if test="xwBt != null"> 
+                xw.xw_bt like '%${xwBt}%' and
+           </if>
+           <if test=" xwYhm != null">
+              xw.xw_yhm like '%${xwYhm}%'  and 
+           </if>
+           <if test=" xwBmdm != null">
+               xw.xw_bmdm = #{xwBmdm.bmId}  and 
+           </if>
+           <if test=" xwXwztdm != null">
+              zt.xwzt_id = #{xwXwztdm.xwztId}  and 
+           </if>
+           <if test=" xwLmdm != null">
+               lm.lm_id = #{xwLmdm.lmId}  and 
+           </if>
+      </trim>
+       order by zt.xwzt_id asc, xw_xgsj desc, xw_bt asc
+    </select>
+
+   <!--  获取所有的新闻列表， 根据栏目id -->
+	<select id="getNewsTitleAndIdListByLmId" parameterType="int" resultMap="XwIdAndXwBt">
+	   select xw_id, xw_bt
+	   from xwb a,lmb b
+	   where a.xw_lmdm = b.lm_id and b.lm_id = #{lmId}
+	</select>
+	
+	<!-- 获取所有的新闻列表 -->
+    <select id="getNewsAllTitleAndIdList"  resultMap="XwIdAndXwBt">
+       select xw_id, xw_bt
+       from xwb a,lmb b
+       where a.xw_lmdm = b.lm_id 
+    </select>
+    
+    <!-- 栏目查询所有栏目信息 -->
+	<select id="getLmbList" resultType="lmb">
+		select lm_id lmId,lm_mc lmMc,lm_fid lmFid,lm_ms lmMs,lm_xgsj lmXgsj from lmb
+	</select>
+	
+	<!-- 插入一条新闻 -->
+	<insert id="insert" parameterType="xwb">
+		insert into xwb (xw_id, xw_slt, xw_bt, xw_fbrdm, 
+		  xw_fbsj, xw_ydrs, xw_xwztdm, 
+		  xw_yhm, xw_bmdm, xw_bmmc, 
+		  xw_xgsj, xw_zw, xw_lmdm, xw_mk, xw_splc)
+		values (#{xwId}, (#{xwSlt}, #{xwBt},  #{xwFbrdm.userId}, 
+		  #{xwFbsj}, #{xwYdrs}, #{xwXwztdm.xwztId}, 
+		  #{xwYhm}, #{xwBmdm.bmId}, #{xwBmmc}, 
+		  #{xwXgsj}, #{xwZw}, #{xwLmdm.lmId}, #{splc.splcId} )
+  </insert>
+  
+    <!-- 插入一条新闻 ， 并且判断是否为空 -->
+    <insert id="insertIfNot" parameterType="xwb">
+		insert into xwb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		  <if test="xwId != null">
+		    xw_id,
+		  </if>
+		  <if test="xwSlt != null">
+            xw_slt,
+          </if>
+		  <if test="xwBt != null">
+		    xw_bt,
+		  </if>
+		  <if test="xwFbrdm != null">
+		    xw_fbrdm,
+		  </if>
+		  <if test="xwFbsj != null">
+		    xw_fbsj,
+		  </if>
+		  <if test="xwYdrs != null">
+		    xw_ydrs,
+		  </if>
+		  <if test="xwXwztdm != null">
+		    xw_xwztdm,
+		  </if>
+		  <if test="xwYhm != null">
+		    xw_yhm,
+		  </if>
+		  <if test="xwBmdm != null">
+		    xw_bmdm,
+		  </if>
+		  <if test="xwBmmc != null">
+		    xw_bmmc,
+		  </if>
+		  <if test="xwXgsj != null">
+		    xw_xgsj,
+		  </if>
+		  <if test="xwZw != null">
+		    xw_zw,
+		  </if>
+		   <if test="xwLmdm != null">
+            xw_lmdm,
+          </if>
+          <if test="xwSfpl != null">
+            xw_sfpl,
+          </if>
+          <if test="xwYxj != null">
+            xw_yxj,
+          </if>
+          <if test="splc != null">
+			 <if test="splc.splcId != null">
+				xw_splc,
+			 </if>
+          </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="xwId != null">
+	        #{xwId},
+	      </if>
+	      <if test="xwSlt != null">
+            #{xwSlt},
+          </if>
+	      <if test="xwBt != null">
+	        #{xwBt},
+	      </if>
+	      <if test="xwFbrdm != null">
+	        #{xwFbrdm.userId},
+	      </if>
+	      <if test="xwFbsj != null">
+	        #{xwFbsj},
+	      </if>
+	      <if test="xwYdrs != null">
+	        #{xwYdrs},
+	      </if>
+	      <if test="xwXwztdm != null">
+	        #{xwXwztdm.xwztId},
+	      </if>
+	      <if test="xwYhm != null">
+	        #{xwYhm},
+	      </if>
+	      <if test="xwBmdm != null">
+	        #{xwBmdm.bmId},
+	      </if>
+	      <if test="xwBmmc != null">
+	        #{xwBmmc},
+	      </if>
+	      <if test="xwXgsj != null">
+	        #{xwXgsj},
+	      </if>
+	      <if test="xwZw != null">
+	        #{xwZw},
+	      </if>
+	       <if test="xwLmdm != null">
+            #{xwLmdm.lmId} ,
+          </if>
+          <if test="xwSfpl != null">
+            #{xwSfpl},
+          </if>
+          <if test="xwYxj != null">
+            #{xwYxj},
+          </if>
+          <if test="splc != null">
+             <if test="splc.splcId != null">
+                #{splc.splcId},
+             </if>
+          </if>
+    </trim>
+  </insert>
+	
+	<!-- 修改新闻 -->
+	<update id="updateNews" parameterType="xwb">
+		update xwb
+	    <set>
+	      <if test="xwBt != null">
+	        xw_bt = #{xwBt},
+	      </if>
+	      <if test="xwBt != null">
+            xw_slt = #{xwSlt},
+          </if>
+	      <if test="xwFbrdm != null">
+	        xw_fbrdm = #{xwFbrdm.userId},
+	      </if>
+	      <if test="xwFbsj != null">
+	        xw_fbsj = #{xwFbsj},
+	      </if>
+	      <if test="xwYdrs != null">
+	        xw_ydrs = #{xwYdrs},
+	      </if>
+	      <if test="xwXwztdm != null">
+	        xw_xwztdm = #{xwXwztdm.xwztId},
+	      </if>
+	      <if test="xwYhm != null">
+	        xw_yhm = #{xwYhm},
+	      </if>
+	      <if test="xwBmdm != null">
+	        xw_bmdm = #{xwBmdm.bmId},
+	      </if>
+	      <if test="xwBmmc != null">
+	        xw_bmmc = #{xwBmmc},
+	      </if>
+	      <if test="xwXgsj != null">
+	        xw_xgsj = #{xwXgsj},
+	      </if>
+	      <if test="xwZw != null">
+	        xw_zw = #{xwZw},
+	      </if>
+	      <if test="splc != null">
+             <if test="splc.splcId != null">
+                xw_splc = #{splc.splcId},
+             </if>
+          </if>
+	    </set>
+	    where xw_id = #{xwId}
+	</update>
+
+  <!--   删除批量新闻 -->	
+	<delete id="deleteNewsById" >
+	   <foreach collection="ids" item="id" >
+           <!-- 删除审批 -->
+           delete from sp_lcxmb where lcxm_dxId = #{id};
+           <!-- 删除通知对象 -->
+           delete from tz_tzdxb where tzdx_tzdm = (select tz_id from tz_tzb where tz_spId =
+               (select lcxm_id from sp_lcxmb where lcxm_dxId = #{id}) );
+           <!-- 删除通知 -->
+            delete from tz_tzb where tz_spId = (select lcxm_id from sp_lcxmb where lcxm_dxId = #{id});
+            <!-- 删除图片 -->
+            delete from xw_tpb where tp_xwdm = #{id};
+            <!-- 删除其他文件 -->
+            delete from xw_qtwjb where jqwj_xwdm = #{id};
+		   <!-- 删除新闻 -->
+		   delete from xwb where  xw_id = #{id}
+       </foreach>
+	</delete> 
+</mapper>

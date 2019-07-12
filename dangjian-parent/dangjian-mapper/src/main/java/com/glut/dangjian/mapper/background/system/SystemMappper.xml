@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.system.SystemMappper">
+
+	<resultMap type="gnb" id="mkAndGnMap">
+		<id column="gn_id" property="gnId"/>
+        <result column="gn_mc" property="gnMc"/>
+        <result column="gn_lj" property="gnLj"/>
+		<collection property="mkbs" ofType="mkb"> 
+		    <id column="mk_id" property="mkId"/>
+	        <result column="mk_mc" property="mkMc"/>
+	        <result column="mk_f_id" property="mkFId"/>
+	        <result column="mk_url" property="mkUrl"/>
+            <result column="mk_icon" property="mkIcon"/>
+		</collection>
+	</resultMap>
+	<select id="getMkbList" resultMap="mkAndGnMap">
+		select a.gn_id, a.gn_mc, a.gn_lj, b.mk_id, b.mk_mc, b.mk_f_id, b.mk_url, b.mk_icon
+		from gnb a,mkb b
+		where b.gnb = a. gn_id
+	</select> 
+
+</mapper>

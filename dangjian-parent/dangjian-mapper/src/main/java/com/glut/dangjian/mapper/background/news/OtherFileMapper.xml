@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.news.OtherFileMapper">
+	<resultMap id="BaseResultMap" type="xwQtwjb">
+		<id column="jqwj_id" property="jqwjId" />
+		<result column="jqwj_sjmc" property="jqwjSjmc" />
+		<result column="jqwj_xsmc" property="jqwjXsmc" />
+		<result column="jqwj_xdlj" property="jqwjXdlj" />
+		<result column="jqwj_jdlj" property="jqwjJdlj" />
+		<association property="jqwjXwdm" javaType="xwb">
+		  <id column="xw_id"  property="xwId" />
+		</association>
+		<association property="jqwjLmdm" javaType="lmb">
+		     <id column="lm_id"  property="lmId" />
+		</association>
+	</resultMap>
+	<sql id="Base_Column_List">
+		jqwj_id, jqwj_sjmc, jqwj_xsmc, jqwj_xdlj, jqwj_lmdm, jqwj_jdlj, jqwj_xwdm
+	</sql>
+	
+	<update id="updateBranch">
+	   <foreach collection="xwQtwjbs" item="xwQtwjb" separator=";">
+	       update xw_qtwjb
+	        <set>
+	            <if test="xwQtwjb.jqwjXdlj != null">
+	                jqwj_xdlj = #{xwQtwjb.jqwjXdlj},
+	            </if>
+	            <if test="xwQtwjb.jqwjXwdm != null">
+	               <if test="xwQtwjb.jqwjXwdm.xwId != null">
+	                    jqwj_xwdm = #{xwQtwjb.jqwjXwdm.xwId},
+	                </if>
+	            </if>
+	        </set>
+	        where jqwj_id = #{xwQtwjb.jqwjId}
+	   </foreach>
+	</update>
+	
+	<select id="selectByPrimaryKey" parameterType="string"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from xw_qtwjb
+		where jqwj_id = #{jqwjId}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="string">
+		delete from xw_qtwjb
+		where jqwj_id = #{jqwjId}
+	</delete>
+	<insert id="insert" parameterType="xwQtwjb">
+		insert into xw_qtwjb (jqwj_id, jqwj_sjmc, jqwj_xsmc,
+		jqwj_xdlj, jqwj_lmdm, jqwj_jdlj,
+		jqwj_xwdm)
+		values (#{jqwjId}, #{jqwjSjmc}, #{jqwjXsmc},
+		#{jqwjXdlj}, #{jqwjLmdm.lmId}, #{jqwjJdlj},
+		#{jqwjXwdm.xwId})
+	</insert>
+	<insert id="insertSelective" parameterType="xwQtwjb">
+		insert into xw_qtwjb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="jqwjId != null">
+				jqwj_id,
+			</if>
+			<if test="jqwjSjmc != null">
+				jqwj_sjmc,
+			</if>
+			<if test="jqwjXsmc != null">
+				jqwj_xsmc,
+			</if>
+			<if test="jqwjXdlj != null">
+				jqwj_xdlj,
+			</if>
+			<if test="jqwjLmdm != null">
+				jqwj_lmdm,
+			</if>
+			<if test="jqwjJdlj != null">
+				jqwj_jdlj,
+			</if>
+			<if test="jqwjXwdm != null">
+				jqwj_xwdm,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="jqwjId != null">
+				#{jqwjId},
+			</if>
+			<if test="jqwjSjmc != null">
+				#{jqwjSjmc},
+			</if>
+			<if test="jqwjXsmc != null">
+				#{jqwjXsmc},
+			</if>
+			<if test="jqwjXdlj != null">
+				#{jqwjXdlj},
+			</if>
+			<if test="jqwjLmdm != null">
+				#{jqwjLmdm.lmId},
+			</if>
+			<if test="jqwjJdlj != null">
+				#{jqwjJdlj},
+			</if>
+			<if test="jqwjXwdm != null">
+				#{jqwjXwdm.xwId},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="xwQtwjb">
+		update xw_qtwjb
+		<set>
+			<if test="jqwjSjmc != null">
+				jqwj_sjmc = #{jqwjSjmc},
+			</if>
+			<if test="jqwjXsmc != null">
+				jqwj_xsmc = #{jqwjXsmc},
+			</if>
+			<if test="jqwjXdlj != null">
+				jqwj_xdlj = #{jqwjXdlj},
+			</if>
+			<if test="jqwjLmdm != null">
+				jqwj_lmdm = #{jqwjLmdm.lmId},
+			</if>
+			<if test="jqwjJdlj != null">
+				jqwj_jdlj = #{jqwjJdlj},
+			</if>
+			<if test="jqwjXwdm != null">
+				 <if test="jqwjXwdm.xwId != null">
+	                jqwj_xwdm = #{jqwjXwdm.xwId},
+	            </if>
+			</if>
+		</set>
+		where jqwj_id = #{jqwjId}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="xwQtwjb">
+		update xw_qtwjb
+		set jqwj_sjmc = #{jqwjSjmc},
+		jqwj_xsmc = #{jqwjXsmc},
+		jqwj_xdlj = #{jqwjXdlj},
+		jqwj_lmdm = #{jqwjLmdm.lmId},
+		jqwj_jdlj = #{jqwjJdlj},
+		jqwj_xwdm = #{jqwjXwdm.xwId}
+		where jqwj_id = #{jqwjId}
+	</update>
+</mapper>

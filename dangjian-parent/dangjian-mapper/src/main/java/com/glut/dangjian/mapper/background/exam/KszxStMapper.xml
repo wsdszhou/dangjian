@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxStMapper">
+    <resultMap id="kszxSt" type="viewKszxStlb">
+        <id column="id" property="id"/>
+        <result column="stmc" property="stmc"/>
+        <result column="stzz" property="stzz"/>
+        <result column="stfl" property="stfl"/>
+        <result column="stlx" property="stlx"/>
+        <result column="stnd" property="stnd"/>
+    </resultMap>
+
+    <insert id="insertQuestion" parameterType="KszxSt">
+        <selectKey keyProperty="id" resultType="int">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into kszx_st (stmc, stzz, stfl, stlx, stjx, stnd, stda) values (#{stmc},#{stzz},#{stfl},#{stlx},#{stjx},#{stnd},#{stda})
+    </insert>
+
+    <update id="updateQuestion" parameterType="KszxSt">
+        update kszx_st
+        <set>
+            <if test="stmc != null">
+                stmc=#{stmc},
+            </if>
+
+            <if test="stzz != null">
+                stzz=#{stzz},
+            </if>
+
+            <if test="stfl != null">
+                stfl=#{stfl},
+            </if>
+
+            <if test="stlx != null">
+                stlx=#{stlx},
+            </if>
+
+            <if test="stjx != null">
+                stjx=#{stjx},
+            </if>
+
+            <if test="stmc != null">
+                stmc=#{stmc},
+            </if>
+
+            <if test="stnd != null">
+                stnd=#{stnd},
+            </if>
+
+            <if test="stda != null">
+                stda=#{stda},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id="updateQuestionsCategorie">
+        update kszx
+    </update>
+
+    <delete id="deleteQuesyionById" parameterType="int">
+        delete from kszx_st where id=#{id}
+    </delete>
+
+    <select id="selectQuestions" resultMap="kszxSt" parameterType="questionFilter">
+        SELECT
+            a.id,
+            a.stmc,
+            a.stzz,
+            c.`name` stfl,
+            a.stlx,
+            a.stnd
+        FROM
+            kszx_st a
+        LEFT JOIN kszx_tmfl c ON a.stfl = c.id
+        <where>
+
+            <if test="stlx != null and stlx!=''">
+                a.stlx=#{stlx}
+            </if>
+
+            <if test="stfl != 0">
+                and a.stfl=#{stfl}
+            </if>
+
+            <if test="stnd != null">
+                and a.stnd=#{stnd}
+            </if>
+
+            <if test="stmc != null">
+                and a.stmc like CONCAT('%',#{stmc}),'%')
+            </if>
+
+        </where>
+
+    </select>
+
+    <resultMap id="questionDetail" type="viewKszxStlb">
+        <id column="id" property="id"/>
+        <result column="stmc" property="stmc"/>
+        <result column="stzz" property="stzz"/>
+        <result column="stfl" property="stfl"/>
+        <result column="stlx" property="stlx"/>
+        <result column="stjx" property="stjx"/>
+        <result column="stnd" property="stnd"/>
+        <result column="stda" property="stda"/>
+
+        <collection property="kszxStxxList" ofType="KszxStxx">
+            <id column="xxid" property="id"/>
+            <result column="xx" property="xx"/>
+            <result column="xxz" property="xxz"/>
+        </collection>
+
+    </resultMap>
+
+    <select id="findQuestionDetailById" resultMap="questionDetail" parameterType="int">
+        SELECT
+            a.id,
+            a.stmc,
+            a.stzz,
+            c.`name` stfl,
+            a.stlx,
+            a.stjx,
+            a.stnd,
+            a.stda,
+            b.id xxid,
+            b.xx,
+            b.xxz
+        FROM
+            kszx_st a
+            LEFT JOIN kszx_stxx b ON a.id = b.stid
+            LEFT JOIN kszx_tmfl c ON a.stfl = c.id
+        where a.id=#{stid}
+    </select>
+
+    <select id="selectQuestionsTypeCount" resultType="map">
+      select stfl,stnd,stlx,count(*) number from kszx_st
+      GROUP BY stfl,stnd,stlx
+    </select>
+
+</mapper>

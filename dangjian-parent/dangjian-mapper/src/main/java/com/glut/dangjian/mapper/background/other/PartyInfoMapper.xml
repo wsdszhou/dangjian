@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.other.PartyInfoMapper">
+	<resultMap id="BaseResultMap" type="partyInfo">
+		<id column="id" property="id" />
+		<result column="sqsj" property="sqsj" />
+		<result column="spsj" property="spsj" />
+		<result column="rdsj" property="rdsj" />
+		<result column="ms" property="ms" />
+		<result column="zrsj" property="zrsj" />
+		<result column="zcdd" property="zcdd" />
+		<result column="zt" property="zt" />
+		<result column="result" property="result" />
+		<result column="sqsj" property="sqsj" />
+		<result column="spsj" property="spsj" />
+		<result column="bmdm" property="bmdm" />
+		<result column="zbdm" property="zbdm" />
+		<result column="dnzwdm" property="dnzwdm" />
+		<result column="zzmmdm" property="zzmmdm" />
+		<association property="yhdm" javaType="yhb">
+		    <id column="user_id"  property="userId" />
+            <result column="user_mc" property="userMc" />
+		</association>
+	</resultMap>
+	
+	<!-- 获取党籍id -->
+	<select id="getFbrIdByPartyinfoId" parameterType="string" resultType="string">
+	   select yhdm from djxx where id = #{id}
+	</select>
+	
+	<select id="getPartyIStateBypartyInfoId" parameterType="string" resultType="int">
+	   select zt
+       from djxx
+       where  id = #{id}
+	</select>
+	
+	<delete id="deleteNoApprovalBySpLcxmbId" >
+	   <!-- 删除通知对象 -->
+		delete from tz_tzdxb where tzdx_tzdm = ( 
+	           select tz_id from tz_tzb where tz_spId = #{lcxmId});
+       <!-- 删除通知 -->
+	    delete from tz_tzb where tz_spId = #{lcxmId};
+       <!-- 删除审批 -->
+	    delete from sp_lcxmb where lcxm_id = #{lcxmId};
+       <!-- 删除党籍 -->
+	    <if test="userId != null">
+		    delete from djxx where yhdm = #{userId};
+	    </if>
+	    <if test="id != null">
+            delete from djxx where id = #{id};
+        </if>
+	</delete>
+	
+	<select id="getUserIdByPartyInfoId" parameterType="string" resultType="string">
+	   select yhdm
+       from djxx
+       where id= #{id}
+	</select>
+	
+	 <update id="updatePartyInfoAgreeApproval">
+	   <if test="partyInfo !=null">
+	       update djxx 
+	       <set>
+	           <if test="partyInfo.result">
+                   result = #{partyInfo.result},
+               </if>
+	           <if test="partyInfo.spsj">
+	               spsj = #{partyInfo.spsj},
+	           </if>
+	           <if test="partyInfo.zrsj">
+	                zrsj = #{partyInfo.zrsj},
+	           </if>
+	           <if test="partyInfo.zt">
+                    zt = #{partyInfo.zt},
+               </if>
+               <if test="partyInfo.result">
+                    result = #{partyInfo.result},
+               </if>
+	       </set>
+	       where id = #{partyInfo.id};
+	   </if>
+	   <if test="yhXxb !=null">
+		   update yh_xxb
+	        <set>
+	            <if test="yhXxb.yhxxZzmmdm != null">
+	                <if test="yhXxb.yhxxZzmmdm.zzmmId != null">
+	                    yhxx_zzmmdm = #{yhXxb.yhxxZzmmdm.zzmmId},
+	                </if>
+	            </if>
+	            <if test="yhXxb.yhxxDnzwdm != null">
+	                <if test="yhXxb.yhxxDnzwdm.dnzwId != null">
+		                yhxx_dnzwdm = #{yhXxb.yhxxDnzwdm.dnzwId},
+		            </if>
+	            </if>
+	            
+	            <if test="yhXxb.yhxxBmdm != null">
+		            <if test="yhXxb.yhxxBmdm.bmId != null">
+		                yhxx_bmdm = #{yhXxb.yhxxBmdm.bmId},
+		            </if>
+	            </if>
+	            <if test="yhXxb.yhxxZbdm != null">
+		            <if test="yhXxb.yhxxZbdm.zbId != null">
+		                yhxx_zbdm = #{yhXxb.yhxxZbdm.zbId},
+		            </if>
+	            </if>
+	        </set>
+	        where yhxx_id = #{yhXxb.yhxxId}
+	   </if>
+	</update> 
+	
+	<!-- 根据id获取对象 -->
+	<select id="getPartyinfoById" parameterType="string" resultMap="BaseResultMap">
+	   select id, sqsj, spsj, rdsj, ms,zrsj, zcdd, yhdm, zt, result, bmdm, zbdm, dnzwdm, zzmmdm
+	   from djxx, yhb
+	   where id= #{id} and djxx.yhdm = yhb.user_id
+	</select>
+	
+	<insert id="insert" parameterType="partyInfo">
+		insert into djxx (id, sqsj, spsj, rdsj, ms,zrsj, zcdd, yhdm, zt, bmdm, zbdm, dnzwdm, zzmmdm)
+		values (#{id}, #{sqsj}, #{spsj}, #{rdsj}, #{ms}, #{zrsj}, #{zcdd},#{yhdm.userId},
+		  #{zt},  #{result},#{bmdm}, #{zbdm}, #{dnzwdm}, #{zzmmdm})
+	</insert>
+	
+	<!--  批量删除 -->
+	<delete id="deleteBatch">
+	   <foreach collection="ids" item="id" >
+	       <!-- 删除审批 -->
+	       delete from sp_lcxmb where lcxm_dxId = #{id};
+	       <!-- 删除通知对象 -->
+	       delete from tz_tzdxb where tzdx_tzdm = (select tz_id from tz_tzb where tz_spId =
+	           (select lcxm_id from sp_lcxmb where lcxm_dxId = #{id}) );
+	       <!-- 删除通知 -->
+	        delete from tz_tzb where tz_spId = (select lcxm_id from sp_lcxmb where lcxm_dxId = #{id});
+	       <!-- 删除党籍记录 -->
+	        delete from djxx where id = #{id};
+       </foreach>
+	</delete>
+	
+	<update id="update" parameterType="partyInfo">
+	   update djxx 
+	   <set>
+	       <if test="zt !=null">
+	           zt = #{zt},
+	       </if>
+	       <if test="result !=null">
+               result = #{result},
+           </if>
+	       <if test="sqsj !=null">
+               sqsj = #{sqsj},
+           </if>
+           <if test="spsj !=null">
+               spsj = #{spsj},
+           </if>
+	       <if test="ms !=null">
+                ms = #{ms},
+           </if>
+           <if test="zrsj !=null">
+                zrsj = #{zrsj},
+           </if>
+           <if test="zcdd !=null">
+                zcdd = #{zcdd},
+           </if>
+           <if test="bmdm !=null">
+                bmdm = #{bmdm},
+           </if>
+           <if test="zbdm !=null">
+                zbdm = #{zbdm},
+           </if>
+           <if test="dnzwdm">
+                dnzwdm = #{dnzwdm},
+           </if>
+           <if test="zzmmdm !=null">
+                zzmmdm = #{zzmmdm},
+           </if>
+	   </set>
+	   where id = #{id}
+	</update>
+	
+	<insert id="insertSelective" parameterType="partyInfo">
+		insert into djxx
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="result != null">
+                result,
+            </if>
+			<if test="sqsj">
+               sqsj ,
+           </if>
+           <if test="spsj">
+               spsj ,
+           </if>
+			<if test="rdsj != null">
+				rdsj,
+			</if>
+			<if test="ms != null">
+				ms,
+			</if>
+			<if test="zrsj != null">
+				zrsj,
+			</if>
+			<if test="zcdd != null">
+				zcdd,
+			</if>
+			<if test="yhdm != null">
+				yhdm,
+			</if>
+			<if test="zt != null">
+				zt,
+			</if>
+			<if test="bmdm">
+                bmdm ,
+           </if>
+           <if test="zbdm">
+                zbdm ,
+           </if>
+           <if test="dnzwdm">
+                dnzwdm ,
+           </if>
+           <if test="zzmmdm">
+                zzmmdm ,
+           </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="result != null">
+                #{result},
+            </if>
+			<if test="sqsj">
+                #{sqsj},
+           </if>
+           <if test="spsj">
+                #{spsj},
+           </if>
+			<if test="rdsj != null">
+				#{rdsj},
+			</if>
+			<if test="ms != null">
+				#{ms},
+			</if>
+			<if test="zrsj != null">
+				#{zrsj},
+			</if>
+			<if test="zcdd != null">
+				#{zcdd},
+			</if>
+			<if test="yhdm != null">
+				#{yhdm.userId},
+			</if>
+			<if test="zt != null">
+				#{zt},
+			</if>
+			<if test="bmdm">
+               #{bmdm},
+           </if>
+           <if test="zbdm">
+                #{zbdm},
+           </if>
+           <if test="dnzwdm">
+               #{dnzwdm},
+           </if>
+           <if test="zzmmdm">
+                 #{zzmmdm},
+           </if>
+		</trim>
+	</insert>
+	
+
+</mapper>

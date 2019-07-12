@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxSjSjstMapper">
+    <insert id="insertOne" useGeneratedKeys="true" keyProperty="id" parameterType="kszxSjSjst">
+        insert into kszx_sj_sjst (sj,stfl,stnd,pdtsl,dxtsl,dxtssl) values (#{sj},#{stfl},#{stnd},#{pdtsl},#{dxtsl},#{dxtssl})
+    </insert>
+    <update id="update">
+        update kszx_sj_sjst set
+        pdtsl = #{pdtsl},dxtsl=#{dxtsl},dxtssl = #{dxtssl}
+        where id=#{id}
+    </update>
+
+    <delete id="deleteOneById">
+        delete from kszx_sj_sjst where id=#{id}
+    </delete>
+    <delete id="deleteBySjid">
+        delete from kszx_sj_sjst where sj=#{sjid}
+    </delete>
+
+    <select id="selectBySjid" resultType="kszxSjSjst">
+        select s.id,s.sj,s.stfl,t.`name` stflmc,s.stnd,s.pdtsl,s.dxtsl,s.dxtssl
+        from kszx_sj_sjst s, kszx_tmfl t
+        where s.stfl=t.id and s.sj=#{id}
+    </select>
+
+
+</mapper>

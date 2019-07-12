@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.news.view.ViewNewsCommentMapper">
+  <resultMap id="BaseResultMap" type="viewNewsComment">
+    <result column="xw_id"  property="xwId" />
+    <result column="xw_bt"  property="xwBt" />
+    <result column="xw_fbsj"  property="xwFbsj" />
+    <result column="xw_ydrs"  property="xwYdrs" />
+    <result column="xw_xgsj"  property="xwXgsj" />
+    <result column="xw_sfpl"  property="xwSfpl" />
+    <result column="xw_splc"  property="xwSplc" />
+    <result column="id"  property="id" />
+    <result column="zw"  property="zw" />
+    <result column="sj"  property="sj" />
+    <result column="flag"  property="flag" />
+    <result column="pl_userId"  property="plUserid" />
+    <result column="pl_userName"  property="plUsername" />
+    <result column="xw_zw" jdbcType="LONGVARBINARY" property="xwZw" />
+  </resultMap>
+  
+  <sql id="all_Column_List">
+    xw_id, xw_bt, xw_fbsj, xw_ydrs, xw_xgsj, xw_sfpl, xw_splc, id, zw, sj,  flag, pl_userId, pl_userName, xw_zw
+  </sql>
+  
+  <sql id="comment_column">
+    distinct(vnc.id), vnc.xw_bt, vnc.zw, vnc.sj,  vnc.flag, vnc.pl_userId, vnc.pl_userName, vnc.xw_id
+  </sql>
+  
+  <!-- 根据noticeI的获取评论内容 -->
+  <select id="getViewNewsCommentByNoticeIId" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="comment_column"></include>
+    from view_news_comment vnc
+    where vnc.id = ( select lcxm_dxId from sp_lcxmb where  lcxm_id = (select tz_spId from tz_tzb where tz_id =#{noticeId}));
+  </select>
+  
+  <!-- 根据评论id获取评论视图 -->
+  <select id="getViewNewsCommentByCommentId" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="comment_column"></include>
+    from view_news_comment vnc
+    where vnc.id = #{commentId}
+  </select>
+  
+  <!-- 根据新闻id分页查询评论和回复数量  -->
+  <select id="getNewsCommentByNewsId" parameterType="string" resultType="viewNewsComment">
+    select <include refid="comment_column"></include>, count(pldz.pldz_id) praiseNum
+    from view_news_comment vnc, xw_pldzb pldz
+    where 
+        pldz.pldz_pldm = vnc.id and 
+        vnc.xw_id = #{newsId} and 
+        vnc.flag = 1
+    group by vnc.id
+    order by vnc.sj desc
+  </select>
+  
+  <insert id="insert" parameterType="viewNewsComment">
+    insert into view_news_comment (xw_id, xw_bt, xw_fbsj,  xw_ydrs, xw_xgsj,
+     xw_sfpl,  xw_splc, id, zw, sj, flag, pl_userId, pl_userName, xw_zw)
+    values (#{xwId}, #{xwBt}, #{xwFbsj}, #{xwYdrs}, #{xwXgsj}, #{xwSfpl}, 
+      #{xwSplc}, #{id}, #{zw}, #{sj},  #{flag}, #{plUserid}, #{plUsername},  #{xwZw})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="viewNewsComment">
+    insert into view_news_comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="xwId != null">
+        xw_id,
+      </if>
+      <if test="xwBt != null">
+        xw_bt,
+      </if>
+      <if test="xwFbsj != null">
+        xw_fbsj,
+      </if>
+      <if test="xwYdrs != null">
+        xw_ydrs,
+      </if>
+      <if test="xwXgsj != null">
+        xw_xgsj,
+      </if>
+      <if test="xwSfpl != null">
+        xw_sfpl,
+      </if>
+      <if test="xwSplc != null">
+        xw_splc,
+      </if>
+      <if test="id != null">
+        id,
+      </if>
+      <if test="zw != null">
+        zw,
+      </if>
+      <if test="sj != null">
+        sj,
+      </if>
+      <if test="flag != null">
+        flag,
+      </if>
+      <if test="plUserid != null">
+        pl_userId,
+      </if>
+      <if test="plUsername != null">
+        pl_userName,
+      </if>
+      <if test="xwZw != null">
+        xw_zw,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="xwId != null">
+        #{xwId},
+      </if>
+      <if test="xwBt != null">
+        #{xwBt},
+      </if>
+      <if test="xwFbsj != null">
+        #{xwFbsj},
+      </if>
+      <if test="xwYdrs != null">
+        #{xwYdrs},
+      </if>
+      <if test="xwXgsj != null">
+        #{xwXgsj},
+      </if>
+      <if test="xwSfpl != null">
+        #{xwSfpl},
+      </if>
+      <if test="xwSplc != null">
+        #{xwSplc},
+      </if>
+      <if test="id != null">
+        #{id},
+      </if>
+      <if test="zw != null">
+        #{zw},
+      </if>
+      <if test="sj != null">
+        #{sj},
+      </if>
+      <if test="flag != null">
+        #{flag},
+      </if>
+      <if test="plUserid != null">
+        #{plUserid},
+      </if>
+      <if test="plUsername != null">
+        #{plUsername},
+      </if>
+      <if test="xwZw != null">
+        #{xwZw},
+      </if>
+    </trim>
+  </insert>
+</mapper>

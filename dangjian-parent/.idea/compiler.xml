@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="dangjian-controller" />
+        <module name="dangjian-entity" />
+        <module name="dangjian-mapper" />
+        <module name="dangjian-service" />
+        <module name="dangjian-utils" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="dangjian-controller" target="1.7" />
+      <module name="dangjian-entity" target="1.7" />
+      <module name="dangjian-mapper" target="1.7" />
+      <module name="dangjian-parent" target="1.7" />
+      <module name="dangjian-service" target="1.7" />
+      <module name="dangjian-utils" target="8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

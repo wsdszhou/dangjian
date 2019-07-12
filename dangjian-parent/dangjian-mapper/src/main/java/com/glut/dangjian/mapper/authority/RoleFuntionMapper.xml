@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.authority.RoleFuntionMapper">
+
+    <delete id="deleteRoleFunctionByRoleId" parameterType="int">
+        delete from js_mk where js_id = #{id}
+    </delete>
+    
+    <delete id="deleteRolefunctionByFunctionId" parameterType="int">
+        delete from js_mk where mk_id = #{id}
+    </delete>
+    
+    <!-- 添加功能角色关系 -->
+   <insert id="addRoleFunctionBatch" >
+        <!-- 添加新的模块与角色关系 -->
+        insert into   js_mk(js_id, mk_id)  values 
+        <foreach collection="functionIds" item="functionId" separator=",">
+            ( #{roleId} ,#{functionId} )
+        </foreach>
+    </insert>
+    
+    <!-- 修改功能角色表数据 -->
+    <insert id="updatRoleFunctionBatch" >
+        <!-- 修改角色信息 -->
+        update jsb
+        <set>
+            <if test="role.jsMc != null">
+                js_mc = #{role.jsMc},
+            </if>
+            <if test="role.jsXgsj != null">
+                js_xgsj = #{role.jsXgsj},
+            </if>
+            <if test="role.jsCode != null">
+                js_code = #{role.jsCode},
+            </if>
+            <if test="role.jsMs != null">
+                js_ms = #{role.jsMs},
+            </if>
+        </set>
+        where js_id = #{role.jsId};
+        <!-- 删除旧的模块与角色关系 -->
+       <!--  delete from js_mk where mk_id = #{role.jsId}; -->
+        <!-- 添加新的模块与角色关系 -->
+        insert into   js_mk(js_id, mk_id)  values 
+        <foreach collection="functionIds" item="functionId" separator=",">
+            ( #{role.jsId} ,#{functionId} )
+        </foreach>;
+    </insert>
+    
+    
+    
+</mapper>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.glut.dangjian.mapper.approval.view.ViewApprovalJobUserMapper">
+
+	<resultMap id="BaseResultMap" type="viewApprovalJobUser">
+		<result column="spgw_id" property="spgwId" />
+		<result column="spgw_spgwmc" property="spgwSpgwmc" />
+		<result column="spry_id" property="spryId" />
+		<result column="yhxx_xm" property="yhxxXm" />
+		<result column="user_id" property="userId" />
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="user_mc" property="userMc" />
+		<result column="spjd_id"  property="spjdId" />
+	    <result column="spjd_mc"  property="spjdMc" />
+	    <result column="spjd_dqspzt"  property="spjdDqspzt" />
+	    <result column="spjd_xyspjdId"  property="spjdXyspjdid" />
+	    <result column="spjd_xyjdmc"  property="spjdXyjdmc" />
+	</resultMap>
+	
+	<sql id="all_column">
+	   spgw_id, spgw_spgwmc, spry_id, user_id, yhxx_xm, bm_id, bm_mc, user_mc, spjd_id, spjd_mc, spjd_dqspzt, spjd_xyspjdId, spjd_xyjdmc
+	</sql>
+	
+	<!-- 根据节点id，或者所有数据 -->
+	<select id="getListByApprovalNodeId" resultMap="BaseResultMap" >
+	   select  spgw_id, spry_id, yhxx_xm, user_id, bm_id, spjd_id, spjd_mc, spjd_xyspjdId
+	   from view_approval_job_user
+	   where spjd_id = #{nodeId} and bm_id =(select bm_id from view_yhxx where user_id =#{userId})
+	</select>
+	
+	<!-- 分页查询视图信息 -->
+	<select id="jobUserPageList" parameterType="viewApprovalJobUser" resultMap="BaseResultMap">
+	   select  spgw_id, spgw_spgwmc, spry_id,yhxx_xm, bm_id, bm_mc, user_mc, spjd_id, spjd_mc
+	   from view_approval_job_user
+	   where 
+	       <trim suffixOverrides="and">
+	            <if test="spgwId != null">
+	                spgw_id = #{spgwId} and 
+	            </if>
+	            <if test="yhxxXm != null">
+	                yhxx_xm like '%${yhxxXm}%' and 
+	            </if>
+	            <if test="bmId != null">
+	                bm_id = #{bmId} and
+	            </if>
+	        </trim>
+	</select>
+
+	<!-- 插入一条视图信息 -->
+	<insert id="insert" parameterType="viewApprovalJobUser">
+		insert into view_approval_job_user (spgw_id, spgw_spgwmc, spry_id,yhxx_xm, bm_id, bm_mc, user_mc,
+		  spjd_id, spjd_mc, spjd_dqspzt, spjd_xyspjdId, spjd_xyjdmc)
+		values (#{spgwId}, #{spgwSpgwmc}, #{spryId}, #{yhxxXm}, #{bmId}, #{bmMc}, #{userMc},
+		  #{spjdId}, #{spjdMc}, #{spjdDqspzt}, #{spjdXyspjdid}, #{spjdXyjdmc}  )
+	</insert>
+
+	<!-- 插入一条视图信息， 并且判断是否为空 -->
+	<insert id="insertSelective" parameterType="viewApprovalJobUser">
+		insert into view_approval_job_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spjdId != null">
+				spjd_id,
+			</if>
+			<if test="spjdMc != null">
+				spjd_mc,
+			</if>
+			<if test="spjdDqspzt != null">
+				spjd_dqspzt,
+			</if>
+			<if test="spjdXyspjdid != null">
+				spjd_xyspjdId,
+			</if>
+			<if test="spjdXyjdmc != null">
+				spjd_xyjdmc,
+			</if>
+			<if test="spgwId != null">
+				spgw_id,
+			</if>
+			<if test="spgwSpgwmc != null">
+				spgw_spgwmc,
+			</if>
+			<if test="spryId != null">
+				spry_id,
+			</if>
+			<if test="yhxxXm != null">
+				yhxx_xm,
+			</if>
+			<if test="bmId != null">
+                bm_id,
+            </if>
+            <if test="bmMc != null">
+                bm_mc,
+            </if>
+            <if test="userMc != null">
+                user_mc,
+            </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spjdId != null">
+				#{spjdId},
+			</if>
+			<if test="spjdMc != null">
+				#{spjdMc},
+			</if>
+			<if test="spjdDqspzt != null">
+				#{spjdDqspzt},
+			</if>
+			<if test="spjdXyspjdid != null">
+				#{spjdXyspjdid},
+			</if>
+			<if test="spjdXyjdmc != null">
+				#{spjdXyjdmc},
+			</if>
+			<if test="spgwId != null">
+				#{spgwId},
+			</if>
+			<if test="spgwSpgwmc != null">
+				#{spgwSpgwmc},
+			</if>
+			<if test="spryId != null">
+				#{spryId},
+			</if>
+			<if test="yhxxXm != null">
+				#{yhxxXm},
+			</if>
+			<if test="bmId != null">
+                #{bmId},
+            </if>
+            <if test="bmMc != null">
+                #{bmMc},
+            </if>
+             <if test="userMc != null">
+                #{userMc},
+            </if>
+		</trim>
+	</insert>
+</mapper>

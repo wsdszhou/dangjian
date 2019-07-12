@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.news.NewsCommentReplyMapper">
+	<resultMap id="BaseResultMap" type="xwPlHf">
+		<id column="id" property="id" />
+		<result column="pldm" property="pldm" />
+		<result column="reply_id" property="replyId" />
+		<result column="reply_type" property="replyType" />
+		<result column="nr" property="nr" />
+		<result column="hf_yhdm" property="hfYhdm" />
+		<result column="mb_yh_id" property="mbYhId" />
+		<result column="sj" property="sj" />
+		<result column="flag" property="flag" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, pldm, reply_id, reply_type, nr, hf_yhdm, mb_yh_id, sj, flag
+	</sql>
+	
+	<!-- 根据id查询 -->
+	<select id="selectByPrimaryKey" parameterType="string" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from xw_pl_hf
+		where id = #{id}
+	</select>
+	
+	<insert id="insert" parameterType="xwPlHf">
+		insert into xw_pl_hf (id, pldm, reply_id,reply_type, nr, hf_yhdm, mb_yh_id, sj, flag)
+		values (#{id}, #{pldm}, #{replyId}, #{replyType}, #{nr}, #{hfYhdm}, #{mbYhId}, #{sj}, #{flag})
+	</insert>
+	
+	<insert id="insertSelective" parameterType="xwPlHf">
+		insert into xw_pl_hf
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="pldm != null">
+				pldm,
+			</if>
+			<if test="replyId != null">
+				reply_id,
+			</if>
+			<if test="replyType != null">
+				reply_type,
+			</if>
+			<if test="nr != null">
+				nr,
+			</if>
+			<if test="hfYhdm != null">
+				hf_yhdm,
+			</if>
+			<if test="mbYhId != null">
+				mb_yh_id,
+			</if>
+			<if test="sj != null">
+				sj,
+			</if>
+			<if test="flag != null">
+				flag,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="pldm != null">
+				#{pldm},
+			</if>
+			<if test="replyId != null">
+				#{replyId},
+			</if>
+			<if test="replyType != null">
+				#{replyType},
+			</if>
+			<if test="nr != null">
+				#{nr},
+			</if>
+			<if test="hfYhdm != null">
+				#{hfYhdm},
+			</if>
+			<if test="mbYhId != null">
+				#{mbYhId},
+			</if>
+			<if test="sj != null">
+				#{sj},
+			</if>
+			<if test="flag != null">
+				#{flag},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="updateByPrimaryKeySelective" parameterType="xwPlHf">
+		update xw_pl_hf
+		<set>
+			<if test="pldm != null">
+				pldm = #{pldm},
+			</if>
+			<if test="replyId != null">
+				reply_id = #{replyId},
+			</if>
+			<if test="replyType != null">
+				reply_type = #{replyType},
+			</if>
+			<if test="nr != null">
+				nr = #{nr},
+			</if>
+			<if test="hfYhdm != null">
+				hf_yhdm = #{hfYhdm},
+			</if>
+			<if test="mbYhId != null">
+				mb_yh_id = #{mbYhId},
+			</if>
+			<if test="sj != null">
+				sj = #{sj},
+			</if>
+			<if test="flag != null">
+				flag = #{flag},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateByPrimaryKey" parameterType="xwPlHf">
+		update xw_pl_hf
+		set pldm = #{pldm},
+		reply_id = #{replyId},
+		reply_type = #{replyType},
+		nr = #{nr},
+		hf_yhdm = #{hfYhdm},
+		mb_yh_id = #{mbYhId},
+		sj = #{sj},
+		flag = #{flag}
+		where id = #{id}
+	</update>
+</mapper>

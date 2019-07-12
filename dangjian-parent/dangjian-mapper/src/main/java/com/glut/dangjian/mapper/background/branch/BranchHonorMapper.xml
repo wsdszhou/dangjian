@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.branch.BranchHonorMapper">
+	<resultMap id="BaseResultMap" type="zbry">
+		<id column="zbry_id" property="zbryId" />
+		<result column="zbry_mc" property="zbryMc" />
+		<result column="zbry_hdsj" property="zbryHdsj" />
+		<result column="zbry_js" property="zbryJs" />
+		<result column="zbry_tp" property="zbryTp" />
+		<association property="zbryZbdm" javaType="zbb">
+			<id column="zb_id"  property="zbId" />
+	        <result column="zb_mc"  property="zbMc" />
+	        <association property="zbSsbmdm" javaType="bmb">
+		        <id column="bm_id" property="bmId" />
+	            <result column="bm_mc" property="bmMc" />
+	        </association>
+		</association>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		zbry_id, zbry_mc, zbry_hdsj, zbry_js, zbry_zbdm, zbry_tp, zb_id, zb_mc
+	</sql>
+	
+	<select id="getHonorIdByName" parameterType="string" resultType="int">
+	    select zbry_id
+        from zbry
+        where zbry_mc = #{zbryMc}
+	</select>
+	
+	<select id="getBranchHonorByHonorid" parameterType="string" resultMap="BaseResultMap">
+       select zbry_id, zbry_mc, zbry_hdsj, zbry_js, zbry_tp
+       from zbry
+       where zbry_id = #{honorId}
+    </select>
+    
+	<select id="getBranchHonorPageList" resultMap="BaseResultMap">
+	   select zbry_id, zbry_mc, zbry_hdsj, zbry_js
+	   from zbry
+	</select>
+	
+	<!-- 批量删除 -->
+    <delete id="deleteBranchHonorBratch" >
+       delete from zbry where 
+       <foreach collection="zbryIds" item="zbryId" separator="  or  ">
+           zbry_id = #{zbryId}
+       </foreach>
+    </delete>
+    
+    <!-- 分页查询 -->
+    <select id="getBranchHonorListPage" parameterType="bmry" resultMap="BaseResultMap">
+       select zbry_id, zbry_mc, zbry_hdsj, zbry_js, zbry_zbdm, zbry_tp, zb_id, zb_mc, bm_id, bm_mc
+       from zbry , zbb, bmb
+       where zbry.zbry_zbdm = zbb.zb_id and zbb.zb_ssbmdm=bmb.bm_id
+       <trim prefix=" and"  suffixOverrides="and">
+            <if test="zbryMc != null">
+                zbry_mc like "%"#{zbryMc}"%"  and
+            </if>
+            <if test="zbryZbdm != null">
+                <if test="zbryZbdm.zbId != null">
+                    zbry_zbdm = #{zbryZbdm.zbId}  and
+                </if>
+            </if>
+       </trim>
+    </select>
+	
+	<select id="selectByPrimaryKey" parameterType="int"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from zbry
+		where zbry_id = #{zbryId}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="int">
+		delete from zbry
+		where zbry_id = #{zbryId}
+	</delete>
+	
+	<insert id="insert" parameterType="zbry">
+		insert into zbry (zbry_id, zbry_mc, zbry_hdsj,
+		zbry_js, zbry_zbdm, zbry_tp
+		)
+		values (#{zbryId}, #{zbryMc}, #{zbryHdsj},
+		#{zbryJs}, #{zbryZbdm.zbId}, #{zbryTp}
+		)
+	</insert>
+	
+	<insert id="insertSelective" parameterType="zbry">
+		insert into zbry
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="zbryId != null">
+				zbry_id,
+			</if>
+			<if test="zbryMc != null">
+				zbry_mc,
+			</if>
+			<if test="zbryHdsj != null">
+				zbry_hdsj,
+			</if>
+			<if test="zbryJs != null">
+				zbry_js,
+			</if>
+			<if test="zbryZbdm != null">
+			    <if test="zbryZbdm.zbId != null">
+					zbry_zbdm,
+                </if>
+			</if>
+			<if test="zbryTp != null">
+				zbry_tp,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="zbryId != null">
+				#{zbryId},
+			</if>
+			<if test="zbryMc != null">
+				#{zbryMc},
+			</if>
+			<if test="zbryHdsj != null">
+				#{zbryHdsj},
+			</if>
+			<if test="zbryJs != null">
+				#{zbryJs},
+			</if>
+			<if test="zbryZbdm != null">
+			     <if test="zbryZbdm.zbId != null">
+                    #{zbryZbdm.zbId},
+                </if>
+			</if>
+			<if test="zbryTp != null">
+				#{zbryTp},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="zbry">
+		update zbry
+		<set>
+			<if test="zbryMc != null">
+				zbry_mc = #{zbryMc},
+			</if>
+			<if test="zbryHdsj != null">
+				zbry_hdsj = #{zbryHdsj},
+			</if>
+			<if test="zbryJs != null">
+				zbry_js = #{zbryJs},
+			</if>
+			<if test="zbryZbdm != null">
+			     <if test="zbryZbdm.zbId != null">
+                    zbry_zbdm = #{zbryZbdm.zbId},
+                </if>
+			</if>
+			<if test="zbryTp != null">
+				zbry_tp = #{zbryTp},
+			</if>
+		</set>
+		where zbry_id = #{zbryId}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="zbry">
+		update zbry
+		set zbry_mc = #{zbryMc},
+		zbry_hdsj = #{zbryHdsj},
+		zbry_js = #{zbryJs},
+		zbry_zbdm = #{zbryZbdm.zbId},
+		zbry_tp = #{zbryTp}
+		where zbry_id = #{zbryId}
+	</update>
+</mapper>

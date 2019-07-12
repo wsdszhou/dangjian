@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.authority.RoleMapper">
+	<resultMap id="BaseResultMap" type="role">
+		<id column="js_id" property="jsId" />
+		<result column="js_mc" property="jsMc" />
+		<result column="js_xgsj" property="jsXgsj" />
+		<result column="js_code" property="jsCode" />
+		<result column="js_ms" property="jsMs" />
+		<collection property="yhbs" ofType="yhb">
+			<id column="user_id" property="userId" />
+	        <result column="user_mc" property="userMc" />
+	        <result column="user_wx_id" property="userWxId" />
+	        <result column="user_wxm" property="userWxm" />
+		</collection>
+	</resultMap>
+	
+	
+	
+	<!-- 分页查询resultMap -->
+	<resultMap type="role" id="getRolePageListResultMap">
+	    <id column="js_id" property="jsId" />
+        <result column="js_mc" property="jsMc" />
+        <result column="js_xgsj" property="jsXgsj" />
+        <result column="js_code" property="jsCode" />
+        <result column="js_ms" property="jsMs" />
+        <collection property="functions" ofType="function">
+            <id column="mk_id" property="mkId" />
+            <result column="mk_mc" property="mkMc" />
+        </collection>
+	</resultMap>
+	
+	<resultMap type="role" id="RoletMap">
+        <id column="js_id" property="jsId" />
+        <result column="js_mc" property="jsMc" />
+        <result column="js_xgsj" property="jsXgsj" />
+        <result column="js_code" property="jsCode" />
+        <result column="js_ms" property="jsMs" />
+    </resultMap>
+	
+	<sql id="Base_Column_List">
+		js.js_id, js.js_mc, js.js_xgsj, js.js_code, js.js_ms, mk.mk_id, mk.mk_mc
+	</sql>
+	
+	<delete id="deleteBatchById" >
+        <if test="ids != null">
+            <foreach collection="ids" item="id" separator=" ; ">
+                 delete from js_mk where js_id = #{id}
+            </foreach>
+              
+            <foreach collection="ids" item="id" separator=" ; ">
+                 delete from jsb where js_id = #{id}
+            </foreach>
+        </if>
+    </delete>
+    
+    <!-- 加载所有的角色 -->
+    <select id="getRoleAllList" resultMap="RoletMap">
+        select distinct(js_id), js_mc
+        from jsb
+    </select>
+    
+     <!-- 根据userId加载所有的角色 -->
+    <select id="getRoleCodeAllList" resultMap="RoletMap">
+        select distinct(js_id), js_mc
+        from jsb
+    </select>
+    
+    <!-- 根据用户加载所拥有的角色 -->
+	<select id="getRoleListById" resultMap="RoletMap">
+		select distinct(js.js_id), js.js_mc
+	    from jsb js, yh_jsb yhjs
+	    where js.js_id = yhjs.js_id and yh_id = #{userId}
+	</select>
+	
+	<!-- 根据用户userId加载所有能授权的角色 -->
+	<select id="loadRoleListById" parameterType="string" resultType="role">
+       select distinct(js.js_id), js.js_mc from jsb js
+			 where js.js_yxj >= (
+			 	select min(t.js_yxj) from jsb t
+			 		where t.js_id in (select yj.js_id from yh_jsb yj where yh_id=#{userId}))
+    </select>
+
+	<!-- 根据用户userId加载所具有的角色 -->
+	<select id="loadRoleListByUserId" parameterType="string" resultType="role">
+		select js.js_id, js.js_mc from jsb js,yh_jsb yj
+		where js.js_id=yj.js_id and yj.yh_id=#{userId}
+	</select>
+	
+	<!-- 根据名称获取id -->
+	<select id="getIdByName" parameterType="string" resultType="int">
+	   select js_id 
+	   from jsb
+	   where js_mc = #{jsMc}
+	</select>
+	
+	<!-- 分页查询角色 -->
+	<select id="getRolePageList" parameterType="role" resultMap="RoletMap">
+        select js.js_id, js.js_mc, js.js_xgsj, js.js_code, js.js_ms
+        from jsb js
+        where 
+        <trim prefix="(" suffix=")" suffixOverrides="and">
+            <if test="jsMc == null">
+                js_mc like '%%' and
+            </if>    
+            <if test="jsMc != null">
+                js_mc like '%${jsMc}%' and
+            </if> 
+            <if test="jsCode != null">
+                js_code like '%${jsCode}%' and 
+            </if>
+            <if test="jsMs != null">
+                js_ms like '%${jsMs}%' and 
+            </if>
+        </trim>
+        
+    </select>
+	
+	<!-- 根据id查询 -->
+	<select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from jsb js
+		where js_id = #{jsId}
+	</select>
+	
+	<!-- 删除一条数据 -->
+	<delete id="deleteById" parameterType="int">
+		delete from jsb
+		where js_id = #{jsId}
+	</delete>
+	
+	<!-- 插入一条数据 -->
+	<insert id="insert" parameterType="role" >
+	   <!--在类似于mysql的数据库,有自增长id的设置时,在插入成功后,返回主键,放入对象中 -->
+        <selectKey keyProperty="jsId" resultType="int" order="AFTER">
+            SELECT LAST_INSERT_ID() as jsId
+        </selectKey>
+		insert into jsb ( js_mc, js_xgsj,
+		js_code, js_ms)
+		values ( #{jsMc}, #{jsXgsj},
+		#{jsCode}, #{jsMs})
+	</insert>
+	
+	<!-- 插入一条数据 -->
+	<insert id="insertSelective" parameterType="role" >
+		insert into jsb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="jsId != null">
+				js_id,
+			</if>
+			<if test="jsMc != null">
+				js_mc,
+			</if>
+			<if test="jsXgsj != null">
+				js_xgsj,
+			</if>
+			<if test="jsCode != null">
+				js_code,
+			</if>
+			<if test="jsMs != null">
+				js_ms,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="jsId != null">
+				#{jsId},
+			</if>
+			<if test="jsMc != null">
+				#{jsMc},
+			</if>
+			<if test="jsXgsj != null">
+				#{jsXgsj},
+			</if>
+			<if test="jsCode != null">
+				#{jsCode},
+			</if>
+			<if test="jsMs != null">
+				#{jsMs},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByIdSelective" parameterType="role">
+		update jsb
+		<set>
+			<if test="jsMc != null">
+				js_mc = #{jsMc},
+			</if>
+			<if test="jsXgsj != null">
+				js_xgsj = #{jsXgsj},
+			</if>
+			<if test="jsCode != null">
+				js_code = #{jsCode},
+			</if>
+			<if test="jsMs != null">
+				js_ms = #{jsMs},
+			</if>
+		</set>
+		where js_id = #{jsId}
+	</update>
+	<update id="updateById" parameterType="role">
+		update jsb
+		set js_mc = #{jsMc},
+		js_xgsj = #{jsXgsj},
+		js_code = #{jsCode},
+		js_ms = #{jsMs}
+		where js_id = #{jsId}
+	</update>
+</mapper>

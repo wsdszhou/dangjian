@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.notice.NoticeMapper">
+	<resultMap id="BaseResultMap" type="notice">
+		<id column="tz_id" property="tzId" />
+		<result column="tz_bt" property="tzBt" />
+		<result column="tz_nr" property="tzNr" />
+		<result column="tz_fbsj" property="tzFbsj" />
+		<result column="tz_fbrmc" property="tzFbrmc" />
+		<result column="tz_jssj" property="tzJssj" />
+		<result column="tz_yxj" property="tzYxj" />
+		<result column="tz_spId" property="tzSpId" />
+		<association property="tzFbrdm" javaType="viewYhxx">
+            <result column="user_id" property="userId"/>
+            <result column="yhxx_xm"  property="yhxxXm" />
+        </association>
+		<association property="tzFwdm" javaType="noticeRange">
+		    <id column="tzfw_id" property="tzfwId" />
+            <result column="tzfw_mc" property="tzfwMc" />
+		</association> 
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		tz_id, tz_bt, tz_nr, tz_fbsj, tz_fbrdm, tz_fbrmc, tz_jssj, tz_fwdm, tz_yxj, tz_spId
+	</sql>
+	
+	<delete id="deleteBySpLcxmbId" parameterType="string">
+       delete from tz_tzb where tz_spId = ( 
+               select lcxm_id from sp_lcxmb where lcxm_dxId = #{id});
+    </delete>
+	
+	<!-- 根据审批对象id获取通知 -->
+	<select id="getNoticeByApprovalId" parameterType="string" resultMap="BaseResultMap">
+       select <include refid="Base_Column_List" />
+        from tz_tzb tz
+        where tz_spId = #{tzSpId} 
+    </select>
+	
+	<!-- 分页查询通知 -->
+	<select id="getNoticePageList" parameterType="notice" resultMap="BaseResultMap">
+	   select tz_id, tz_bt, tz_nr, tz_fbsj, tz_jssj, tz_yxj, tzfw_id, tzfw_mc, vy.user_id, vy.yhxx_xm
+        from tz_tzb tz, tz_fw fw, view_yhxx vy
+        where tz.tz_fwdm = fw.tzfw_id  and  
+              tz.tz_fbrdm =vy.user_id  and
+              <trim suffixOverrides="and">
+		            <if test="tzBt != null">
+			            <if test="tzBt != ''">
+		                    tz_bt like '%${tzBt}%'  and 
+		                </if>
+		            </if>
+		            <if test="tzNr != null">
+			            <if test="tzNr != ''">
+		                    tz_nr like '%${tzNr}%'  and
+		                </if>
+		            </if>
+		            <if test="tzFwdm != null">
+		                 fw.tzfw_mc like '%${tzFwdm.tzfwMc}%' and
+	                </if>
+	                <if test="tzFwdm.tzfwId != null">
+		               tz_fwdm = #{tzFwdm.tzfwId} and 
+		            </if>
+		            <if test="tzFbsj != null">
+		                tz_fbsj &gt;= #{tzFbsj} and
+		            </if>
+		            <if test="tzJssj != null">
+		                tz_fbsj &lt; #{tzJssj} and 
+		            </if>
+		            <if test="tzFbrdm != null">
+		                tz_fbrdm = #{tzFbrdm.userId} and
+		            </if>
+		            <if test="tzYxj != null">
+		                tz_yxj =  #{tzYxj} and
+		            </if>
+	          </trim>
+	          order by tz_fbsj desc
+	</select>
+	
+	<!-- 根据主键查询信息   -->
+	<select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tz_tzb
+		where tz_id = #{tzId}
+	</select>
+	
+	<!--  删除一条记录  -->
+	<delete id="deleteById" parameterType="java.lang.String">
+		delete from tz_tzb
+		where tz_id = #{tzId}
+	</delete>
+	
+	 <!-- 添加一信息  -->
+	<insert id="insert" parameterType="notice">
+		insert into tz_tzb (tz_id, tz_bt, tz_nr, tz_fbsj, tz_fbrdm, tz_fbrmc, tz_jssj, tz_fwdm, tz_yxj, tz_spId)
+		values (#{tzId}, #{tzBt}, #{tzNr},#{tzFbsj}, #{tzFbrdm.userId}, #{tzFbrmc}, #{tzJssj}, #{tzFwdm.tzfwId}, #{tzYxj}, #{tzSpId})
+	</insert>
+	
+	 <!-- 添加一信息，并且判断是否为空 --> 
+	<insert id="insertSelective" parameterType="notice">
+		
+	</insert>
+	
+	<!--  修改信息，并且判断是否为空  -->
+	<update id="updateByIdSelective" parameterType="notice">
+		update tz_tzb
+		<set>
+			<if test="tzBt != null">
+				tz_bt = #{tzBt},
+			</if>
+			<if test="tzNr != null">
+				tz_nr = #{tzNr},
+			</if>
+			<if test="tzFbsj != null">
+				tz_fbsj = #{tzFbsj},
+			</if>
+			<if test="tzFbrdm != null">
+				tz_fbrdm = #{tzFbrdm.userId},
+			</if>
+			<if test="tzFbrmc != null">
+				tz_fbrmc = #{tzFbrmc},
+			</if>
+			<if test="tzJssj != null">
+				tz_jssj = #{tzJssj},
+			</if>
+			<if test="tzFwdm != null">
+				tz_fwdm = #{tzFwdm.tzfwId},
+			</if>
+			<if test="tzYxj != null">
+				tz_yxj = #{tzYxj},
+			</if>
+			<if test="tzSpId != null">
+                tz_spId = #{tzSpId},
+            </if>
+		</set>
+		where tz_id = #{tzId}
+	</update>
+	
+	 <!-- 修改信息 --> 
+	<update id="updateById" parameterType="notice">
+		update tz_tzb
+		set tz_bt = #{tzBt},
+		tz_nr = #{tzNr},
+		tz_fbsj = #{tzFbsj},
+		tz_fbrdm = #{tzFbrdm.userId},
+		tz_fbrmc = #{tzFbrmc},
+		tz_jssj = #{tzJssj},
+		tz_fwdm = #{tzFwdm.tzfwId},
+		tz_yxj = #{tzYxj}
+		where tz_id = #{tzId}
+	</update> 
+</mapper>

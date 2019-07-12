@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.branch.BranchMapper">
+
+	<resultMap id="BaseResultMap" type="zbb">
+		<id column="zb_id"  property="zbId" />
+		<result column="zb_mc"  property="zbMc" />
+		<result column="zb_ms"  property="zbMs" />
+		<result column="zb_xgsj"  property="zbXgsj" />
+        <association property="zbSsbmdm" javaType="bmb" >  
+            <id column="bm_id"  property="bmId"/>
+            <result column="bm_mc"  property="bmMc" />
+        </association>	
+        <association property="zbLxdm" javaType="zbLxb" >
+            <id column="zblx_id"  property="zblxId"/>
+            <result column="zblx_mc"  property="zblxMc" />
+        </association> 
+        <association property="zbSj" javaType="viewYhxx" >
+            <result column="user_id"  property="userId"/>
+            <result column="yhxx_xm"  property="yhxxXm" />
+        </association> 
+         <association property="zbXcwy" javaType="viewYhxx" >
+            <result column="user_id"  property="userId"/>
+            <result column="yhxx_xm"  property="yhxxXm" />
+        </association> 
+         <association property="zbZzwy" javaType="viewYhxx" >
+            <result column="user_id"  property="userId"/>
+            <result column="yhxx_xm"  property="yhxxXm" />
+        </association> 
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		zb_id, zb_mc, zb_ssbmdm, zb_lxdm, zb_ms, zb_xgsj,zb_sj, zb_zzwy, zb_xcwy
+	</sql>
+	
+	<!-- 根据支部id加载所有支部 -->
+    <select id="getBranchListByDeptId" resultType="zbb">
+       select zb_id, zb_mc
+       from zbb
+       where zb_ssbmdm =#{deptId}
+    </select>
+    
+	<!-- 加载所有支部 -->
+	<select id="getAllBranch" resultType="zbb">
+	   select zb_id, zb_mc
+	   from zbb
+	</select>
+	
+	<!-- 批量删除 -->
+    <delete id="deleteBranchBatch" >
+       delete from zbb where 
+       <foreach collection="branchIds" item="branchId" separator="  or  ">
+           zb_id = #{branchId}
+       </foreach>
+    </delete>
+	
+	<!-- 分页查询 -->
+	<select id="getBranchPageList" parameterType="zbb" resultMap="BaseResultMap">
+	   select zb.zb_id, zb. zb_mc, zb.zb_ssbmdm, zb.zb_lxdm, zb.zb_ms, zb.zb_xgsj, zb.zb_sj, zb.zb_zzwy, zb.zb_xcwy
+       from zbb zb, view_yhxx yhxx1, view_yhxx yhxx2, view_yhxx yhxx3, zb_lxb, bmb
+       where zb.zb_sj = yhxx1.user_id  and zb.zb_lxdm=zb_lxb.zblx_id and zb.zb_ssbmdm = bmb.bm_id and zb.zb_zzwy = yhxx2.user_id and zb.zb_xcwy = yhxx3.user_id 
+       <trim prefix="   and">
+	      <if test="zbMc != null">
+	           zb_mc like "%"#{zbMc}"%" 
+	      </if>
+	      <if test="zbSsbmdm != null">
+	           <if test="zbSsbmdm.bmId != null">
+	               zb_ssbmdm = #{zbSsbmdm.bmId}     
+	          </if>
+	      </if>
+	      <if test="zbLxdm != null">
+	           <if test="zbLxdm.zblxId != null">
+                   zb_lxdm = #{zbLxdm.zblxId}    
+              </if>
+	      </if>
+       </trim>
+       
+	</select>
+	
+	<!-- 根据部门和支部类型加载支部列表 -->
+	<select id="loadBranchByDepartmentAndBranchTypeList" resultType="zbb">
+       select zb_id, zb_mc
+       from zbb zb, zb_lxb lx, bmb bm
+       where zb.zb_ssbmdm = bm.bm_id  and  zb.zb_lxdm = lx.zblx_id and  bm_id = #{deptId} and zblx_id= #{branchTypeId}
+    </select>
+    
+    <!-- 根据部门加载支部列表 -->
+    <!--<select id="loadBranchByDepartmentList" parameterType="int" resultType="zbb">
+       select zb_id, zb_mc
+       from zbb zb, bmb bm
+       where zb.zb_ssbmdm = bm.bm_id  
+       <if test="deptId != null">
+           and  bm_id = #{deptId} 
+       </if>
+    </select>-->
+
+    <select id="loadBranchByDepartmentList" parameterType="int" resultType="zbb">
+        select zb_id, zb_mc
+        from zbb zb where zb_ssbmdm = #{deptId}
+    </select>
+    
+	<!-- 加载支部类型 -->
+	<select id="loadBranchTypeList" resultType="zbLxb">
+	   select zblx_id, zblx_mc
+	   from zb_lxb
+	</select>
+	
+	<!-- 根据id加载支部 -->
+    <select id="selectByPrimaryKey" parameterType="int" resultType="zbb">
+       select <include refid="Base_Column_List"></include>
+       from zbb
+       where zb_id = #{zbId}
+    </select>
+	
+	<!-- 加载所有支部 -->
+	<select id="loadBranchAllList" resultType="zbb">
+       select zb_id, zb_mc
+       from zbb
+    </select>
+
+	<select id="getZbListByUserId" parameterType="string">
+		select <include refid="Base_Column_List"></include>
+		from zbb a,yhb b, yhxx_id c
+		where b.user_yhxxdm = c.yhxx_id
+		and a.zb_id = b.yhxx_zbdm
+		and a.zb_ssbmdm = b.yhxx_bmdm
+		and a.user_id = #{userId}
+	</select>
+	
+    <insert id="insert" parameterType="zbb">
+    insert into zbb (zb_id, zb_mc, zb_ssbmdm, zb_lxdm, zb_ms, zb_sj, zb_zzwy, zb_xcwy, zb_xgsj)
+    values (#{zbId}, #{zbMc}, #{zbSsbmdm.bmId}, #{zbLxdm.zblxId}, #{zbMs}, #{zbSj.userId}, 
+        #{zbZzwy.userId}, #{zbXcwy.userId}, #{zbXgsj})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="zbb">
+    insert into zbb
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="zbId != null">
+        zb_id,
+      </if>
+      <if test="zbMc != null">
+        zb_mc,
+      </if>
+      <if test="zbSsbmdm != null">
+          <if test="zbSsbmdm.bmId != null">
+            zb_ssbmdm,
+          </if>
+      </if>
+      <if test="zbLxdm != null">
+          <if test="zbLxdm.zblxId != null">
+            zb_lxdm,
+          </if>
+      </if>
+      <if test="zbMs != null">
+        zb_ms,
+      </if>
+      <if test="zbSj != null">
+          <if test="zbSj.userId != null">
+            zb_sj,
+          </if>
+      </if>
+      <if test="zbZzwy != null">
+          <if test="zbZzwy.userId != null">
+           zb_zzwy,
+          </if>
+      </if>
+      <if test="zbXcwy != null">
+        <if test="zbXcwy.userId != null">
+            zb_xcwy,
+          </if>
+      </if>
+      <if test="zbXgsj != null">
+        zb_xgsj,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="zbId != null">
+        #{zbId},
+      </if>
+      <if test="zbMc != null">
+        #{zbMc},
+      </if>
+      <if test="zbSsbmdm != null">
+	      <if test="zbSsbmdm.bmId != null">
+	        #{zbSsbmdm.bmId},
+	      </if>
+      </if>
+      <if test="zbLxdm != null">
+	      <if test="zbLxdm.zblxId != null">
+	        #{zbLxdm.zblxId},
+	      </if>
+      </if>
+      <if test="zbMs != null">
+        #{zbMs},
+      </if>
+      <if test="zbSj != null">
+	      <if test="zbSj.userId != null">
+	        #{zbSj.userId},
+	      </if>
+      </if>
+      <if test="zbZzwy != null">
+	      <if test="zbZzwy.userId != null">
+	        #{zbZzwy.userId},
+	      </if>
+      </if>
+      <if test="zbXcwy != null">
+        <if test="zbXcwy.userId != null">
+	        #{zbXcwy.userId},
+	      </if>
+      </if>
+      <if test="zbXgsj != null">
+         #{zbXgsj},
+      </if>
+    </trim>;
+     update yh_xxb 
+     set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%支部书记" and dnzw_jb=3)
+     where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbSj.userId} );
+     update yh_xxb 
+     set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%组织委员" and dnzw_jb=3)
+     where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbZzwy.userId} );
+     update yh_xxb 
+     set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%宣传委员" and dnzw_jb=3)
+     where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbXcwy.userId} );
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="zbb">
+    update zbb
+    <set>
+      <if test="zbMc != null">
+        zb_mc = #{zbMc},
+      </if>
+      <if test="zbSsbmdm != null">
+        <if test="zbSsbmdm.bmId != null">
+            zb_ssbmdm = #{zbSsbmdm.bmId},
+         </if>
+      </if>
+      <if test="zbLxdm != null">
+	        <if test="zbLxdm.zblxId != null">
+	        zb_lxdm = #{zbLxdm.zblxId},
+	      </if>
+      </if>
+      <if test="zbMs != null">
+        zb_ms = #{zbMs},
+      </if>
+      <if test="zbSj != null">
+        <if test="zbSj.userId != null">
+            zb_sj = #{zbSj.userId},
+        </if>
+      </if>
+      <if test="zbZzwy != null">
+	      <if test="zbZzwy.userId != null">
+	            zb_zzwy = #{zbZzwy.userId},
+	      </if>
+      </if>
+      <if test="zbXcwy != null">
+        <if test="zbXcwy.userId != null">
+            zb_xcwy = #{zbXcwy.userId},
+        </if>
+      </if>
+      <if test="zbXgsj != null">
+        zb_xgsj =  #{zbXgsj},
+      </if>
+    </set>
+    where zb_id = #{zbId};
+     update yh_xxb 
+     set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%支部书记" and dnzw_jb=3)
+     where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbSj.userId} );
+     update yh_xxb 
+     set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%组织委员" and dnzw_jb=3)
+     where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbZzwy.userId} );
+     update yh_xxb 
+     set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%宣传委员" and dnzw_jb=3)
+     where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbXcwy.userId} );
+  </update>
+  <update id="updateByPrimaryKey" parameterType="zbb">
+    update zbb
+    set zb_mc = #{zbMc},
+      zb_ssbmdm = #{zbSsbmdm.bmId},
+      zb_lxdm = #{zbLxdm.zblxId},
+      zb_ms = #{zbMs},
+      zb_sj = #{zbSj.userId},
+      zb_zzwy = #{zbZzwy.userId},
+      zb_xcwy = #{zbXcwy.userId},
+      zb_xgsj =  #{zbXgsj},
+    where zb_id = #{zbId};
+    update yh_xxb 
+    set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%支部书记" and dnzw_jb=3)
+    where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbSj.userId} );
+    update yh_xxb 
+    set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%组织委员" and dnzw_jb=3)
+    where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbZzwy.userId} );
+    update yh_xxb 
+    set yhxx_dnzwdm = (select dnzw_id from dnzwb where dnzw_mc like "%宣传委员" and dnzw_jb=3)
+    where yhxx_id = (select user_yhxxdm from yhb where user_id = #{zbXcwy.userId} );
+  </update> 
+
+	
+</mapper>

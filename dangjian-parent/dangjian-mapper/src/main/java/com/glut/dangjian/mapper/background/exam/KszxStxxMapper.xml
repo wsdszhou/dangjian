@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxStxxMapper">
+    <insert id="insert" parameterType="list">
+        insert into kszx_stxx(xx, xxz, stid) values 
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.xx},#{item.xxz},#{item.stid})
+        </foreach>
+    </insert>
+
+    <insert id="insertByStid">
+        insert into kszx_stxx(xx, xxz, stid) values
+        <foreach collection="kszxStxxList" item="item" index="index" separator=",">
+            (#{item.xx},#{item.xxz},#{stid})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByStid" parameterType="int">
+        delete from kszx_stxx where stid=#{stid}
+    </delete>
+
+</mapper>

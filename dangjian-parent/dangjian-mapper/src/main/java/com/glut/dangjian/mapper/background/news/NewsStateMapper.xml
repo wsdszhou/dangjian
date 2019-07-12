@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.news.NewsStateMapper">
+    
+    <resultMap id="BaseResultMap" type="xwztb">
+        <id column="xwzt_id"  property="xwztId" />
+        <result column="xwzt_mc"  property="xwztMc" />
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        xwzt_id, xwzt_mc
+    </sql>
+    
+    <!--  -->
+    <select id="getNewsStateListAll" resultMap="BaseResultMap">
+       select <include refid="Base_Column_List"></include>
+       from xw_ztb
+    </select>
+    
+    <select id="selectByPrimaryKey"
+        parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from xw_ztb
+        where xwzt_id = #{xwztId}
+    </select>
+    
+    <delete id="deleteByPrimaryKey"
+        parameterType="java.lang.Integer">
+        delete from xw_ztb
+        where xwzt_id = #{xwztId}
+    </delete>
+    <insert id="insert"
+        parameterType="xwztb">
+        insert into xw_ztb (xwzt_id, xwzt_mc)
+        values (#{xwztId}, #{xwztMc})
+    </insert>
+    <insert id="insertSelective"
+        parameterType="xwztb">
+        insert into xw_ztb
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="xwztId != null">
+                xwzt_id,
+            </if>
+            <if test="xwztMc != null">
+                xwzt_mc,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="xwztId != null">
+                #{xwztId},
+            </if>
+            <if test="xwztMc != null">
+                #{xwztMc},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective"
+        parameterType="xwztb">
+        update xw_ztb
+        <set>
+            <if test="xwztMc != null">
+                xwzt_mc = #{xwztMc},
+            </if>
+        </set>
+        where xwzt_id = #{xwztId}
+    </update>
+    <update id="updateByPrimaryKey"
+        parameterType="xwztb">
+        update xw_ztb
+        set xwzt_mc = #{xwztMc}
+        where xwzt_id = #{xwztId}
+    </update>
+</mapper>

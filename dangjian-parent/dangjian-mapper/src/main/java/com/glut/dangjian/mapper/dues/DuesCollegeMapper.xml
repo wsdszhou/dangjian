@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glut.dangjian.mapper.dues.DuesCollegeMapper">
+    <resultMap id="BaseResultMap" type="duesCollege">
+        <id column="college_id" property="collegeId"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="college_num" property="collegeNum"/>
+        <result column="college_rate" property="collegeRate"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        college_id,college_name,college_num,college_rate
+    </sql>
+
+    <!-- 加载党费学院-->
+    <select id="loadDuesCollege" resultType="duesCollege">
+        select college_id,college_name,college_num,college_rate
+        from dues_college
+    </select>
+
+    <!-- 分页查询学院  -->
+    <select id="duesCollegePageList" resultMap="BaseResultMap">
+        select college_id,college_name,college_num,college_rate
+        from dues_college
+    </select>
+
+    <!-- 通过主键查询学院 -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from dues_college
+        where college_id = #{collegeId}
+    </select>
+
+</mapper>

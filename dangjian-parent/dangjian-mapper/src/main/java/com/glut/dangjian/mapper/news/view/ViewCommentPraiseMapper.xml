@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.news.view.ViewCommentPraiseMapper">
+  <resultMap id="BaseResultMap" type="viewCommentPraise">
+    <result column="pl_id"  property="plId" />
+    <result column="pl_zw"  property="plZw" />
+    <result column="pl_sj"  property="plSj" />
+    <result column="pl_flag"  property="plFlag" />
+    <result column="pl_xwdm"  property="plXwdm" />
+    <result column="pl_yhdm"  property="plYhdm" />
+    <result column="pldz_id"  property="pldzId" />
+    <result column="pldz_userId"  property="pldzUserid" />
+    <result column="pldz_userName"  property="pldzUsername" />
+  </resultMap>
+  <insert id="insert" parameterType="viewCommentPraise">
+    insert into view_comment_praise (pl_id, pl_zw, pl_sj, 
+      pl_flag, pl_xwdm, pl_yhdm, 
+      pldz_id, pldz_userId, pldz_userName
+      )
+    values (#{plId}, #{plZw}, #{plSj}, 
+      #{plFlag}, #{plXwdm}, #{plYhdm}, 
+      #{pldzId}, #{pldzUserid}, #{pldzUsername}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="viewCommentPraise">
+    insert into view_comment_praise
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="plId != null">
+        pl_id,
+      </if>
+      <if test="plZw != null">
+        pl_zw,
+      </if>
+      <if test="plSj != null">
+        pl_sj,
+      </if>
+      <if test="plFlag != null">
+        pl_flag,
+      </if>
+      <if test="plXwdm != null">
+        pl_xwdm,
+      </if>
+      <if test="plYhdm != null">
+        pl_yhdm,
+      </if>
+      <if test="pldzId != null">
+        pldz_id,
+      </if>
+      <if test="pldzUserid != null">
+        pldz_userId,
+      </if>
+      <if test="pldzUsername != null">
+        pldz_userName,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="plId != null">
+        #{plId},
+      </if>
+      <if test="plZw != null">
+        #{plZw},
+      </if>
+      <if test="plSj != null">
+        #{plSj},
+      </if>
+      <if test="plFlag != null">
+        #{plFlag},
+      </if>
+      <if test="plXwdm != null">
+        #{plXwdm},
+      </if>
+      <if test="plYhdm != null">
+        #{plYhdm},
+      </if>
+      <if test="pldzId != null">
+        #{pldzId},
+      </if>
+      <if test="pldzUserid != null">
+        #{pldzUserid},
+      </if>
+      <if test="pldzUsername != null">
+        #{pldzUsername},
+      </if>
+    </trim>
+  </insert>
+</mapper>

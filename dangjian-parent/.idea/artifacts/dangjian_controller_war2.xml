@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="dangjian-controller:war2">
+    <output-path>$PROJECT_DIR$/classes/artifacts/dangjian_controller</output-path>
+    <root id="archive" name="dangjian-controller.war">
+      <element id="artifact" artifact-name="dangjian-controller:war exploded" />
+      <element id="dir-copy" path="$PROJECT_DIR$/dangjian-controller/src/main/webapp" />
+    </root>
+  </artifact>
+</component>

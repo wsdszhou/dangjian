@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <!-- 默认配置 -->
+    <defaultCache    
+	    maxElementsInMemory="10000"    
+	    maxElementsOnDisk="0"    
+	    eternal="true"    
+	    overflowToDisk="true"    
+	    diskPersistent="false"    
+	    timeToIdleSeconds="0"    
+	    timeToLiveSeconds="0"    
+	    diskSpoolBufferSizeMB="50"    
+	    diskExpiryThreadIntervalSeconds="120"    
+	    memoryStoreEvictionPolicy="LFU"/>
+	    
+	    
+	<diskStore path="java.io.tmpdir"/>
+	
+	<!--
+	          用于对权限的缓存
+		maxElementsInMemory 为缓存对象的最大数目,
+		eternal 设置是否永远不过期,
+		timeToIdleSeconds 对象处于空闲状态的最多秒数,
+		timeToLiveSeconds 对象缓存时间
+		overflowToDisk 是否允许磁盘溢出
+	-->
+	<cache name="shiroAuthorizationCache" 
+		maxElementsInMemory="3000" 
+		eternal="false" 
+		timeToLiveSeconds="1440"
+		diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+		memoryStoreEvictionPolicy="LFU" 
+		overflowToDisk="false"/>
+		
+	   <!-- 审批岗位缓存  -->
+    <cache name="approvalJobCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 审批岗位用户缓存  -->
+    <cache name="approvalJobUserCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 审批节点缓存  -->
+    <cache name="approvalNodeCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 审批流程缓存  -->
+    <cache name="approvalProcessCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 功能缓存  -->
+    <cache name="functionCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 角色缓存  -->
+    <cache name="roleCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 支部缓存  -->
+    <cache name="branchCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 支部荣誉缓存  -->
+    <cache name="branchHonorCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 部门荣誉缓存  -->
+    <cache name="departmentHonorCache" 
+        maxElementsInMemory="3000" 
+        eternal="true" 
+        timeToLiveSeconds="14400"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 部门缓存  -->
+    <cache name="departmentCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 试卷管理缓存  -->
+    <cache name="examManageCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+      <!-- 题目管理缓存  -->
+    <cache name="topicManageCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>  	
+        
+         <!-- 栏目缓存  -->
+    <cache name="columnCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/> 
+        
+        <!-- 新闻缓存  -->
+    <cache name="newsCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/> 
+        
+         <!-- 新闻缓存  -->
+    <cache name="newsCommentCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>  
+        
+        <!-- 新闻状态缓存  -->
+    <cache name="newsStateCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 通知对象缓存  -->
+    <cache name="noticeObjectCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 通知范围缓存  -->
+    <cache name="noticeRangeCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 其他缓存  -->
+    <cache name="otherCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- 党籍缓存  -->
+    <cache name="partyCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- bug缓存  -->
+    <cache name="bugCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+        <!-- bug缓存  -->
+    <cache name="systemCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+        
+		<!-- bug缓存  -->
+    <cache name="userCache" 
+        maxElementsInMemory="3000" 
+        eternal="false" 
+        timeToLiveSeconds="1440"
+        diskSpoolBufferSizeMB="50"    
+        diskExpiryThreadIntervalSeconds="120" 
+        memoryStoreEvictionPolicy="LFU" 
+        overflowToDisk="false"/>
+
+    <!-- 党费提醒缓存  -->
+    <cache name="duesNotice"
+           maxElementsInMemory="3000"
+           eternal="false"
+           timeToLiveSeconds="1440"
+           diskSpoolBufferSizeMB="50"
+           diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LFU"
+           overflowToDisk="false"/>
+</ehcache>

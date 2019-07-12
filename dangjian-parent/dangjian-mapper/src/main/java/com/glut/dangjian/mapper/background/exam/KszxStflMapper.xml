@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxStflMapper">
+
+    <insert id="insertCategorie" parameterType="map">
+      insert into kszx_tmfl (`name`,parent_id)
+      select #{flName},#{fjfl}
+      where not exists(select id from kszx_tmfl where `name`=#{flName})
+    </insert>
+
+    <update id="updateCategorie" parameterType="KszxTmfl">
+        update kszx_tmfl
+        <set>
+            <if test="name != null">
+                `name` = #{name},
+            </if>
+
+            <if test="children != -1">
+                children = #{children},
+            </if>
+
+            <if test="parentId != -1">
+                parent_id = #{parentId},
+            </if>
+        </set>
+        where id=#{id} and not exists(select id from kszx_tmfl where `name`=#{name})
+    </update>
+
+    <delete id="deleteCategorieById" parameterType="int">
+        delete from kszx_tmfl where id=#{id}
+    </delete>
+
+    <select id="selectCategories" resultType="kszxTmfl">
+        select id,`name`,children,parent_id parentId from kszx_tmfl order by parent_id asc
+    </select>
+
+    <select id="selectCategoriesByPid" resultType="kszxTmfl" parameterType="int">
+        select id,`name`,children,parent_id parentId from kszx_tmfl where parent_id=#{id}
+    </select>
+
+
+    <select id="selectCategoriesToHashMap" resultType="java.util.Map">
+        select `name`,id from kszx_tmfl
+    </select>
+
+</mapper>

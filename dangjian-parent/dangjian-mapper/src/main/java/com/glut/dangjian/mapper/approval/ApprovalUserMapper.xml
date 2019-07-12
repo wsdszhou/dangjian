@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.ApprovalUserMapper">
+	
+	<resultMap id="BaseResultMap" type="spRyb">
+		<id column="spry_id"  property="spryId" />
+		<result column="spry_bmdm" property="spryBmdm" />
+		<association property="spryYh" javaType="yhb">
+		    <id column="user_id" property="userId"/>
+		</association>
+		<association property="sprySpgwdm" javaType="spSpgwb">
+            <id column="spgw_id"  property="spgwId" />
+            <result column="spgw_spgwmc"  property="spgwSpgwmc" />
+        </association>
+    </resultMap>
+    
+	<sql id="Base_Column_List">
+		spry_id, spry_yh, spry_spgwdm, spry_bmdm
+	</sql>
+	
+	<!-- 根据userId获取审批用户 -->
+	<select id="getApprovalUserByUserId"  resultType="spRyb">
+	   select spry_id
+	   from sp_ryb
+	   where spry_yh = #{userId} and spry_spgwdm =#{spgwId}
+	</select>
+	<select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from sp_ryb
+		where spry_id = #{spryId}
+	</select>
+	
+	<delete id="deleteById" >
+	   <if test="ids != null">
+	       <foreach collection="ids" item="id" separator=";">
+				delete from sp_ryb  where spry_id = #{id}
+	       </foreach>
+	   </if>
+	</delete>
+	
+	
+	<insert id="insert" parameterType="spRyb">
+		insert into sp_ryb (spry_id, spry_yh, spry_spgwdm, spry_bmdm)
+		values (#{spryId}, #{spryYh.userId},#{sprySpgwdm.spgwId}, #{spryBmdm})
+	</insert>
+	
+	
+	<insert id="insertSelective" parameterType="spRyb">
+		insert into sp_ryb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spryId != null">
+				spry_id,
+			</if>
+			<if test="spryYh != null">
+				spry_yh,
+			</if>
+			<if test="sprySpgwdm != null">
+				spry_spgwdm,
+			</if>
+			<if test="spryBmdm != null">
+                spry_bmdm,
+            </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spryId != null">
+				#{spryId},
+			</if>
+			<if test="spryYh != null">
+				#{spryYh.userId},
+			</if>
+			<if test="sprySpgwdm != null">
+				#{sprySpgwdm.spgwId},
+			</if>
+			<if test="spryBmdm != null">
+                #{spryBmdm},
+            </if>
+		</trim>
+	</insert>
+	
+	
+	<update id="updateByIdSelective" parameterType="spRyb">
+		update sp_ryb
+		<set>
+			<if test="spryYh != null">
+				spry_yh = #{spryYh.userId},
+			</if>
+			<if test="sprySpgwdm != null">
+				spry_spgwdm = #{sprySpgwdm.spgwId},
+			</if>
+			<if test="spryBmdm != null">
+                spry_bmdm = #{spryBmdm},
+            </if>
+		</set>
+		where spry_id = #{spryId}
+	</update>
+	
+	
+	<update id="updateById" parameterType="spRyb">
+		update sp_ryb
+			set spry_yh = #{spryYh.userId},
+			spry_spgwdm = #{sprySpgwdm.spgwId},
+			spry_bmdm = #{spryBmdm}
+		where spry_id = #{spryId}
+	</update>  
+</mapper>

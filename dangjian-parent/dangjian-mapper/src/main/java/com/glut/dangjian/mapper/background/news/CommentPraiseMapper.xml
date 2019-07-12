@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.news.CommentPraiseMapper">
+	<resultMap id="BaseResultMap" type="xwPldzb">
+		<id column="pldz_id" property="pldzId" />
+		<result column="pldz_pldm" property="pldzPldm" />
+		<result column="pldz_yhdm" property="pldzYhdm" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		pldz_id, pldz_pldm, pldz_yhdm
+	</sql>
+
+	<!-- 根据新闻id和用户id获取新闻评论对象 -->
+	<select id="getCommentPraiseByCommentidAnuserid"  resultType="string">
+		select pldz_id
+		from xw_pldzb
+		where pldz_pldm = #{commentId} and pldz_yhdm = #{userId}
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="string"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from xw_pldzb
+		where pldz_id = #{pldzId}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="string">
+		delete from xw_pldzb
+		where pldz_id = #{pldzId}
+	</delete>
+	<insert id="insert" parameterType="xwPldzb">
+		insert into xw_pldzb (pldz_id, pldz_pldm, pldz_yhdm
+		)
+		values (#{pldzId}, #{pldzPldm}, #{pldzYhdm}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="xwPldzb">
+		insert into xw_pldzb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="pldzId != null">
+				pldz_id,
+			</if>
+			<if test="pldzPldm != null">
+				pldz_pldm,
+			</if>
+			<if test="pldzYhdm != null">
+				pldz_yhdm,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="pldzId != null">
+				#{pldzId},
+			</if>
+			<if test="pldzPldm != null">
+				#{pldzPldm},
+			</if>
+			<if test="pldzYhdm != null">
+				#{pldzYhdm},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="xwPldzb">
+		update xw_pldzb
+		<set>
+			<if test="pldzPldm != null">
+				pldz_pldm = #{pldzPldm},
+			</if>
+			<if test="pldzYhdm != null">
+				pldz_yhdm = #{pldzYhdm},
+			</if>
+		</set>
+		where pldz_id = #{pldzId}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="xwPldzb">
+		update xw_pldzb
+		set pldz_pldm = #{pldzPldm},
+		pldz_yhdm = #{pldzYhdm}
+		where pldz_id = #{pldzId}
+	</update>
+</mapper>

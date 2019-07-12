@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.ApprovalJobMapper">
+	
+	<resultMap id="BaseResultMap" type="spSpgwb">
+		<id column="spgw_id"  property="spgwId" />
+		<result column="spgw_spgwmc"  property="spgwSpgwmc" />
+		<association property="spgwLcdm" javaType="spSplcb">
+		    <id column="splc_id"  property="splcId" />
+	        <result column="splc_mc"  property="splcMc" />
+	        <result column="splc_state"  property="splcState" />
+	        <result column="splc_ywdm"  property="splcYwdm" />
+		</association>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		spgw_id, spgw_spgwmc
+	</sql>
+	
+	<!--  -->
+	<select id="getJobByName" parameterType="string" resultType="spSpgwb">
+	   select spgw_id, spgw_spgwmc
+	   from sp_spgwb
+	   where spgw_spgwmc = #{spgwSpgwmc}
+	</select>
+	
+	<!-- 加载审批岗位 -->
+	<select id="loadApprovalJob" resultType="spSpgwb">
+	   select spgw_id, spgw_spgwmc
+	   from sp_spgwb
+	</select>
+	
+	<!-- 分页查询审批岗位  -->
+	<select id="approvalJobPageList" resultMap="BaseResultMap">
+	   select spgw_id, spgw_spgwmc
+       from sp_spgwb
+	</select>
+	
+	<!-- 通过主键查询审批岗位 -->
+	<select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from sp_spgwb
+		where spgw_id = #{spgwId}
+	</select>
+	
+	<!-- 通过主键删除审批岗位 -->
+	<delete id="deleteById" parameterType="java.lang.Integer">
+		delete from sp_spgwb
+		where spgw_id = #{spgwId}
+	</delete>
+	
+	<!-- 插入审批岗位 -->
+	<insert id="insert" parameterType="spSpgwb">
+		insert into sp_spgwb (spgw_id, spgw_spgwmc, spgw_lcdm)
+		values (#{spgwId}, #{spgwSpgwmc}, #{spgwLcdm.splcId})
+	</insert>
+	
+	<!-- 插入审批岗位， 并且判断是否为空 -->
+	<insert id="insertSelective" parameterType="spSpgwb">
+		insert into sp_spgwb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spgwId != null">
+				spgw_id,
+			</if>
+			<if test="spgwSpgwmc != null">
+				spgw_spgwmc,
+			</if>
+			<if test="spgwLcdm != null">
+                spgw_lcdm,
+            </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spgwId != null">
+				#{spgwId},
+			</if>
+			<if test="spgwSpgwmc != null">
+				#{spgwSpgwmc},
+			</if>
+			<if test="spgwLcdm != null">
+                #{spgwLcdm.splcId},
+            </if>
+		</trim>
+	</insert>
+	
+	<!-- 修改审批岗位， 并且判断是否为空 -->
+	<update id="updateByIdSelective" parameterType="spSpgwb">
+		update sp_spgwb
+		<set>
+			<if test="spgwSpgwmc != null">
+				spgw_spgwmc = #{spgwSpgwmc},
+			</if>
+			<if test="spgwLcdm != null">
+                spgw_lcdm =  #{spgwLcdm.splcId},
+            </if>
+		</set>
+		where spgw_id = #{spgwId}
+	</update>
+	
+	<!-- 修改审批岗位 -->
+	<update id="updateById" parameterType="spSpgwb">
+		update sp_spgwb
+		set spgw_spgwmc = #{spgwSpgwmc}, spgw_lcdm =  #{spgwLcdm.splcId}
+		where spgw_id = #{spgwId}
+	</update> 
+	
+</mapper>

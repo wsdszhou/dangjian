@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.news.view.ViewCommentReplyMapper">
+  <resultMap id="BaseResultMap" type="viewCommentReply">
+    <result column="pl_id"  property="plId" />
+    <result column="pl_zw"  property="plZw" />
+    <result column="pl_sj"  property="plSj" />
+    <result column="pl_flag"  property="plFlag" />
+    <result column="pl_xwdm"  property="plXwdm" />
+    <result column="pl_yhdm"  property="plYhdm" />
+    <result column="hf_id"  property="hfId" />
+    <result column="hf_reply_id"  property="hfReplyId" />
+    <result column="hf_reply_type"  property="hfReplyType" />
+    <result column="hf_nr"  property="hfNr" />
+    <result column="hf_mb_yh_id"  property="hfMbYhId" />
+    <result column="hf_sj"  property="hfSj" />
+    <result column="hf_flag"  property="hfFlag" />
+    <result column="hf_userId"  property="hfUserid" />
+    <result column="hf_userName"  property="hfUsername" />
+  </resultMap>
+  
+  <sql id="all_column">
+     pl_id, pl_zw, pl_sj, pl_flag, pl_xwdm, pl_yhdm, hf_id, hf_reply_id, hf_reply_type, 
+     hf_nr, hf_mb_yh_id, hf_sj, hf_flag, hf_userId, hf_userName
+  </sql>
+  
+  <sql id="reply_column">
+    distinct(reply.hf_id), reply.hf_reply_id, reply.hf_reply_type, reply.hf_nr, reply.hf_mb_yh_id, 
+    reply.hf_sj, reply.hf_flag, reply.hf_userId, reply.hf_userName
+  </sql>
+  
+  <!-- 获取回复评论，根据评论id分页查询 -->
+  <select id="getReplyCommentByCommentId" parameterType="string" resultMap="BaseResultMap">
+        select <include refid="reply_column"></include>, count(pldz.pldz_id) accountParise
+        from view_comment_reply reply, xw_pldzb pldzb
+        where  reply.pl_id = #{commentId} and reply.hf_flag = 1
+        group by reply.hf_id
+        order by hf_sj desc
+  </select>
+  
+  
+  <insert id="insert" parameterType="viewCommentReply">
+    insert into view_comment_reply (pl_id, pl_zw, pl_sj, 
+      pl_flag, pl_xwdm, pl_yhdm, 
+      hf_id, hf_reply_id, hf_reply_type, 
+      hf_nr, hf_mb_yh_id, hf_sj, 
+      hf_flag, hf_userId, hf_userName
+      )
+    values (#{plId}, #{plZw}, #{plSj}, 
+      #{plFlag}, #{plXwdm}, #{plYhdm}, 
+      #{hfId}, #{hfReplyId}, #{hfReplyType}, 
+      #{hfNr}, #{hfMbYhId}, #{hfSj}, 
+      #{hfFlag}, #{hfUserid}, #{hfUsername}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="viewCommentReply">
+    insert into view_comment_reply
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="plId != null">
+        pl_id,
+      </if>
+      <if test="plZw != null">
+        pl_zw,
+      </if>
+      <if test="plSj != null">
+        pl_sj,
+      </if>
+      <if test="plFlag != null">
+        pl_flag,
+      </if>
+      <if test="plXwdm != null">
+        pl_xwdm,
+      </if>
+      <if test="plYhdm != null">
+        pl_yhdm,
+      </if>
+      <if test="hfId != null">
+        hf_id,
+      </if>
+      <if test="hfReplyId != null">
+        hf_reply_id,
+      </if>
+      <if test="hfReplyType != null">
+        hf_reply_type,
+      </if>
+      <if test="hfNr != null">
+        hf_nr,
+      </if>
+      <if test="hfMbYhId != null">
+        hf_mb_yh_id,
+      </if>
+      <if test="hfSj != null">
+        hf_sj,
+      </if>
+      <if test="hfFlag != null">
+        hf_flag,
+      </if>
+      <if test="hfUserid != null">
+        hf_userId,
+      </if>
+      <if test="hfUsername != null">
+        hf_userName,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="plId != null">
+        #{plId},
+      </if>
+      <if test="plZw != null">
+        #{plZw},
+      </if>
+      <if test="plSj != null">
+        #{plSj},
+      </if>
+      <if test="plFlag != null">
+        #{plFlag},
+      </if>
+      <if test="plXwdm != null">
+        #{plXwdm},
+      </if>
+      <if test="plYhdm != null">
+        #{plYhdm},
+      </if>
+      <if test="hfId != null">
+        #{hfId},
+      </if>
+      <if test="hfReplyId != null">
+        #{hfReplyId},
+      </if>
+      <if test="hfReplyType != null">
+        #{hfReplyType},
+      </if>
+      <if test="hfNr != null">
+        #{hfNr},
+      </if>
+      <if test="hfMbYhId != null">
+        #{hfMbYhId},
+      </if>
+      <if test="hfSj != null">
+        #{hfSj},
+      </if>
+      <if test="hfFlag != null">
+        #{hfFlag},
+      </if>
+      <if test="hfUserid != null">
+        #{hfUserid},
+      </if>
+      <if test="hfUsername != null">
+        #{hfUsername},
+      </if>
+    </trim>
+  </insert>
+</mapper>

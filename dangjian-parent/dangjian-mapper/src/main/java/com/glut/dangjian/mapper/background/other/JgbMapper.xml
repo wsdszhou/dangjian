@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.other.JgbMapper">
+	<resultMap id="BaseResultMap" type="jgb">
+		<id column="jg_id" jdbcType="INTEGER" property="jgId" />
+	    <result column="js_szs_id" jdbcType="INTEGER" property="jsSzsId" />
+	    <result column="js_szqx_mc" jdbcType="VARCHAR" property="jsSzqxMc" />
+	    <result column="jg_szs_mc" jdbcType="VARCHAR" property="jgSzsMc" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		jg_id, js_szs_id, js_szqx_mc, jg_szs_mc
+	</sql>
+	
+	<!-- 获取所有的籍贯 -->
+    <select id="getAll" resultType="java.util.HashMap">
+        select js_szqx_mc, jg_id
+        from jgb
+    </select>
+	
+	<!-- 根据籍贯主键查询籍贯信息 -->
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from jgb
+		where jg_id = #{jgId}
+	</select>
+	
+	<!-- 查询所有籍贯信息 -->
+	<select id="getJgbList" resultMap="BaseResultMap">
+	   select <include refid="Base_Column_List" />
+       from jgb
+	</select>
+	
+	<!-- 根据所在省查询所有籍贯 -->
+	<select id="getJgbListBySzsId"  parameterType="java.lang.Integer"  resultMap="BaseResultMap">
+       select <include refid="Base_Column_List" />
+       from jgb
+       where js_szs_id = #{szsId}
+    </select>
+	
+	
+	
+	
+	
+	
+	<delete id="deleteByPrimaryKey"
+		parameterType="java.lang.Integer">
+		delete from jgb
+		where jg_id = #{jgId}
+	</delete>
+	<insert id="insert"
+		parameterType="jgb">
+		insert into jgb (jg_id, jg_mc)
+		values (#{jgId}, #{jgMc})
+	</insert>
+	<insert id="insertSelective"
+		parameterType="jgb">
+		insert into jgb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="jgId != null">
+				jg_id,
+			</if>
+			<if test="jgMc != null">
+				jg_mc,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="jgId != null">
+				#{jgId},
+			</if>
+			<if test="jgMc != null">
+				#{jgMc},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective"
+		parameterType="jgb">
+		update jgb
+		<set>
+			<if test="jgMc != null">
+				jg_mc = #{jgMc},
+			</if>
+		</set>
+		where jg_id = #{jgId}
+	</update>
+	<update id="updateByPrimaryKey"
+		parameterType="jgb">
+		update jgb
+		set jg_mc = #{jgMc}
+		where jg_id = #{jgId}
+	</update>
+</mapper>

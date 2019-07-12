@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.user.YhXxbMapper">
+
+	<!-- 用户视图所有字段 -->
+    <sql id="viewYhxx_all_column">
+       yhxx_id, yhxx_xmm, yhxx_xb, yhxx_csrq, yhxx_sjh, yhxx_mj, yhxx_yx, yhxx_sfzh, yhxx_ms, yhxx_da,
+       xl_id, xl_mc, zzmm_id, zzmm_mc, jg_id, js_szs_id, js_szqx_mc, jg_szs_mc, mz_id, mz_mc, dnzw_id,
+       dnzw_mc, dnzw_jb, xzzw_id, xzzw_mc, xzzw_jb, bm_id, bm_mc, zb_id, zb_mc, zb_ssbmdm, zb_lxdm,
+       zb_ms, user_id, user_mc, user_pwk, user_mm, user_wx_id, user_wxm, user_ms, user_cjrq, user_ztdm
+    </sql>
+    
+    <!-- 头像需要单独插入 -->
+    <sql id="Blob_Column_List">
+        yhxx_tx
+    </sql>
+    
+    <!-- 用户视图所有的结果集 -->
+    <resultMap id="BaseResultMap" type="viewYhxx">
+        <id column="yhxx_id" jdbcType="VARCHAR" property="yhxxId" />
+        <result column="yhxx_xm" jdbcType="VARCHAR" property="yhxxXm" />
+        <result column="yhxx_xb" jdbcType="VARCHAR" property="yhxxXb" />
+        <result column="yhxx_csrq" jdbcType="DATE" property="yhxxCsrq" />
+        <result column="yhxx_sjh" jdbcType="VARCHAR" property="yhxxSjh" />
+        <result column="yhxx_mj" jdbcType="VARCHAR" property="yhxxMj" />
+        <result column="yhxx_yx" jdbcType="VARCHAR" property="yhxxYx" />
+        <result column="yhxx_sfzh" jdbcType="VARCHAR" property="yhxxSfzh" />
+        <result column="yhxx_ms" jdbcType="VARCHAR" property="yhxxMs" />
+        <result column="yhxx_da" jdbcType="VARCHAR" property="yhxxDa" />
+        <result column="xl_id" jdbcType="INTEGER" property="xlId" />
+        <result column="xl_mc" jdbcType="VARCHAR" property="xlMc" />
+        <result column="zzmm_id" jdbcType="INTEGER" property="zzmmId" />
+        <result column="zzmm_mc" jdbcType="VARCHAR" property="zzmmMc" />
+        <result column="jg_id" jdbcType="INTEGER" property="jgId" />
+        <result column="js_szs_id" jdbcType="INTEGER" property="jsSzsId" />
+        <result column="js_szqx_mc" jdbcType="VARCHAR" property="jsSzqxMc" />
+        <result column="jg_szs_mc" jdbcType="VARCHAR" property="jgSzsMc" />
+        <result column="mz_id" jdbcType="INTEGER" property="mzId" />
+        <result column="mz_mc" jdbcType="VARCHAR" property="mzMc" />
+        <result column="dnzw_id" jdbcType="INTEGER" property="dnzwId" />
+        <result column="dnzw_mc" jdbcType="VARCHAR" property="dnzwMc" />
+        <result column="dnzw_jb" jdbcType="INTEGER" property="dnzwJb" />
+        <result column="xzzw_id" jdbcType="INTEGER" property="xzzwId" />
+        <result column="xzzw_mc" jdbcType="VARCHAR" property="xzzwMc" />
+        <result column="xzzw_jb" jdbcType="INTEGER" property="xzzwJb" />
+        <result column="bm_id" jdbcType="INTEGER" property="bmId" />
+        <result column="bm_mc" jdbcType="VARCHAR" property="bmMc" />
+        <result column="zb_id" jdbcType="INTEGER" property="zbId" />
+        <result column="zb_mc" jdbcType="VARCHAR" property="zbMc" />
+        <result column="zb_ssbmdm" jdbcType="INTEGER" property="zbSsbmdm" />
+        <result column="zb_lxdm" jdbcType="INTEGER" property="zbLxdm" />
+        <result column="zb_ms" jdbcType="VARCHAR" property="zbMs" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="user_mc" jdbcType="VARCHAR" property="userMc" />
+        <result column="user_pwk" jdbcType="VARCHAR" property="userPwk" />
+        <result column="user_mm" jdbcType="VARCHAR" property="userMm" />
+        <result column="user_wx_id" jdbcType="VARCHAR" property="userWxId" />
+        <result column="user_wxm" jdbcType="VARCHAR" property="userWxm" />
+        <result column="user_ms" jdbcType="VARCHAR" property="userMs" />
+        <result column="user_cjrq" jdbcType="TIMESTAMP" property="userCjrq" />
+        <result column="user_ztdm" jdbcType="INTEGER" property="userZtdm" />
+    </resultMap>
+
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="viewYhxx">
+        <result column="yhxx_tx" jdbcType="LONGVARBINARY" property="yhxxTx" />
+    </resultMap>
+    
+    <!-- 根据用户视图中的用户表id 查询用户视图对象 -->
+    <select id="getViewYhxxByUserId" resultMap="BaseResultMap">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+       where user_id=#{userId}
+    </select>   
+    
+    <!-- 查询所有的用户视图信息 -->
+    <select id="getListViewYhxx">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+    </select>
+    
+    <!--根据分页信息pageNum、pageSize查询用户视图信息 -->
+    <select id="">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+       order by yhxx_id desc 
+    </select>
+
+    <!-- 插入一条用户视图对象 -->
+    <insert id="saveViewYhxx" parameterType="viewYhxx">
+        insert into view_yhxx (yhxx_id, yhxx_xm, yhxx_xb,
+        yhxx_csrq, yhxx_sjh, yhxx_mj,
+        yhxx_yx, yhxx_sfzh, yhxx_ms,
+        yhxx_da, xl_id, xl_mc,
+        zzmm_id, zzmm_mc, jg_id,
+        js_szs_id, js_szqx_mc, jg_szs_mc,
+        mz_id, mz_mc, dnzw_id,
+        dnzw_mc, dnzw_jb, xzzw_id,
+        xzzw_mc, xzzw_jb, bm_id,
+        bm_mc, zb_id, zb_mc, zb_ssbmdm,
+        zb_lxdm, zb_ms, user_id,
+        user_mc, user_pwk, user_mm,
+        user_wx_id, user_wxm, user_ms,
+        user_cjrq, user_ztdm, yhxx_tx
+        )
+        values (#{yhxxId,jdbcType=VARCHAR}, #{yhxxXm,jdbcType=VARCHAR},
+        #{yhxxXb,jdbcType=VARCHAR},
+        #{yhxxCsrq,jdbcType=DATE}, #{yhxxSjh,jdbcType=VARCHAR}, #{yhxxMj,jdbcType=VARCHAR},
+        #{yhxxYx,jdbcType=VARCHAR}, #{yhxxSfzh,jdbcType=VARCHAR},
+        #{yhxxMs,jdbcType=VARCHAR},
+        #{yhxxDa,jdbcType=VARCHAR}, #{xlId,jdbcType=INTEGER}, #{xlMc,jdbcType=VARCHAR},
+        #{zzmmId,jdbcType=INTEGER}, #{zzmmMc,jdbcType=VARCHAR},
+        #{jgId,jdbcType=INTEGER},
+        #{jsSzsId,jdbcType=INTEGER}, #{jsSzqxMc,jdbcType=VARCHAR}, #{jgSzsMc,jdbcType=VARCHAR},
+        #{mzId,jdbcType=INTEGER}, #{mzMc,jdbcType=VARCHAR},
+        #{dnzwId,jdbcType=INTEGER},
+        #{dnzwMc,jdbcType=VARCHAR}, #{dnzwJb,jdbcType=INTEGER}, #{xzzwId,jdbcType=INTEGER},
+        #{xzzwMc,jdbcType=VARCHAR}, #{xzzwJb,jdbcType=INTEGER},
+        #{bmId,jdbcType=INTEGER},
+        #{bmMc,jdbcType=VARCHAR}, #{zbId,jdbcType=INTEGER}, #{zbMc,jdbcType=VARCHAR},
+        #{zbSsbmdm,jdbcType=INTEGER},
+        #{zbLxdm,jdbcType=INTEGER}, #{zbMs,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR},
+        #{userMc,jdbcType=VARCHAR}, #{userPwk,jdbcType=VARCHAR},
+        #{userMm,jdbcType=VARCHAR},
+        #{userWxId,jdbcType=VARCHAR}, #{userWxm,jdbcType=VARCHAR}, #{userMs,jdbcType=VARCHAR},
+        #{userCjrq,jdbcType=TIMESTAMP}, #{userZtdm,jdbcType=INTEGER},
+        #{yhxxTx,jdbcType=LONGVARBINARY}
+        )
+    </insert>
+
+    <!-- 插入一条用户视图对象：使用判断语句，为空不插入 -->
+    <insert id="insertViewYhxxByIf" parameterType="viewYhxx">
+        insert into view_yhxx
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="yhxxId != null">
+                yhxx_id,
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm,
+            </if>
+            <if test="yhxxXb != null">
+                yhxx_xb,
+            </if>
+            <if test="yhxxCsrq != null">
+                yhxx_csrq,
+            </if>
+            <if test="yhxxSjh != null">
+                yhxx_sjh,
+            </if>
+            <if test="yhxxMj != null">
+                yhxx_mj,
+            </if>
+            <if test="yhxxYx != null">
+                yhxx_yx,
+            </if>
+            <if test="yhxxSfzh != null">
+                yhxx_sfzh,
+            </if>
+            <if test="yhxxMs != null">
+                yhxx_ms,
+            </if>
+            <if test="yhxxDa != null">
+                yhxx_da,
+            </if>
+            <if test="xlId != null">
+                xl_id,
+            </if>
+            <if test="xlMc != null">
+                xl_mc,
+            </if>
+            <if test="zzmmId != null">
+                zzmm_id,
+            </if>
+            <if test="zzmmMc != null">
+                zzmm_mc,
+            </if>
+            <if test="jgId != null">
+                jg_id,
+            </if>
+            <if test="jsSzsId != null">
+                js_szs_id,
+            </if>
+            <if test="jsSzqxMc != null">
+                js_szqx_mc,
+            </if>
+            <if test="jgSzsMc != null">
+                jg_szs_mc,
+            </if>
+            <if test="mzId != null">
+                mz_id,
+            </if>
+            <if test="mzMc != null">
+                mz_mc,
+            </if>
+            <if test="dnzwId != null">
+                dnzw_id,
+            </if>
+            <if test="dnzwMc != null">
+                dnzw_mc,
+            </if>
+            <if test="dnzwJb != null">
+                dnzw_jb,
+            </if>
+            <if test="xzzwId != null">
+                xzzw_id,
+            </if>
+            <if test="xzzwMc != null">
+                xzzw_mc,
+            </if>
+            <if test="xzzwJb != null">
+                xzzw_jb,
+            </if>
+            <if test="bmId != null">
+                bm_id,
+            </if>
+            <if test="bmMc != null">
+                bm_mc,
+            </if>
+            <if test="zbId != null">
+                zb_id,
+            </if>
+            <if test="zbMc != null">
+                zb_mc,
+            </if>
+            <if test="zbSsbmdm != null">
+                zb_ssbmdm,
+            </if>
+            <if test="zbLxdm != null">
+                zb_lxdm,
+            </if>
+            <if test="zbMs != null">
+                zb_ms,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="userMc != null">
+                user_mc,
+            </if>
+            <if test="userPwk != null">
+                user_pwk,
+            </if>
+            <if test="userMm != null">
+                user_mm,
+            </if>
+            <if test="userWxId != null">
+                user_wx_id,
+            </if>
+            <if test="userWxm != null">
+                user_wxm,
+            </if>
+            <if test="userMs != null">
+                user_ms,
+            </if>
+            <if test="userCjrq != null">
+                user_cjrq,
+            </if>
+            <if test="userZtdm != null">
+                user_ztdm,
+            </if>
+            <if test="yhxxTx != null">
+                yhxx_tx,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="yhxxId != null">
+                #{yhxxId,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxXm != null">
+                #{yhxxXm,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxXb != null">
+                #{yhxxXb,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxCsrq != null">
+                #{yhxxCsrq,jdbcType=DATE},
+            </if>
+            <if test="yhxxSjh != null">
+                #{yhxxSjh,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxMj != null">
+                #{yhxxMj,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxYx != null">
+                #{yhxxYx,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxSfzh != null">
+                #{yhxxSfzh,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxMs != null">
+                #{yhxxMs,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxDa != null">
+                #{yhxxDa,jdbcType=VARCHAR},
+            </if>
+            <if test="xlId != null">
+                #{xlId,jdbcType=INTEGER},
+            </if>
+            <if test="xlMc != null">
+                #{xlMc,jdbcType=VARCHAR},
+            </if>
+            <if test="zzmmId != null">
+                #{zzmmId,jdbcType=INTEGER},
+            </if>
+            <if test="zzmmMc != null">
+                #{zzmmMc,jdbcType=VARCHAR},
+            </if>
+            <if test="jgId != null">
+                #{jgId,jdbcType=INTEGER},
+            </if>
+            <if test="jsSzsId != null">
+                #{jsSzsId,jdbcType=INTEGER},
+            </if>
+            <if test="jsSzqxMc != null">
+                #{jsSzqxMc,jdbcType=VARCHAR},
+            </if>
+            <if test="jgSzsMc != null">
+                #{jgSzsMc,jdbcType=VARCHAR},
+            </if>
+            <if test="mzId != null">
+                #{mzId,jdbcType=INTEGER},
+            </if>
+            <if test="mzMc != null">
+                #{mzMc,jdbcType=VARCHAR},
+            </if>
+            <if test="dnzwId != null">
+                #{dnzwId,jdbcType=INTEGER},
+            </if>
+            <if test="dnzwMc != null">
+                #{dnzwMc,jdbcType=VARCHAR},
+            </if>
+            <if test="dnzwJb != null">
+                #{dnzwJb,jdbcType=INTEGER},
+            </if>
+            <if test="xzzwId != null">
+                #{xzzwId,jdbcType=INTEGER},
+            </if>
+            <if test="xzzwMc != null">
+                #{xzzwMc,jdbcType=VARCHAR},
+            </if>
+            <if test="xzzwJb != null">
+                #{xzzwJb,jdbcType=INTEGER},
+            </if>
+            <if test="bmId != null">
+                #{bmId,jdbcType=INTEGER},
+            </if>
+            <if test="bmMc != null">
+                #{bmMc,jdbcType=VARCHAR},
+            </if>
+            <if test="zbId != null">
+                #{zbId,jdbcType=INTEGER},
+            </if>
+            <if test="zbMc != null">
+                #{zbMc,jdbcType=VARCHAR},
+            </if>
+            <if test="zbSsbmdm != null">
+                #{zbSsbmdm,jdbcType=INTEGER},
+            </if>
+            <if test="zbLxdm != null">
+                #{zbLxdm,jdbcType=INTEGER},
+            </if>
+            <if test="zbMs != null">
+                #{zbMs,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="userMc != null">
+                #{userMc,jdbcType=VARCHAR},
+            </if>
+            <if test="userPwk != null">
+                #{userPwk,jdbcType=VARCHAR},
+            </if>
+            <if test="userMm != null">
+                #{userMm,jdbcType=VARCHAR},
+            </if>
+            <if test="userWxId != null">
+                #{userWxId,jdbcType=VARCHAR},
+            </if>
+            <if test="userWxm != null">
+                #{userWxm,jdbcType=VARCHAR},
+            </if>
+            <if test="userMs != null">
+                #{userMs,jdbcType=VARCHAR},
+            </if>
+            <if test="userCjrq != null">
+                #{userCjrq,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userZtdm != null">
+                #{userZtdm,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxTx != null">
+                #{yhxxTx,jdbcType=LONGVARBINARY},
+            </if>
+        </trim>
+    </insert>
+	
+
+</mapper>

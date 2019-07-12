@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.system.view.ViewBugMapper">
+  <resultMap id="BaseResultMap" type="viewBug">
+    <result column="id"  property="id" />
+    <result column="bt"  property="bt" />
+    <result column="sj"  property="sj" />
+    <result column="sfyd"  property="sfyd" />
+    <result column="yhdm"  property="yhdm" />
+    <result column="user_id"  property="userId" />
+    <result column="user_mc"  property="userMc" />
+    <result column="yhxx_xm"  property="yhxxXm" />
+    <result column="nr"  property="nr" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, bt, sj, user_id, user_mc, yhxx_xm, nr, sfyd
+  </sql>
+  
+   <select id="getBugPageList" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from view_bug
+        where sfyd = 0
+  </select>
+  
+  <select id="getViewBugById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from view_bug
+    where id = #{id}
+  </select>
+  
+  <insert id="insert" parameterType="viewBug">
+    insert into view_bug (id, bt, sj, yhdm, user_id, user_mc,  yhxx_xm, nr)
+    values (#{id}, #{bt}, #{sj}, #{yhdm}, #{userId}, #{userMc},#{yhxxXm}, #{nr})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="viewBug">
+    insert into view_bug
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="bt != null">
+        bt,
+      </if>
+      <if test="sj != null">
+        sj,
+      </if>
+      <if test="yhdm != null">
+        yhdm,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userMc != null">
+        user_mc,
+      </if>
+      <if test="yhxxXm != null">
+        yhxx_xm,
+      </if>
+      <if test="nr != null">
+        nr,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id},
+      </if>
+      <if test="bt != null">
+        #{bt},
+      </if>
+      <if test="sj != null">
+        #{sj},
+      </if>
+      <if test="yhdm != null">
+        #{yhdm},
+      </if>
+      <if test="userId != null">
+        #{userId},
+      </if>
+      <if test="userMc != null">
+        #{userMc},
+      </if>
+      <if test="yhxxXm != null">
+        #{yhxxXm},
+      </if>
+      <if test="nr != null">
+        #{nr},
+      </if>
+    </trim>
+  </insert>
+</mapper>

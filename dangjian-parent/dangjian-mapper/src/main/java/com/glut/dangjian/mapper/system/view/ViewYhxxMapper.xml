@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.system.view.ViewYhxxMapper">
+	
+	<!-- 用户视图所有字段 -->
+	<sql id="viewYhxx_all_column">
+	   yhxx_id, yhxx_xm, yhxx_xb, yhxx_csrq, yhxx_sjh, yhxx_mj, yhxx_yx, yhxx_sfzh, yhxx_ms, yhxx_da,yhxx_dhhm,
+	   xl_id, xl_mc, zzmm_id, zzmm_mc, jg_id, js_szs_id, js_szqx_mc, jg_szs_mc, mz_id, mz_mc, dnzw_id,
+	   dnzw_mc, dnzw_jb, xzzw_id, xzzw_mc, xzzw_jb, bm_id, bm_mc, zb_id, zb_mc, zb_ssbmdm, zb_lxdm,
+	   zb_ms, user_id, user_mc, user_pwk, user_mm, user_wx_id, user_wxm, user_ms, user_cjrq, user_ztId,user_ztMc
+	</sql>
+	
+	<!-- 头像需要单独插入 -->
+    <sql id="Blob_Column_List">
+        yhxx_tx
+    </sql>
+	
+	<!-- 用户所有的结果集 -->
+	<resultMap id="BaseResultMap" type="viewYhxx">
+		<result column="yhxx_id" property="yhxxId" />
+		<result column="yhxx_xm" property="yhxxXm" />
+		<result column="yhxx_xb" property="yhxxXb" />
+		<result column="yhxx_csrq"  property="yhxxCsrq" />
+		<result column="yhxx_sjh" property="yhxxSjh" />
+		<result column="yhxx_mj" property="yhxxMj" />
+		<result column="yhxx_dhhm" property="yhxxDhhm" />
+		<result column="yhxx_yx" property="yhxxYx" />
+		<result column="yhxx_sfzh" property="yhxxSfzh" />
+		<result column="yhxx_ms" property="yhxxMs" />
+		<result column="yhxx_da" property="yhxxDa" />
+		<result column="xl_id" property="xlId" />
+		<result column="xl_mc" property="xlMc" />
+		<result column="zzmm_id" property="zzmmId" />
+		<result column="zzmm_mc" property="zzmmMc" />
+		<result column="jg_id" property="jgId" />
+		<result column="js_szs_id" property="jsSzsId" />
+		<result column="js_szqx_mc" property="jsSzqxMc" />
+		<result column="jg_szs_mc" property="jgSzsMc" />
+		<result column="mz_id" property="mzId" />
+		<result column="mz_mc" property="mzMc" />
+		<result column="dnzw_id" property="dnzwId" />
+		<result column="dnzw_mc" property="dnzwMc" />
+		<result column="dnzw_jb" property="dnzwJb" />
+		<result column="xzzw_id" property="xzzwId" />
+		<result column="xzzw_mc" property="xzzwMc" />
+		<result column="xzzw_jb" property="xzzwJb" />
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="zb_id" property="zbId" />
+		<result column="zb_mc" property="zbMc" />
+		<result column="zb_ssbmdm" property="zbSsbmdm" />
+		<result column="zb_lxdm" property="zbLxdm" />
+		<result column="zb_ms" property="zbMs" />
+		<result column="user_id" property="userId" />
+		<result column="user_mc" property="userMc" />
+		<result column="user_pwk" property="userPwk" />
+		<result column="user_mm" property="userMm" />
+		<result column="user_wx_id" property="userWxId" />
+		<result column="user_wxm" property="userWxm" />
+		<result column="user_ms" property="userMs" />
+		<result column="user_cjrq" property="userCjrq" />
+		<result column="user_ztId" property="userZtId" />
+		<result column="user_ztMc" property="userZtMc" />
+	</resultMap>
+
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="viewYhxx">
+		<result column="yhxx_tx" jdbcType="LONGVARBINARY" property="yhxxTx" />
+	</resultMap>
+	
+	<select id="getIdentityByUserMc" parameterType="string" resultType="string">
+	   select yhxx_sfzh
+       from view_yhxx
+       where  user_mc = #{userMc}
+	</select>
+	
+	<select id="getUserInfoIdByPartyInfoId" parameterType="string" resultType="string">
+	   select yhxx_id
+       from view_yhxx
+       where user_id in (select yhdm from djxx where id = #{partyInfoId})
+	</select>
+	
+	<!-- 根据用户id获取用户信息id -->
+	<select id="getUserInfoIdByUserId" parameterType="string" resultType="string">
+	   select yhxx_id
+	   from view_yhxx
+	   where user_id = #{userId}
+	</select>
+	
+	<!-- 分页查询用户信息 -->
+    <select id="loadUserInfoPageList" parameterType="viewYhxx" resultType="viewYhxx">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx  
+       where 
+             (user_ztId = 1 or user_ztId = 2) and
+       <trim prefix="(" suffix=")" suffixOverrides="and">
+            <if test="userMc == null">
+                user_mc like  '%%' and
+            </if>
+            <if test="userMc != null">
+                user_mc like  '%${userMc}%' and
+            </if>
+            <if test="userMs != null">
+                user_ms like  '%${userMs}%' and
+            </if>
+            <if test="userZtId != null">
+                user_ztId = #{userZtId} and
+            </if>
+            <if test="userZtMc != null">
+                user_ztMc = #{userZtMc} and
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm like  '%${yhxxXm}%'  and
+            </if>
+            <if test="yhxxXb != null">
+              yhxx_xb = #{yhxxXb} and
+            </if>
+            <if test="xlId != null">
+                xl_id = #{xlId} and
+            </if>
+            <if test="zzmmId != null">
+                zzmm_id = #{zzmmId} and
+            </if>
+            <if test="jgId != null">
+                jg_id = #{jgId} and
+            </if>
+            <if test="jsSzsId != null">
+                js_szs_id = #{jsSzsId} and
+            </if>
+            <if test="mzId != null">
+                mz_id = #{mzId} and
+            </if>
+            <if test="dnzwId != null">
+                dnzw_id = #{dnzwId} and
+            </if>
+            <if test="xzzwId != null">
+                xzzw_id = #{xzzwId} and
+            </if>
+            <if test="bmId != null">
+                bm_id = #{bmId} and
+            </if>
+            <if test="zbId != null">
+                  zb_id = #{zbId} and
+            </if>
+       </trim>
+    </select>
+	
+	<!-- 根据userId获取部门支部id -->
+	<select id="getZbIdByUserId" parameterType="string" resultType="int">
+       select zb_id
+       from view_yhxx
+       where user_id=#{userId}
+    </select>
+	
+	<!-- 根据userId获取部门id -->
+	<select id="getBmIdByUserId" parameterType="string" resultType="int">
+	   select bm_id
+	   from view_yhxx
+	   where user_id=#{userId}
+	</select>
+	
+	<!-- 通过过yhb中的userMc字段获取信息 -->
+	<select id="getViewYhxxByUserMc" parameterType="string" resultMap="BaseResultMap">
+	   select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+       where user_mc=#{userMc}
+	</select>
+	
+	<!-- 通过过yhb中的id字段获取用户姓名 -->
+    <select id="getYhxxNameByUserId" parameterType="string" resultType="string">
+       select yhxx_xm
+       from view_yhxx
+       where user_id=#{userId}
+    </select>
+	
+	<!-- 根据用户视图中的用户表name 查询用户视图对象 -->
+    <select id="getViewYhxxByUserName" parameterType="string" resultMap="BaseResultMap">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+       where yhxx_xm=#{xwYhm}
+    </select>
+	
+	<!-- 根据用户视图中的用户表id 查询用户视图对象 -->
+    <select id="getViewYhxxByUserId" resultMap="BaseResultMap">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+       where user_id=#{userId}
+    </select>
+    
+    <!-- 查询所有的用户视图信息 -->
+    <select id="getListViewYhxx" resultMap="BaseResultMap">
+       select <include refid="viewYhxx_all_column"></include>
+       from view_yhxx
+       where (user_ztId = 1 or user_ztId = 2)
+    </select>
+
+    <!-- 插入一条用户视图对象 -->
+    <insert id="saveViewYhxx" parameterType="viewYhxx">
+        insert into view_yhxx (yhxx_id, yhxx_xm, yhxx_xb,
+        yhxx_csrq, yhxx_sjh, yhxx_mj,
+        yhxx_yx, yhxx_sfzh, yhxx_ms,
+        yhxx_da, xl_id, xl_mc,
+        zzmm_id, zzmm_mc, jg_id,
+        js_szs_id, js_szqx_mc, jg_szs_mc,
+        mz_id, mz_mc, dnzw_id,
+        dnzw_mc, dnzw_jb, xzzw_id,
+        xzzw_mc, xzzw_jb, bm_id,
+        bm_mc, zb_id, zb_mc, zb_ssbmdm,
+        zb_lxdm, zb_ms, user_id,
+        user_mc, user_pwk, user_mm,
+        user_wx_id, user_wxm, user_ms,
+        user_cjrq, user_ztId, user_ztMc, yhxx_tx,
+        yhxx_dhhm
+        )
+        values (#{yhxxId}, #{yhxxXm},
+        #{yhxxXb},
+        #{yhxxCsrq,jdbcType=DATE}, #{yhxxSjh}, #{yhxxMj},
+        #{yhxxYx}, #{yhxxSfzh},
+        #{yhxxMs},
+        #{yhxxDa}, #{xlId}, #{xlMc},
+        #{zzmmId}, #{zzmmMc},
+        #{jgId},
+        #{jsSzsId}, #{jsSzqxMc}, #{jgSzsMc},
+        #{mzId}, #{mzMc},
+        #{dnzwId},
+        #{dnzwMc}, #{dnzwJb}, #{xzzwId},
+        #{xzzwMc}, #{xzzwJb},
+        #{bmId},
+        #{bmMc}, #{zbId}, #{zbMc},
+        #{zbSsbmdm},
+        #{zbLxdm}, #{zbMs}, #{userId},
+        #{userMc}, #{userPwk},
+        #{userMm},
+        #{userWxId}, #{userWxm}, #{userMs},
+        #{userCjrq}, #{userZtId},#{userZtMc},
+        #{yhxxTx}, #{yhxxDhhm}
+        )
+    </insert>
+    
+    <insert id="insertViewYhxx">
+        insert into view_yhxx
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="userMc != null">
+                user_mc,
+            </if>
+            <if test="userMm != null">
+                user_mm,
+            </if>
+            <if test="userMs != null">
+                user_ms ,
+            </if>
+            <if test="userCjrq != null">
+                user_cjrq,
+            </if>
+            <if test="userZtId != null">
+                user_ztId,
+            </if>
+            <if test="userZtMc != null">
+                user_ztMc,
+            </if>
+            <if test="userYhxxdm != null">
+                user_yhxxdm,
+            </if>
+            <if test="yhxxId != null">
+                yhxx_id ,
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm ,
+            </if>
+            <if test="yhxxXb != null">
+              yhxx_xb ,
+            </if>
+            <if test="yhxxCsrq != null">
+              yhxx_csrq ,
+            </if>
+            <if test="yhxxSjh != null">
+              yhxx_sjh ,
+            </if>
+            <if test="yhxxMj != null">
+              yhxx_mj ,
+            </if>
+            <if test="yhxxYx != null">
+              yhxx_yx ,
+            </if>
+            <if test="yhxxSfzh != null">
+                yhxx_sfzh ,
+            </if>
+            <if test="yhxxMs != null">
+                yhxx_ms ,
+            </if>
+            <if test="xlId != null">
+                xl_id ,
+            </if>
+            <if test="zzmmId != null">
+                zzmm_id ,
+            </if>
+            <if test="jgId != null">
+                jg_id,
+            </if>
+            <if test="jsSzsId != null">
+                js_szs_id ,
+            </if>
+            <if test="mzId != null">
+                mz_id ,
+            </if>
+            <if test="dnzwId != null">
+                dnzw_id ,
+            </if>
+            <if test="xzzwId != null">
+                xzzw_id ,
+            </if>
+            <if test="bmId != null">
+                bm_id ,
+            </if>
+            <if test="zbId != null">
+                  zb_id ,
+            </if>
+            <if test="yhxxDhhm != null">
+                  yhxx_dhhm ,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                 #{userId},
+            </if>
+            <if test="userMc != null">
+               #{userMc},
+            </if>
+            <if test="userMm != null">
+                #{userMm},
+            </if>
+            <if test="userMs != null">
+               #{userMs},
+            </if>
+            <if test="userCjrq != null">
+                #{userCjrq},
+            </if>
+            <if test="userZtId != null">
+                 #{userZtId},
+            </if>
+            <if test="userYhxxdm != null">
+                 #{userYhxxdm},
+            </if>
+            <if test="yhxxId != null">
+                #{yhxxId},
+            </if>
+            <if test="yhxxXm != null">
+                #{yhxxXm},
+            </if>
+            <if test="yhxxXb != null">
+              #{yhxxXb},
+            </if>
+            <if test="yhxxCsrq != null">
+              #{yhxxCsrq},
+            </if>
+            <if test="yhxxSjh != null">
+              #{yhxxSjh},
+            </if>
+            <if test="yhxxMj != null">
+              #{yhxxMj},
+            </if>
+            <if test="yhxxYx != null">
+              #{yhxxYx},
+            </if>
+            <if test="yhxxSfzh != null">
+               #{yhxxSfzh},
+            </if>
+            <if test="yhxxMs != null">
+                #{yhxxMs},
+            </if>
+            <if test="xlId != null">
+                #{xlId},
+            </if>
+            <if test="zzmmId != null">
+                #{zzmmId},
+            </if>
+            <if test="jgId != null">
+                #{jgId},
+            </if>
+            <if test="jsSzsId != null">
+                #{jsSzsId},
+            </if>
+            <if test="mzId != null">
+                #{mzId},
+            </if>
+            <if test="dnzwId != null">
+                #{dnzwId},
+            </if>
+            <if test="xzzwId != null">
+                #{xzzwId},
+            </if>
+            <if test="bmId != null">
+                #{bmId},
+            </if>
+            <if test="zbId != null">
+                #{zbId},
+            </if>
+            <if test="yhxxDhhm != null">
+                #{yhxxDhhm},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 通过修改视图的内容从而修改数据库中的用户表、用户信息表 -->
+    <update id="updateViewYhxx" parameterType="viewYhxx">
+        update view_yhxx 
+        <set>
+            <if test="userMc != null">
+                user_mc = #{userMc},
+            </if>
+            <if test="userMm != null">
+                user_mm = #{userMm},
+            </if>
+            <if test="userWxId != null">
+                user_wx_id = #{userWxId},
+            </if>
+            <if test="userWxm != null">
+                user_wxm = #{userWxm},
+            </if>
+            <if test="userMs != null">
+                user_ms = #{userMs},
+            </if>
+            <if test="userCjrq != null">
+                user_cjrq = #{userCjrq},
+            </if>
+            <if test="userZtId != null">
+                user_ztId = #{userZtId},
+            </if>
+             <if test="userZtMc != null">
+                user_ztMc = #{userZtMc},
+            </if>
+            <if test="userYhxxdm != null">
+                user_yhxxdm = #{userYhxxdm},
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm = #{yhxxXm},
+            </if>
+            <if test="yhxxXb != null">
+              yhxx_xb = #{yhxxXb},
+            </if>
+            <if test="yhxxSjh != null">
+		      yhxx_sjh = #{yhxxSjh},
+            </if>
+            <if test="yhxxMj != null">
+		      yhxx_mj = #{yhxxMj},
+            </if>
+            <if test="yhxxYx != null">
+		      yhxx_yx = #{yhxxYx},
+		    </if>
+		    <if test="yhxxMs != null">
+		        yhxx_ms = #{yhxxMs},
+		    </if>
+		    <if test="xlId != null">
+				xl_id = #{xlId},
+			</if>
+			<if test="zzmmId != null">
+				zzmm_id = #{zzmmId},
+			</if>
+			<if test="jgId != null">
+				jg_id = #{jgId},
+			</if>
+			<if test="jsSzsId != null">
+				js_szs_id = #{jsSzsId},
+			</if>
+			<if test="mzId != null">
+				mz_id = #{mzId},
+			</if>
+			<if test="dnzwId != null">
+				dnzw_id = #{dnzwId},
+			</if>
+			<if test="xzzwId != null">
+				xzzw_id = #{xzzwId},
+			</if>
+			<if test="bmId != null">
+				bm_id = #{bmId},
+			</if>
+			<if test="zbId != null">
+                  zb_id = #{zbId},
+            </if>
+            <if test="yhxxDhhm != null">
+                  yhxx_dhhm = #{yhxxDhhm},
+            </if>
+        </set>
+        where user_id=#{userId}
+    </update>
+    
+    <!-- 根据userId删除用户 -->
+    <delete id="deleteUserByUserId" parameterType="string">
+        delete from view_yhxx where user_id = #{userId}
+    </delete>
+    
+</mapper>

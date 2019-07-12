@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.system.view.ViewUserRoleFunctionMapper">
+	<resultMap id="BaseResultMap" type="viewUserRoleFunction">
+		<result column="user_id" property="userId" />
+		<result column="user_mc" property="userMc" />
+		<result column="yhxx_id" property="yhxxId" />
+		<result column="yhxx_xm" property="yhxxXm" />
+		<result column="js_id" property="jsId" />
+		<result column="js_mc" property="jsMc" />
+		<result column="js_xgsj" property="jsXgsj" />
+		<result column="js_code" property="jsCode" />
+		<result column="js_ms" property="jsMs" />
+		<result column="js_yxj" property="jsYxj" />
+		<result column="mk_id" property="mkId" />
+		<result column="mk_mc" property="mkMc" />
+		<result column="mk_code" property="mkCode" />
+		<result column="mk_f_id" property="mkFId" />
+		<result column="mk_sfsccd" property="mkSfsccd" />
+		<result column="mk_px" property="mkPx" />
+		<result column="mk_url" property="mkUrl" />
+		<result column="mk_ms" property="mkMs" />
+		<result column="mk_icon" property="mkIcon" />
+		<result column="mk_xgsj" property="mkXgsj" />
+	</resultMap>
+	
+	<select id="getFunctionAllList" resultMap="BaseResultMap">
+	   select distinct(mk_id), mk_code
+	   from view_user_role_function
+	</select>
+	
+	<select id="getFunctionList" parameterType="string" resultType="function">
+        select distinct(mk_id), mk_mc, mk_f_id, mk_url, mk_icon
+        from view_user_role_function,
+        where user_id = #{userId} and mk_sfsccd = 1
+    </select>
+	
+	<select id="getFunctionListByUserId" parameterType="string" resultMap="BaseResultMap">
+       select distinct(mk_id), mk_code
+       from view_user_role_function
+       where user_id = #{userId}
+    </select>
+	
+	<insert id="insert" parameterType="viewUserRoleFunction">
+		insert into
+		view_user_role_function (user_id, user_mc, yhxx_id,
+		yhxx_xm, js_id,
+		js_mc,
+		js_xgsj, js_code, js_ms,
+		js_yxj, mk_id, mk_mc,
+		mk_code, mk_f_id,
+		mk_sfsccd,
+		mk_px, mk_url, mk_ms,
+		mk_icon, mk_xgsj)
+		values (#{userId},
+		#{userMc}, #{yhxxId},
+		#{yhxxXm}, #{jsId}, #{jsMc},
+		#{jsXgsj}, #{jsCode},
+		#{jsMs},
+		#{jsYxj}, #{mkId}, #{mkMc},
+		#{mkCode}, #{mkFId}, #{mkSfsccd},
+		#{mkPx}, #{mkUrl}, #{mkMs},
+		#{mkIcon}, #{mkXgsj})
+	</insert>
+	<insert id="insertSelective"
+		parameterType="viewUserRoleFunction">
+		insert into view_user_role_function
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="userMc != null">
+				user_mc,
+			</if>
+			<if test="yhxxId != null">
+				yhxx_id,
+			</if>
+			<if test="yhxxXm != null">
+				yhxx_xm,
+			</if>
+			<if test="jsId != null">
+				js_id,
+			</if>
+			<if test="jsMc != null">
+				js_mc,
+			</if>
+			<if test="jsXgsj != null">
+				js_xgsj,
+			</if>
+			<if test="jsCode != null">
+				js_code,
+			</if>
+			<if test="jsMs != null">
+				js_ms,
+			</if>
+			<if test="jsYxj != null">
+				js_yxj,
+			</if>
+			<if test="mkId != null">
+				mk_id,
+			</if>
+			<if test="mkMc != null">
+				mk_mc,
+			</if>
+			<if test="mkCode != null">
+				mk_code,
+			</if>
+			<if test="mkFId != null">
+				mk_f_id,
+			</if>
+			<if test="mkSfsccd != null">
+				mk_sfsccd,
+			</if>
+			<if test="mkPx != null">
+				mk_px,
+			</if>
+			<if test="mkUrl != null">
+				mk_url,
+			</if>
+			<if test="mkMs != null">
+				mk_ms,
+			</if>
+			<if test="mkIcon != null">
+				mk_icon,
+			</if>
+			<if test="mkXgsj != null">
+				mk_xgsj,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="userId != null">
+				#{userId},
+			</if>
+			<if test="userMc != null">
+				#{userMc},
+			</if>
+			<if test="yhxxId != null">
+				#{yhxxId},
+			</if>
+			<if test="yhxxXm != null">
+				#{yhxxXm},
+			</if>
+			<if test="jsId != null">
+				#{jsId},
+			</if>
+			<if test="jsMc != null">
+				#{jsMc},
+			</if>
+			<if test="jsXgsj != null">
+				#{jsXgsj},
+			</if>
+			<if test="jsCode != null">
+				#{jsCode},
+			</if>
+			<if test="jsMs != null">
+				#{jsMs},
+			</if>
+			<if test="jsYxj != null">
+				#{jsYxj},
+			</if>
+			<if test="mkId != null">
+				#{mkId},
+			</if>
+			<if test="mkMc != null">
+				#{mkMc},
+			</if>
+			<if test="mkCode != null">
+				#{mkCode},
+			</if>
+			<if test="mkFId != null">
+				#{mkFId},
+			</if>
+			<if test="mkSfsccd != null">
+				#{mkSfsccd},
+			</if>
+			<if test="mkPx != null">
+				#{mkPx},
+			</if>
+			<if test="mkUrl != null">
+				#{mkUrl},
+			</if>
+			<if test="mkMs != null">
+				#{mkMs},
+			</if>
+			<if test="mkIcon != null">
+				#{mkIcon},
+			</if>
+			<if test="mkXgsj != null">
+				#{mkXgsj},
+			</if>
+		</trim>
+	</insert>
+
+
+</mapper>

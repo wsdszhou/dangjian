@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/dangjian-controller/dangjian-controller.iml" filepath="$PROJECT_DIR$/dangjian-controller/dangjian-controller.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dangjian-entity/dangjian-entity.iml" filepath="$PROJECT_DIR$/dangjian-entity/dangjian-entity.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dangjian-mapper/dangjian-mapper.iml" filepath="$PROJECT_DIR$/dangjian-mapper/dangjian-mapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dangjian-parent.iml" filepath="$PROJECT_DIR$/dangjian-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dangjian-service/dangjian-service.iml" filepath="$PROJECT_DIR$/dangjian-service/dangjian-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dangjian-utils/dangjian-utils.iml" filepath="$PROJECT_DIR$/dangjian-utils/dangjian-utils.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.approval.view.ViewApprovalNodeMapper">
+  <resultMap id="BaseResultMap" type="viewApprovalNode">
+    <result column="spjd_id"  property="spjdId" />
+    <result column="spjd_mc"  property="spjdMc" />
+    <result column="spjd_dqspzt"  property="spjdDqspzt" />
+    <result column="spjd_xyspjdId"  property="spjdXyspjdid" />
+    <result column="spjd_xyjdmc"  property="spjdXyjdmc" />
+    <result column="splc_id"  property="splcId" />
+    <result column="splc_state"  property="splcState" />
+    <result column="splc_mc"  property="splcMc" />
+    <result column="splc_ywdm"  property="splcYwdm" />
+    <result column="spgw_id"  property="spgwId" />
+    <result column="spgw_spgwmc"  property="spgwSpgwmc" />
+    <result column="spjd_isFirst"  property="spjdIsFirst" />
+  </resultMap>
+  
+  <sql id="all_column">
+    spjd_id, spjd_mc, spjd_dqspzt, spjd_xyspjdId, spjd_xyjdmc, splc_id, splc_state, splc_mc, splc_ywdm, spgw_id, spgw_spgwmc
+  </sql>
+  
+  <select id="getFirstNodeIdByApprovalProcessName" parameterType="string" resultMap="BaseResultMap">
+     select <include refid="all_column"></include>
+     from view_approval_node
+     where splc_mc = #{approvalProcessName} and spjd_isFirst = 1
+  </select>
+  
+  <!-- nodePageListBySplcId -->
+  <select id="nodePageListBySplcId" parameterType="int" resultMap="BaseResultMap">
+       select <include refid="all_column"></include>
+       from view_approval_node
+       where splc_id = #{splcId}
+  </select>
+  
+  
+  
+  <!-- 插入一条视图 -->
+  <insert id="insert" parameterType="viewApprovalNode">
+    insert into view_approval_node (spjd_id, spjd_mc, spjd_dqspzt, 
+      spjd_xyspjdId, spjd_xyjdmc, splc_id, 
+      splc_state, splc_mc, splc_ywdm, 
+      spgw_id, spgw_spgwmc)
+    values (#{spjdId}, #{spjdMc}, #{spjdDqspzt}, 
+      #{spjdXyspjdid}, #{spjdXyjdmc}, #{splcId}, 
+      #{splcState}, #{splcMc}, #{splcYwdm}, 
+      #{spgwId}, #{spgwSpgwmc})
+  </insert>
+  
+   <!-- 插入一条视图,并且判断是否为空 -->
+  <insert id="insertSelective" parameterType="viewApprovalNode">
+    insert into view_approval_node
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="spjdId != null">
+        spjd_id,
+      </if>
+      <if test="spjdMc != null">
+        spjd_mc,
+      </if>
+      <if test="spjdDqspzt != null">
+        spjd_dqspzt,
+      </if>
+      <if test="spjdXyspjdid != null">
+        spjd_xyspjdId,
+      </if>
+      <if test="spjdXyjdmc != null">
+        spjd_xyjdmc,
+      </if>
+      <if test="splcId != null">
+        splc_id,
+      </if>
+      <if test="splcState != null">
+        splc_state,
+      </if>
+      <if test="splcMc != null">
+        splc_mc,
+      </if>
+      <if test="splcYwdm != null">
+        splc_ywdm,
+      </if>
+      <if test="spgwId != null">
+        spgw_id,
+      </if>
+      <if test="spgwSpgwmc != null">
+        spgw_spgwmc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="spjdId != null">
+        #{spjdId},
+      </if>
+      <if test="spjdMc != null">
+        #{spjdMc},
+      </if>
+      <if test="spjdDqspzt != null">
+        #{spjdDqspzt},
+      </if>
+      <if test="spjdXyspjdid != null">
+        #{spjdXyspjdid},
+      </if>
+      <if test="spjdXyjdmc != null">
+        #{spjdXyjdmc},
+      </if>
+      <if test="splcId != null">
+        #{splcId},
+      </if>
+      <if test="splcState != null">
+        #{splcState},
+      </if>
+      <if test="splcMc != null">
+        #{splcMc},
+      </if>
+      <if test="splcYwdm != null">
+        #{splcYwdm},
+      </if>
+      <if test="spgwId != null">
+        #{spgwId},
+      </if>
+      <if test="spgwSpgwmc != null">
+        #{spgwSpgwmc},
+      </if>
+    </trim>
+  </insert>
+</mapper>

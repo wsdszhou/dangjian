@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.log.LogMapper">
+	<resultMap id="BaseResultMap" type="log">
+		<id column="id" property="id" />
+		<result column="login_ip" property="loginIp" />
+		<result column="type" property="type" />
+		<result column="operation" property="operation" />
+		<result column="create_time" property="createTime" />
+		<result column="remark" property="remark" />
+		<association property="yhdm" javaType="yhb">
+			<id column="user_id" property="userId" />
+			<association property="userYhxxdm" javaType="yhXxb">
+				<id column="yhxx_id" property="yhxxId" />
+				<result column="yhxx_xm" property="yhxxXm" />
+			</association>
+		</association>
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, yhdm, login_ip, type, operation, create_time, remark
+	</sql>
+	
+	<delete id="deleteBatch">
+	   delete from log
+	   where 
+	   <foreach collection="ids" item="id" separator=" or ">
+	       id = #{id}
+	   </foreach>
+	</delete>
+	
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from log
+		where id = #{id}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from log
+		where id = #{id}
+	</delete>
+	
+	<insert id="insert" parameterType="log">
+		insert into log (id, yhdm,
+		login_ip,
+		type, operation, create_time,
+		remark)
+		values (#{id},
+		#{yhdm.userId}, #{loginIp},
+		#{type}, #{operation}, #{createTime},
+		#{remark})
+	</insert>
+	
+	<insert id="insertSelective" parameterType="log">
+		insert into log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="yhdm != null">
+				yhdm,
+			</if>
+			<if test="loginIp != null">
+				login_ip,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="operation != null">
+				operation,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="yhdm != null">
+				#{yhdm.userId},
+			</if>
+			<if test="loginIp != null">
+				#{loginIp},
+			</if>
+			<if test="type != null">
+				#{type},
+			</if>
+			<if test="operation != null">
+				#{operation},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="remark != null">
+				#{remark},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="log">
+		update log
+		<set>
+			<if test="yhdm != null">
+				yhdm = #{yhdm.userId},
+			</if>
+			<if test="loginIp != null">
+				login_ip = #{loginIp},
+			</if>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="operation != null">
+				operation = #{operation},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="log">
+		update log
+		set yhdm
+		= #{yhdm.userId},
+		login_ip = #{loginIp},
+		type = #{type},
+		operation =
+		#{operation},
+		create_time = #{createTime},
+		remark = #{remark}
+		where id =
+		#{id}
+	</update>
+</mapper>

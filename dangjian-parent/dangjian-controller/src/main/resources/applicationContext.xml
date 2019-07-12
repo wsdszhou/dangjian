@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+    
+
+    <!-- 包扫描 -->
+    <context:component-scan base-package="com.glut.dangjian"></context:component-scan>
+    
+    <!-- 导入外部文件 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+    
+    <!-- 配置spring自带的管理数据库的连接源 -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+    
+    <!-- 注册事物 -->
+    <bean id="txMgr" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    
+    <!-- 开启事物注解驱动 -->
+    <tx:annotation-driven transaction-manager="txMgr"/>
+    
+    <!-- 配置mybatis的sqlsessionFactoryBean -->
+    <bean id="sqlsessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>    
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+    </bean>
+    
+    <!-- 配置可以整体扫描Mapper的一个扫描器 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.glut.dangjian.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlsessionFactory"></property>
+    </bean>
+    
+    <!-- 注册realm -->
+    <bean id="dangjianRealm" class="com.glut.dangjian.realm.DangjianRealm">
+        <!-- 对权限信息进行缓存 -->
+        <property name="authorizationCacheName" value="shiroAuthorizationCache"></property>
+    </bean>
+    
+    <!--配置spring框架的工厂  -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- shiro 的核心安全接口 -->
+        <property name="securityManager" ref="securityManager"/>
+        <!-- 要求登录时的链接 -->
+        <property name="loginUrl" value="/WEB-INF/views/background/login.jsp"/>
+        <!-- 登陆成功后要跳转的连接 -->
+        <property name="successUrl" value="/WEB-INF/views/background/index.jsp"/>
+        <!-- 未授权时要跳转的连接 -->
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+        <!--url拦截策略    shiro 连接约束配置  -->
+        <property name="filterChainDefinitions">
+            <!-- 拦截的url -->
+	        <value>
+	            /jsAndCss/** = anon
+	            /excel/** = anon
+	            /images/** = anon
+	            /kindeditor/** = anon
+	            /upload/** = anon
+	            /validatecode.jsp* = anon
+	            /background.jsp* = anon
+	            /WEB-INF/views/background/login.jsp = anon
+	            /index.jsp* = anon
+	            /back/login = anon
+	            <!--所有的请求都会被拦截到,必须通过认证  -->
+	            <!--/* = anon-->
+	            <!--/* = authc-->
+	        </value>
+        </property>
+    </bean>
+    
+    <!--注册安全管理器对象  -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="dangjianRealm" />
+        <property name="cacheManager" ref="cacheManager"/>
+    </bean>
+    
+    <!-- shiro 对 ehcache 的缓存管理直接使用 spring 的缓存工厂 -->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+       <property name="cacheManager" ref="ehCacheManagerFactory" />
+    </bean> 
+    
+    <!-- shiro生命周期 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    
+    <!-- spring 对 ehcache 的缓存工厂支持 -->
+    <bean id="ehCacheManagerFactory" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+        <property name="configLocation" value="classpath:ehcache.xml" />
+        <property name="shared" value="false" />
+    </bean>
+    
+    <!-- spring 对 ehcache 的缓存管理 -->
+    <bean id="springCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+       <property name="cacheManager" ref="ehCacheManagerFactory"></property>
+    </bean> 
+    
+    <!-- 使用缓存 annotation 配置 -->
+    <cache:annotation-driven cache-manager="springCacheManager" /> 
+    
+    
+    <!-- 开启shiro注解驱动支持 -->
+    <!-- <bean id="defaultAdvisorAutoProxyCreator" class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor">
+        使用cglib 为action 创建代理对象
+        <property name="proxyTargetClass" value="true"></property>
+    </bean> -->
+    
+    <!-- 配置shiro 框架提供的切面类,用于创建代理对象 -->
+    <!-- <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/> 
+    </bean> -->
+</beans>

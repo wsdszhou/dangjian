@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.news.ColumnMapper">
+	<resultMap id="BaseResultMap" type="lmb">
+		<id column="lm_id"  property="lmId" />
+		<result column="lm_mc"  property="lmMc" />
+		<result column="lm_fid"  property="lmFid" />
+		<result column="lm_ms"  property="lmMs" />
+		<result column="lm_xgsj"  property="lmXgsj" />
+		<association property="lmMkdm" javaType="mkb">
+		    <id column="mk_id"  property="mkId" />
+		    <result column="mk_mc"  property="mkMc" />
+		</association>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+        lm_id, lm_mc, lm_fid, lm_ms, lm_xgsj,
+	</sql>
+	
+	<!-- 获取栏目信息，根据栏目id -->
+	<select id="getLmbByImId" parameterType="int" resultMap="BaseResultMap">
+        select  a.lm_id, a.lm_mc, a.lm_fid, a.lm_ms, a.lm_xgsj, b.mk_id, b.mk_mc
+        from lmb a, mkb b
+        where a.lm_mkdm = b.mk_id and  a.lm_id = #{lmId}
+    </select>
+
+	<!-- 查询非首栏目信息 -->
+	<select id="getNotFirstLmbList" resultType="lmb">
+        select  lm_id, lm_mc, lm_fid, lm_ms, lm_xgsj
+        from lmb
+        where lm_fid != 0
+    </select>
+	
+	<!-- 获取一级栏目 -->
+	<select id="getFirstLmbList" resultType="lmb">
+	    select  lm_id, lm_mc, lm_fid, lm_ms, lm_xgsj
+	    from lmb
+	    where lm_fid= 0
+	</select>
+	
+	<!-- 获取获取子栏目栏目 -->
+    <select id="getChildrenLmbListByFid" parameterType="integer" resultType="lmb">
+        select lm_id, lm_mc, lm_fid, lm_ms, lm_xgsj
+        from lmb
+        where lm_fid= #{lmId}
+    </select>
+
+	<!-- 获取所有栏目 -->
+	<select id="getLmbList" resultType="lmb">
+		select lm_id lmId,lm_mc lmMc,lm_fid lmFid,lm_ms lmMs,lm_xgsj lmXgsj 
+		from lmb
+	</select>
+
+	<!--获取当前栏目id的最大值-->
+	<select id="getMaxLmId" resultType="java.lang.Integer">
+		select max(lm_id) from lmb
+	</select>
+	
+	<!-- 插入一条记录 -->
+    <insert id="insert" parameterType="Lmb">
+        insert into lmb(lm_id, lm_mc, lm_fid, lm_ms, lm_xgsj) values (#{lmId},#{lmMc},#{lmFid},#{lmMs},#{lmXgsj})
+    </insert>
+
+    <!-- 更新一条记录 -->
+    <update id="updateByPrimaryKey" parameterType="Lmb">
+        update lmb set
+        <trim suffixOverrides=",">
+
+                <if test="lmMc != null">
+                    lm_mc = #{lmMc},
+                </if>
+
+                <if test="lmMs != null">
+                    lm_ms = #{lmMs},
+                </if>
+
+            <if test="lmMs != null">
+                lm_xgsj = #{lmXgsj},
+            </if>
+
+        </trim>
+        where lm_id=#{lmId}
+    </update>
+
+    <!-- 删除一条记录 -->
+    <delete id="deleteByPrimaryKey" parameterType="integer">
+        delete from lmb where lm_id=#{id}
+    </delete>
+	
+
+
+	<!-- <insert id="insertSelective" parameterType="lmb">
+		insert into lmb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		  <if test="lmId != null">
+		    lm_id,
+		  </if>
+		  <if test="lmMc != null">
+		    lm_mc,
+		  </if>
+		  <if test="lmFid != null">
+		    lm_fid,
+		  </if>
+		  <if test="lmMs != null">
+		    lm_ms,
+		  </if>
+		  <if test="lmXwdm != null">
+		    lm_xwdm,
+		  </if>
+		  <if test="lmXgsj != null">
+		    lm_xgsj,
+		  </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		  <if test="lmId != null">
+		    #{lmId,jdbcType=INTEGER},
+		  </if>
+		  <if test="lmMc != null">
+		    #{lmMc,jdbcType=VARCHAR},
+		  </if>
+		  <if test="lmFid != null">
+		    #{lmFid,jdbcType=INTEGER},
+		  </if>
+		  <if test="lmMs != null">
+		    #{lmMs,jdbcType=VARCHAR},
+		  </if>
+		  <if test="lmXwdm != null">
+		    #{lmXwdm,jdbcType=VARCHAR},
+		  </if>
+		  <if test="lmXgsj != null">
+		    #{lmXgsj,jdbcType=TIMESTAMP},
+		  </if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="lmb">
+		update lmb
+		<set>
+		  <if test="lmMc != null">
+		    lm_mc = #{lmMc,jdbcType=VARCHAR},
+		  </if>
+		  <if test="lmFid != null">
+		    lm_fid = #{lmFid,jdbcType=INTEGER},
+		  </if>
+		  <if test="lmMs != null">
+		    lm_ms = #{lmMs,jdbcType=VARCHAR},
+		  </if>
+		  <if test="lmXwdm != null">
+		    lm_xwdm = #{lmXwdm,jdbcType=VARCHAR},
+		  </if>
+		  <if test="lmXgsj != null">
+		    lm_xgsj = #{lmXgsj,jdbcType=TIMESTAMP},
+		  </if>
+		</set>
+		where lm_id = #{lmId,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="lmb">
+		update lmb
+		set lm_mc = #{lmMc,jdbcType=VARCHAR},
+		  lm_fid = #{lmFid,jdbcType=INTEGER},
+		  lm_ms = #{lmMs,jdbcType=VARCHAR},
+		  lm_xwdm = #{lmXwdm,jdbcType=VARCHAR},
+		  lm_xgsj = #{lmXgsj,jdbcType=TIMESTAMP}
+		where lm_id = #{lmId,jdbcType=INTEGER}
+	</update> -->
+</mapper>

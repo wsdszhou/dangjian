@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.glut.dangjian.mapper.background.exam.KszxSjflMapper">
+    <insert id="insert" parameterType="KszxSjfl">
+        insert into kszx_sjfl(`name`,parent_id) select #{name},#{parentId}
+        where not exists(select id from kszx_sjfl where `name`=#{name})
+    </insert>
+
+    <update id="update" parameterType="kszxSjfl">
+        update kszx_sjfl
+        <set>
+            <if test="name != null">
+                `name`=#{name},
+            </if>
+
+            <if test="parentId != 0">
+                parent_id=#{parentId},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <delete id="delete" parameterType="KszxSjfl">
+        delete from kszx_sjfl where id=#{id}
+    </delete>
+
+    <select id="select" resultType="kszxSjfl">
+        select id,`name`,parent_id from kszx_sjfl
+    </select>
+</mapper>

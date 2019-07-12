@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.background.picture.XwTpbMapper">
+	<resultMap id="BaseResultMap" type="xwTpb">
+		<id column="tp_id"  property="tpId" />
+		<result column="tp_sjmc"  property="tpSjmc" />
+		<result column="tp_xsmc"  property="tpXsmc" />
+		<result column="tp_xdlj"  property="tpXdlj" />
+		<result column="tp_jdlj"  property="tpJdlj" />
+		<association property="tpLmdm" javaType="lmb">
+			<id column="lm_id"  property="lmId" />
+		    <result column="lm_mc"  property="lmMc" />
+		    <result column="lm_fid"  property="lmFid" />
+		    <result column="lm_ms"  property="lmMs" />
+		    <result column="lm_xgsj" jdbcType="TIMESTAMP" property="lmXgsj" />
+		</association>
+		<association property="tpXwdm" javaType="xwb">
+		  <id column="xw_id"  property="xwId" />
+		</association>
+	</resultMap>
+	<sql id="Base_Column_List">
+        tp_id, tp_sjmc, tp_xsmc, tp_xdlj, tp_jdlj
+	</sql>
+	
+	<select id="getPicturnUrlByNewsId" parameterType="string" resultType="string">
+	   select tp_xdlj
+	   from xw_tpb
+	   where tp_xwdm = #{newsId}
+	</select>
+	
+	<update id="updateBranch">
+	   <foreach collection="xwTpbs" item="xwTpb" separator=";">
+	       update xw_tpb set
+	           tp_lmdm = #{xwTpb.tpLmdm.lmId},
+	           tp_xwdm = #{xwTpb.xwb.xwId}
+	       where tp_id = #{xwTpb.tpId}
+	   </foreach>
+	</update>
+	
+	<select id="getLocalXwTpbPageList" resultType="xwTpb" parameterType="xwTpb" >
+		select <include refid="Base_Column_List"></include>
+		from xw_tpb
+		order by tp_id desc
+	</select>
+
+	<!-- 分页查询远程图片 -->
+    <select id="getFarXwTpbPageList" resultType="xwTpb" parameterType="xwTpb" >
+       select <include refid="Base_Column_List"></include>
+       from xw_tpb
+       where (tp_xdlj is null or tp_xdlj='') 
+          <if test="tpXsmc != null">
+              and  tp_xsmc like '%${tpXsmc}%'
+           </if> 
+           <if test="tpLmdm != null">
+               and tp_lmdm like '%${tpLmdm.lmId}%'
+           </if>
+       order by tp_id desc
+    </select> 
+	
+	<!--  根据图片id查询图片 -->
+	<select id="getTpbByTpId" parameterType="string" resultMap="BaseResultMap">
+	     select <include refid="Base_Column_List"></include>
+	     from xw_tpb
+	     where tp_id =#{tpId}
+	</select>
+	
+	<!-- 根据图片id删除该图片 -->
+	<delete id="deleteByTpId" parameterType="java.lang.String">
+		delete from xw_tpb
+		where tp_id = #{tpId,jdbcType=VARCHAR}
+	</delete>
+	
+	<!-- 添加一张图片 -->
+	<insert id="insert" parameterType="xwTpb">
+		insert into xw_tpb (tp_id, tp_sjmc, tp_xsmc, tp_xdlj, tp_jdlj, tp_lmdm)
+		values (
+		 #{tpId,jdbcType=VARCHAR},
+		 #{tpSjmc,jdbcType=VARCHAR},
+		 #{tpXsmc,jdbcType=VARCHAR}, 
+		 #{tpXdlj,jdbcType=VARCHAR}, 
+		 #{tpJdlj,jdbcType=VARCHAR}),
+		 #{tpLmdm.lmId,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 添加一张图片，并且每个字段是否为空  -->
+	<insert id="insertSelective" parameterType="xwTpb">
+		insert into xw_tpb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		  <if test="tpId != null">
+		    tp_id,
+		  </if>
+		  <if test="tpSjmc != null">
+		    tp_sjmc,
+		  </if>
+		  <if test="tpXsmc != null">
+		    tp_xsmc,
+		  </if>
+		  <if test="tpXdlj != null">
+		    tp_xdlj,
+		  </if>
+		  <if test="tpJdlj != null">
+		    tp_jdlj,
+		  </if>
+		  <if test="tpLmdm != null">
+		      <if test="tpLmdm.lmId != null">
+	               tp_lmdm,
+	          </if>
+          </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		  <if test="tpId != null">
+		    #{tpId,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpSjmc != null">
+		    #{tpSjmc,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpXsmc != null">
+		    #{tpXsmc,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpXdlj != null">
+		    #{tpXdlj,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpJdlj != null">
+		    #{tpJdlj,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpLmdm != null">
+			  <if test="tpLmdm.lmId != null">
+	            #{tpLmdm.lmId,jdbcType=VARCHAR},
+	          </if>
+          </if>
+		</trim>
+	</insert>
+	
+    <!-- 修改图片信息，并且每个字段是否为空 -->
+	<update id="updateByTpIdIfNull" parameterType="xwTpb">
+		update xw_tpb
+		<set>
+		  <if test="tpSjmc != null">
+		    tp_sjmc = #{tpSjmc,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpXsmc != null">
+		    tp_xsmc = #{tpXsmc,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpXdlj != null">
+		    tp_xdlj = #{tpXdlj,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpJdlj != null">
+		    tp_jdlj = #{tpJdlj,jdbcType=VARCHAR},
+		  </if>
+		  <if test="tpLmdm != null">
+            tp_lmdm = #{tpLmdm.lmId},
+          </if>
+		</set>
+		where tp_id = #{tpId,jdbcType=VARCHAR}
+	</update>
+	 
+	<!-- 修改图片信息 -->
+	<update id="updateByTpId" parameterType="xwTpb">
+		 update xw_tpb
+		 set tp_sjmc = #{tpSjmc,jdbcType=VARCHAR},
+		   tp_xsmc = #{tpXsmc,jdbcType=VARCHAR},
+		   tp_xdlj = #{tpXdlj,jdbcType=VARCHAR},
+		   tp_jdlj = #{tpJdlj,jdbcType=VARCHAR},
+		   tp_lmdm = #{tpLmdm.lmId}
+		 where tp_id = #{tpId,jdbcType=VARCHAR}
+	</update>
+</mapper>

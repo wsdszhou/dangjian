@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.notice.view.ViewMyselfNoticeMapper">
+  <resultMap id="BaseResultMap" type="viewMyselfNotice">
+    <result column="tz_id" property="tzId" />
+    <result column="tz_bt" property="tzBt" />
+    <result column="tz_nr" property="tzNr" />
+    <result column="tz_fbsj" property="tzFbsj" />
+    <result column="tz_fbrdm" property="tzFbrdm" />
+    <result column="tz_fbrmc" property="tzFbrmc" />
+    <result column="tz_jssj" property="tzJssj" />
+    <result column="tz_yxj" property="tzYxj" />
+    <result column="tzdx_id" property="tzdxId" />
+    <result column="tzdx_btzyhdm" property="tzdxBtzyhdm" />
+    <result column="tzdx_btzyhXm" property="tzdxBtzyhxm" />
+    <result column="tzdx_sfyd" property="tzdxSfyd" />
+    <result column="tzdx_ydsj" property="tzdxYdsj" />
+    <result column="bm_id" property="bmId" />
+    <result column="bm_mc" property="bmMc" />
+    <result column="tzfw_id" property="tzfwId" />
+    <result column="tzfw_mc" property="tzfwMc" />
+    <result column="yhxx_xm" property="yhxxXm" />
+  </resultMap>
+  
+  <sql id="all_column">
+    tz_id, tz_bt, tz_nr, tz_fbsj, tz_fbrdm, tz_fbrmc, tz_jssj, tz_yxj, tzdx_id,
+    tzdx_btzyhdm, tzdx_btzyhXm, tzdx_sfyd, tzdx_ydsj, bm_id, bm_mc, tzfw_id, tzfw_mc, yhxx_xm
+  </sql>
+  
+  <!-- 获取未审批的通知对象 -->
+    <select id="getNotApprovalNoticeObjectByNoticeId" parameterType="string" resultMap="BaseResultMap">
+       select distinct(tz_id), tzdx_sfyd,tzdx_ydsj, tzdx_btzyhdm, tz_fbrdm
+       from view_myself_notice
+       where  
+            tz_id = #{noticeId} and tzdx_sfyd = 0 and
+            tzdx_ydsj is null   and   tzdx_btzyhdm = #{userId}
+    </select>
+  
+  <select id="getMyselNoticePageList" parameterType="viewMyselfNotice" resultMap="BaseResultMap">
+     select <include refid="all_column"></include>
+     from view_myself_notice
+     where
+     <trim prefix="(" suffix=")" suffixOverrides="and">
+          tz_bt like '%${tzBt}%'  and
+	      <if test="tzNr != null">
+	          tz_nr like '%${tzNr}%'  and
+	      </if>
+	      <if test="tzfwId != null">
+	         tzfw_id = #{tzfwId} and 
+	      </if>
+	      <if test="tzFbsj != null">
+	          tz_fbsj &gt;= #{tzFbsj} and
+	      </if>
+	      <if test="tzJssj != null">
+	          tz_fbsj &lt; #{tzJssj} and 
+	      </if>
+	      <if test="tzYxj != null">
+	          tz_yxj =  #{tzYxj} and
+	      </if>
+	</trim>
+	order by tz_fbsj desc
+  </select>
+  
+  <!-- 插入一条视图  -->
+  <insert id="insert" parameterType="viewMyselfNotice">
+    insert into view_myself_notice (tz_id, tz_bt, tz_nr, 
+      tz_fbsj, tz_fbrdm, tz_fbrmc, 
+      tz_jssj, tz_yxj, tzdx_id, 
+      tzdx_btzyhdm, tzdx_btzyhXm, tzdx_sfyd, 
+      tzdx_ydsj, bm_id, bm_mc, 
+      tzfw_id, tzfw_mc, yhxx_xm
+      )
+    values (#{tzId}, #{tzBt}, #{tzNr}, 
+      #{tzFbsj}, #{tzFbrdm}, #{tzFbrmc}, 
+      #{tzJssj}, #{tzYxj}, #{tzdxId}, 
+      #{tzdxBtzyhdm}, #{tzdxBtzyhxm}, #{tzdxSfyd}, 
+      #{tzdxYdsj}, #{bmId}, #{bmMc}, 
+      #{tzfwId}, #{tzfwMc}, #{yhxxXm}
+      )
+  </insert>
+  
+  <!-- 插入一条视图，并且判断是否为空  -->
+  <insert id="insertSelective" parameterType="viewMyselfNotice">
+    insert into view_myself_notice
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="tzId != null">
+        tz_id,
+      </if>
+      <if test="tzBt != null">
+        tz_bt,
+      </if>
+      <if test="tzNr != null">
+        tz_nr,
+      </if>
+      <if test="tzFbsj != null">
+        tz_fbsj,
+      </if>
+      <if test="tzFbrdm != null">
+        tz_fbrdm,
+      </if>
+      <if test="tzFbrmc != null">
+        tz_fbrmc,
+      </if>
+      <if test="tzJssj != null">
+        tz_jssj,
+      </if>
+      <if test="tzYxj != null">
+        tz_yxj,
+      </if>
+      <if test="tzdxId != null">
+        tzdx_id,
+      </if>
+      <if test="tzdxBtzyhdm != null">
+        tzdx_btzyhdm,
+      </if>
+      <if test="tzdxBtzyhxm != null">
+        tzdx_btzyhXm,
+      </if>
+      <if test="tzdxSfyd != null">
+        tzdx_sfyd,
+      </if>
+      <if test="tzdxYdsj != null">
+        tzdx_ydsj,
+      </if>
+      <if test="bmId != null">
+        bm_id,
+      </if>
+      <if test="bmMc != null">
+        bm_mc,
+      </if>
+      <if test="tzfwId != null">
+        tzfw_id,
+      </if>
+      <if test="tzfwMc != null">
+        tzfw_mc,
+      </if>
+      <if test="yhxxXm != null">
+        yhxx_xm,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="tzId != null">
+        #{tzId},
+      </if>
+      <if test="tzBt != null">
+        #{tzBt},
+      </if>
+      <if test="tzNr != null">
+        #{tzNr},
+      </if>
+      <if test="tzFbsj != null">
+        #{tzFbsj},
+      </if>
+      <if test="tzFbrdm != null">
+        #{tzFbrdm},
+      </if>
+      <if test="tzFbrmc != null">
+        #{tzFbrmc},
+      </if>
+      <if test="tzJssj != null">
+        #{tzJssj},
+      </if>
+      <if test="tzYxj != null">
+        #{tzYxj},
+      </if>
+      <if test="tzdxId != null">
+        #{tzdxId},
+      </if>
+      <if test="tzdxBtzyhdm != null">
+        #{tzdxBtzyhdm},
+      </if>
+      <if test="tzdxBtzyhxm != null">
+        #{tzdxBtzyhxm},
+      </if>
+      <if test="tzdxSfyd != null">
+        #{tzdxSfyd},
+      </if>
+      <if test="tzdxYdsj != null">
+        #{tzdxYdsj},
+      </if>
+      <if test="bmId != null">
+        #{bmId},
+      </if>
+      <if test="bmMc != null">
+        #{bmMc},
+      </if>
+      <if test="tzfwId != null">
+        #{tzfwId},
+      </if>
+      <if test="tzfwMc != null">
+        #{tzfwMc},
+      </if>
+      <if test="yhxxXm != null">
+        #{yhxxXm},
+      </if>
+    </trim>
+  </insert>
+</mapper>

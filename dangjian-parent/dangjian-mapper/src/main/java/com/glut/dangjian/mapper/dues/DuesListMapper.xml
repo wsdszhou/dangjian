@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glut.dangjian.mapper.dues.DuesListMapper">
+    <resultMap id="BaseResultMap" type="viewDuesList">
+        <result column="list_id" property="listId"/>
+        <result column="yhxx_id" property="yhxxId"/>
+        <result column="yhxx_xm" property="yhxxXm"/>
+        <result column="dues_status" property="duesStatus"/>
+        <result column="dues_person" property="duesPerson"/>
+        <result column="dues_time" property="duesTime"/>
+        <result column="dues_month" property="duesMonth"/>
+        <result column="college_id" property="collegeId"/>
+        <result column="college_name" property="collegeName"/>
+        <result column="branch_id" property="branchId"/>
+        <result column="branch_name" property="branchName"/>
+        <result column="dues_anount" property="duesAnount"/>
+        <result column="dues_notice" property="duesNotice"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        list_id,yhxx_id,yhxx_xm,dues_status,dues_person,dues_time,dues_month,college_id,college_name,branch_id,branch_name,dues_anount,dues_notice
+    </sql>
+
+
+    <select id="duesPageList"  parameterType="viewDuesList" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />
+        from view_dues_list
+        where
+        <trim suffixOverrides="and">
+            <if test="branchId != null">
+                branch_id = #{branchId} and
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm like '%${yhxxXm}%' and
+            </if>
+            <if test="duesMonth != null">
+                dues_month like '%${duesMonth}%' and
+            </if>
+            <if test="duesStatus != null">
+                dues_status = #{duesStatus} and
+            </if>
+        </trim>
+    </select>
+
+    <select id="noticeById" parameterType="Integer">
+        update dues_list
+        set dues_notice = "已提醒"
+        where list_id = #{id}
+    </select>
+
+</mapper>

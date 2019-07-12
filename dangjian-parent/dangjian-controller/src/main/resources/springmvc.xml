@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
+
+    <!-- 配置包扫描 -->
+    <context:component-scan base-package="com.glut.dangjian.background.controller"/>
+    <!-- 配置包扫描 -->
+    <context:component-scan base-package="com.glut.dangjian.controller"/>
+
+    <!-- AOP的注解的自动代理生成器 -->
+    <aop:aspectj-autoproxy proxy-target-class="true" ></aop:aspectj-autoproxy>
+    
+    <!-- 配置视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+            <property name="prefix" value="/WEB-INF/views/"/>
+            <property name="suffix" value=".jsp"/>
+    </bean>
+    
+    <bean  id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 第一上传文件的编码格式 -->
+            <property name="defaultEncoding" value="utf-8"/>
+        <!-- 指定文件上床大小：字节，注意不只是单个文件，还指多个文件,这里设置为1G  -->
+            <property name="maxUploadSize" value="1073741824"/>
+    </bean>
+    
+    <!-- 对没有映射的请求，交由web服务器默认有的servlet去处理 -->
+    <mvc:default-servlet-handler/>    
+    
+    <!-- 开启我们的mvc注解 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="true">
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8" />
+            </bean>
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+            <bean id="fastJsonHttpMessageConverter" class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/plain;charset=UTF-8</value>
+                        <value>application/octet-stream;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value><!-- 避免IE出现下载JSON文件的情况 -->
+                    </list>
+                </property>
+                <property name="fastJsonConfig" ref="fastJsonConfig"/>
+            </bean> 
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 拦截器 -->
+   <mvc:interceptors>
+       <!--登录拦截器 -->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>   
+            <mvc:exclude-mapping path="/excel/**"/>
+            <mvc:exclude-mapping path="/images/**"/>
+            <mvc:exclude-mapping path="/images/**"/>
+            <mvc:exclude-mapping path="/jsAndCss/**"/>
+            <mvc:exclude-mapping path="/upload/**"/>
+            <mvc:exclude-mapping path="/background/home"/>
+            <mvc:exclude-mapping path="/back/login"/>
+            <mvc:exclude-mapping path="/mobile/login"/>
+            <mvc:exclude-mapping path="/back/toForgetPassword"/>
+            <mvc:exclude-mapping path="/back/validateInformation"/>
+            <mvc:exclude-mapping path="/back/setPassword"/>
+            <mvc:exclude-mapping path="/login"/>
+            <mvc:exclude-mapping path="/validateCode"/>
+            <mvc:exclude-mapping path="/mobile/validateCode"/>
+            <bean class="com.glut.dangjian.controller.intercepter.LoginInterception"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <bean id="fastJsonConfig" class="com.alibaba.fastjson.support.config.FastJsonConfig">
+        <!--默认编码格式 -->
+        <property name="charset" value="UTF-8"/>
+        <property name="serializerFeatures">
+            <list>
+                <value>WriteNullListAsEmpty</value>
+                <value>WriteDateUseDateFormat</value>
+                <value>PrettyFormat</value>
+                <value>WriteMapNullValue</value>
+                <!--<value>WriteNullStringAsEmpty</value>-->
+                <value>DisableCircularReferenceDetect</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>

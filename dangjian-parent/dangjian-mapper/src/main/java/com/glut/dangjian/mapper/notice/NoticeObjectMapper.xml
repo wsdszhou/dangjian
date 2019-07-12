@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.notice.NoticeObjectMapper">
+	<resultMap id="BaseResultMap" type="noticeObject">
+		<id column="tzdx_id" property="tzdxId" />
+		<result column="tzdx_sfyd" property="tzdxSfyd" />
+		<result column="tzdx_ydsj" property="tzdxYdsj" />
+		<association property="tzdxTzdm" javaType="notice">
+			<id column="tz_id" property="tzId" />
+	        <result column="tz_bt" property="tzBt" />
+	        <result column="tz_nr" property="tzNr" />
+	        <result column="tz_fbsj" property="tzFbsj" />
+	        <result column="tz_fbrmc" property="tzFbrmc" />
+	        <result column="tz_jssj" property="tzJssj" />
+	        <result column="tz_yxj" property="tzYxj" />
+		</association>
+		<association property="tzdxBtzyhdm" javaType="yhb">
+            <id column="user_id" property="userId"/>
+        </association> 
+        <association property="tzdxBmdm" javaType="bmb">
+            <id column="bm_id"  property="bmId" />
+            <result column="bm_mc"  property="bmMc" />
+        </association>
+        <association property="tzdxZbdm" javaType="zbb">
+            <id column="zb_id"  property="zbId" />
+            <result column="zb_mc"  property="zbMc" />
+        </association> 
+	</resultMap>
+	
+    <sql id="Base_Column_List">
+        tzdx_id, tzdx_tzdm, tzdx_btzyhdm, tzdx_sfyd, tzdx_ydsj
+    </sql>
+    
+    <!-- 添加通知 -->
+    <insert id="addNotice">
+        <!-- 添加通知 -->
+        insert into tz_tzb 
+            (tz_id, tz_bt, tz_nr, tz_fbsj, tz_fbrdm, tz_jssj, tz_fwdm, tz_yxj)
+        values 
+            (#{notice.tzId}, #{notice.tzBt}, #{notice.tzNr}, #{notice.tzFbsj}, #{notice.tzFbrdm.userId}, 
+                #{notice.tzJssj}, #{notice.tzFwdm.tzfwId}, #{notice.tzYxj});
+        <!-- 添加通知对象 -->
+        insert into tz_tzdxb
+            (tzdx_id, tzdx_tzdm, tzdx_sfyd) 
+        values
+              (#{noticeObject.tzdxId}, #{notice.tzId}, 0);
+    </insert>
+    
+	<!--  阅读通知 -->
+	<update id="readNotice">
+	   update tz_tzdxb set
+	       tzdx_sfyd = 1 , tzdx_ydsj = #{date}
+	   where tzdx_tzdm = #{noticeId}
+	</update>
+	
+	<!-- 结束审批添加通知 -->
+	<insert id="endAprrovalNotice" parameterType="noticeObject">
+	   insert into tz_tzb (tz_id, tz_bt, tz_nr, tz_fbsj, tz_fbrdm, tz_fwdm, tz_spId)
+        values (#{tzdxTzdm.tzId}, #{tzdxTzdm.tzBt}, #{tzdxTzdm.tzNr}, #{tzdxTzdm.tzFbsj}, #{tzdxTzdm.tzFbrdm.userId}, #{tzdxTzdm.tzFwdm.tzfwId}, #{tzdxTzdm.tzSpId});   
+        
+	   insert into tz_tzdxb (tzdx_id, tzdx_tzdm, tzdx_btzyhdm)
+        values (#{tzdxId}, #{tzdxTzdm.tzId}, #{tzdxBtzyhdm.userId});
+	</insert>
+	
+	<!-- 删除通知对象通过审批项目id -->
+	<delete id="deleteBySpLcxmbId" parameterType="string">
+       delete from tz_tzdxb where tzdx_tzdm = ( 
+           select tz_id from tz_tzb where tz_spId = ( 
+               select lcxm_id from sp_lcxmb where lcxm_dxId = #{id}));
+    </delete>
+	
+	<!-- 不同意新闻审批 -->
+	<update id="disagreeNews" parameterType="spLcxmb">
+	   <if test="spLcxmb != null">
+	        update sp_lcxmb
+	       <set>
+	            lcxm_xgsj = #{spLcxmb.splbXgsj} ,
+	            lcxm_dqspzt = #{spLcxmb.splbDqspzt},
+	            lcxm_resulte = #{spLcxmb.splbResulte},
+	       </set>
+	       where lcxm_id = #{spLcxmb.lcxmId};
+	   </if>
+	   
+	   <if test="noticeObjects != null">
+	       <foreach collection="noticeObjects" item="noticeObject" separator=";">
+	            update tz_tzdxb
+	            <set>
+	                <if test="yhb.userId == noticeObject.tzdxBtzyhdm.userId">
+	                    tzdx_sfyd = 1,
+	                </if>
+	                tzdx_ydsj = #{spLcxmb.splbXgsj}
+	            </set>
+	            where tzdx_id = #{noticeObject.tzdxId}
+	        </foreach>
+	   </if>
+	   
+	</update>
+	
+	<!--  -->
+	<select id="getNoticeObjectListByApprovalId" parameterType="string" resultMap="BaseResultMap">
+	   SELECT
+	tzdx_id,
+	tzdx_tzdm,
+	tzdx_btzyhdm,
+	tzdx_sfyd,
+	tzdx_ydsj,
+	user_id
+FROM
+	tz_tzdxb,
+	yhb
+WHERE
+	yhb.user_id = tz_tzdxb.tzdx_btzyhdm
+	AND tzdx_tzdm = (
+	SELECT
+		tz_id
+	FROM
+		tz_tzb
+WHERE
+	tz_spId =  #{lcxmId})
+	</select>
+	
+	<!--  同意审批通知 -->
+	<update id="agreeApprovalNotice">
+	   <if test="notice != null">
+		   <if test="notice.tzJssj != null">
+			   update tz_tzb
+	           <set>
+	               tz_jssj = #{notice.tzJssj}
+	           </set>
+	           where tz_id = #{notice.tzId};
+		   </if>
+	   </if>
+	   
+	   update tz_tzdxb
+	   <set>
+	       tzdx_ydsj = #{spLcxmb.splbXgsj}
+	   </set>
+	   where tzdx_tzdm = #{notice.tzId} and tzdx_sfyd = 0 and tzdx_ydsj is null;
+	   
+	   update tz_tzdxb
+       <set>
+           tzdx_sfyd = 1
+       </set>
+       where tzdx_tzdm = #{notice.tzId} and tzdx_btzyhdm = #{yhb.userId};
+       
+       <if test="viewApprovalJobUsers != null">
+
+	       <foreach collection="viewApprovalJobUsers" item="viewApprovalJobUser" separator=";">
+               insert into tz_tzdxb(tzdx_id, tzdx_tzdm, tzdx_btzyhdm, tzdx_sfyd) values (#{viewApprovalJobUser.noticeObjectId}, #{notice.tzId}, #{viewApprovalJobUser.userId}, 0)
+	       </foreach>; 
+       </if>
+       
+	</update>
+	
+	<!--  修改批量添加人员通知  -->
+    <insert id="updateIndividualNoticeInsertBartchSelective" >
+        delete from tz_tzdxb where tzdx_tzdm = #{notice.tzId};
+        update tz_tzb
+        <set>
+            <if test="notice.tzBt != null">
+                tz_bt = #{notice.tzBt},
+            </if>
+            <if test="notice.tzNr != null">
+                tz_nr = #{notice.tzNr},
+            </if>
+            <if test="notice.tzFbsj != null">
+                tz_fbsj = #{notice.tzFbsj},
+            </if>
+            <if test="notice.tzFwdm != null">
+                tz_fwdm = #{notice.tzFwdm.tzfwId},
+            </if>
+            <if test="notice.tzYxj != null">
+                tz_yxj = #{notice.tzYxj},
+            </if>
+            <if test="spLcxmb.lcxmId != null">
+                tz_spId = #{spLcxmb.lcxmId} ,
+            </if>
+        </set>
+        where tz_id = #{notice.tzId};
+        
+        insert into tz_tzdxb(tzdx_id, tzdx_tzdm, tzdx_btzyhdm, tzdx_sfyd) values
+        <foreach collection="viewApprovalJobUsers" item="viewApprovalJobUser" separator=",">
+            (#{viewApprovalJobUser.noticeObjectId}, #{notice.tzId}, #{viewApprovalJobUser.userId}, 0 )
+        </foreach>; 
+        
+        update sp_lcxmb
+        <set>
+            <if test="spLcxmb.lcxmMc != null">
+                lcxm_mc = #{spLcxmb.lcxmMc},
+            </if>
+            <if test="spLcxmb.lcxmXmms != null">
+                lcxm_xmms = #{spLcxmb.lcxmXmms},
+            </if>
+            <if test="spLcxmb.splbXgsj != null">
+                lcxm_xgsj = #{spLcxmb.splbXgsj} ,
+            </if>
+            <if test="spLcxmb.splbDqjddm.spjdId != null">
+                lcxm_dqjddm = #{spLcxmb.splbDqjddm.spjdId} ,
+            </if>
+        </set>
+        where lcxm_id = #{spLcxmb.lcxmId};
+    </insert> 
+	
+	<!--  批量添加人员通知  -->
+    <insert id="insertBartchSelective" >
+        insert into sp_lcxmb 
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="spLcxmb.lcxmId != null">
+                lcxm_id,
+            </if>
+            <if test="spLcxmb.lcxmMc != null">
+                lcxm_mc,
+            </if>
+            <if test="spLcxmb.lcxmSplcdm != null">
+                lcxm_splcdm,
+            </if>
+            <if test="spLcxmb.lcxmXmms != null">
+                lcxm_xmms,
+            </if>
+            <if test="spLcxmb.splbDqjddm != null">
+                lcxm_dqjddm,
+            </if>
+            <if test="spLcxmb.splbDqspzt != null">
+                lcxm_dqspzt ,
+            </if>
+            <if test="spLcxmb.splbXgsj != null">
+                lcxm_xgsj ,
+            </if>
+            <if test="spLcxmb.lcxmDxId != null">
+                lcxm_dxId ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="spLcxmb.lcxmId != null">
+                #{spLcxmb.lcxmId},
+            </if>
+            <if test="spLcxmb.lcxmMc != null">
+                #{spLcxmb.lcxmMc},
+            </if>
+            <if test="spLcxmb.lcxmSplcdm != null">
+                #{spLcxmb.lcxmSplcdm.splcId},
+            </if>
+            <if test="spLcxmb.lcxmXmms != null">
+                #{spLcxmb.lcxmXmms},
+            </if>
+            <if test="spLcxmb.splbDqjddm != null">
+                #{spLcxmb.splbDqjddm.spjdId},
+            </if>
+            <if test="spLcxmb.splbDqspzt != null">
+                #{spLcxmb.splbDqspzt},
+            </if>
+            <if test="spLcxmb.splbXgsj != null">
+                #{spLcxmb.splbXgsj} ,
+            </if>
+            <if test="spLcxmb.lcxmDxId != null">
+                #{spLcxmb.lcxmDxId} ,
+            </if>
+        </trim>;  
+        insert into tz_tzb
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="notice.tzId != null">
+                tz_id,
+            </if>
+            <if test="notice.tzBt != null">
+                tz_bt,
+            </if>
+            <if test="notice.tzNr != null">
+                tz_nr,
+            </if>
+            <if test="notice.tzFbsj != null">
+                tz_fbsj,
+            </if>
+            <if test="notice.tzFbrdm != null">
+                tz_fbrdm,
+            </if>
+            <if test="notice.tzFbrmc != null">
+                tz_fbrmc,
+            </if>
+            <if test="notice.tzJssj != null">
+                tz_jssj,
+            </if>
+            <if test="notice.tzFwdm != null">
+                tz_fwdm,
+            </if>
+            <if test="notice.tzYxj != null">
+                tz_yxj,
+            </if>
+            <if test="spLcxmb.lcxmId != null">
+                tz_spId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="notice.tzId != null">
+                #{notice.tzId},
+            </if>
+            <if test="notice.tzBt != null">
+                #{notice.tzBt},
+            </if>
+            <if test="notice.tzNr != null">
+                #{notice.tzNr},
+            </if>
+            <if test="notice.tzFbsj != null">
+                #{notice.tzFbsj},
+            </if>
+            <if test="notice.tzFbrdm != null">
+                #{notice.tzFbrdm.userId},
+            </if>
+            <if test="notice.tzFbrmc != null">
+                #{notice.tzFbrmc},
+            </if>
+            <if test="notice.tzJssj != null">
+                #{notice.tzJssj},
+            </if>
+            <if test="notice.tzFwdm != null">
+                #{notice.tzFwdm.tzfwId},
+            </if>
+            <if test="notice.tzYxj != null">
+                #{notice.tzYxj},
+            </if>
+            <if test="spLcxmb.lcxmId != null">
+                #{spLcxmb.lcxmId},
+            </if>
+        </trim>;
+
+        <if test="viewApprovalJobUsers != null">
+            <foreach collection="viewApprovalJobUsers" item="viewApprovalJobUser" separator=";">
+                insert into tz_tzdxb(tzdx_id, tzdx_tzdm, tzdx_btzyhdm, tzdx_sfyd) values (#{viewApprovalJobUser.noticeObjectId}, #{notice.tzId}, #{viewApprovalJobUser.userId}, 0 )
+            </foreach>
+        </if>
+
+    </insert> 
+    
+	<!--  根据主键查询信息  -->
+	<select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tz_tzdxb
+		where tzdx_id = #{tzdxId}
+	</select> 
+	
+	<!-- 删除一条记录   -->
+	<delete id="deleteById" parameterType="java.lang.String">
+		delete from tz_tzdxb
+		where tzdx_id = #{tzdxId}
+	</delete> 
+	
+	<!-- 删除一条记录   -->
+    <delete id="deleteByNoticeId" parameterType="java.lang.String">
+        delete from tz_tzdxb
+        where tzdx_tzdm = #{noticeId}
+    </delete>
+    
+	<!--  添加一信息  -->
+	<insert id="insert" parameterType="noticeObject">
+		insert into tz_tzdxb 
+		  (tzdx_id, tzdx_tzdm, tzdx_btzyhdm, tzdx_sfyd, tzdx_ydsj, tzdx_bmdm, tzdx_zbdm)
+		values 
+		(#{tzdxId}, #{tzdxTzdm.tzId}, #{tzdxBtzyhdm.userId}, #{tzdxSfyd}, #{tzdxYdsj},  #{tzdxBmdm.bmId},#{tzdxZbdm.zbId}  )
+	</insert> 
+	
+	<!--  添加一信息，并且判断是否为空  -->
+	<insert id="insertSelective" parameterType="noticeObject">
+		insert into tz_tzdxb
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="tzdxId != null">
+				tzdx_id,
+			</if>
+			<if test="tzdxTzdm != null">
+				tzdx_tzdm,
+			</if>
+			<if test="tzdxBtzyhdm != null">
+				tzdx_btzyhdm,
+			</if>
+			<if test="tzdxSfyd != null">
+				tzdx_sfyd,
+			</if>
+			<if test="tzdxYdsj != null">
+				tzdx_ydsj,
+			</if>
+			<if test="tzdxBmdm != null">
+                tzdx_bmdm,
+            </if>
+            <if test="tzdxZbdm != null">
+                tzdx_zbdm,
+            </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="tzdxId != null">
+				#{tzdxId},
+			</if>
+			<if test="tzdxTzdm != null">
+				#{tzdxTzdm.tzId},
+			</if>
+			<if test="tzdxBtzyhdm != null">
+				#{tzdxBtzyhdm.userId},
+			</if>
+			<if test="tzdxSfyd != null">
+				#{tzdxSfyd},
+			</if>
+			<if test="tzdxYdsj != null">
+				#{tzdxYdsj},
+			</if>
+			<if test="tzdxBmdm != null">
+                #{tzdxBmdm.bmId},
+            </if>
+            <if test="tzdxZbdm != null">
+                #{tzdxZbdm.zbId},
+            </if>
+		</trim>
+	</insert>
+	
+	<!--  修改信息，并且判断是否为空  -->
+	<update id="updateByIdSelective"  parameterType="noticeObject">
+		update tz_tzdxb
+		<set>
+			<if test="tzdxTzdm != null">
+				tzdx_tzdm = #{tzdxTzdm.tzId},
+			</if>
+			<if test="tzdxBtzyhdm != null">
+				tzdx_btzyhdm = #{tzdxBtzyhdm.userId},
+			</if>
+			<if test="tzdxSfyd != null">
+				tzdx_sfyd = #{tzdxSfyd},
+			</if>
+			<if test="tzdxYdsj != null">
+				tzdx_ydsj = #{tzdxYdsj},
+			</if>
+			<if test="tzdxBmdm != null">
+                tzdx_bmdm = #{tzdxBmdm.bmId},
+            </if>
+            <if test="tzdxZbdm != null">
+                tzdx_zbdm = #{tzdxZbdm.zbId},
+            </if>
+		</set>
+		where tzdx_id = #{tzdxId}
+    </update> 
+    
+	<!--  修改信息  -->
+	<update id="updateById" parameterType="noticeObject">
+		update tz_tzdxb
+		set tzdx_tzdm = #{tzdxTzdm.tzId},
+		tzdx_btzyhdm = #{tzdxBtzyhdm.userId},
+		tzdx_sfyd = #{tzdxSfyd},
+		tzdx_ydsj = #{tzdxYdsj},
+		tzdx_bmdm = #{tzdxBmdm.bmId},
+		tzdx_zbdm = #{tzdxZbdm.zbId}
+		where tzdx_id = #{tzdxId}
+	</update> 
+</mapper>

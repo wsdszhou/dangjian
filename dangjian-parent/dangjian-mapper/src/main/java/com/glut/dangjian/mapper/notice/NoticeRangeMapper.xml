@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.notice.NoticeRangeMapper">
+	<resultMap id="BaseResultMap" type="noticeRange">
+		<id column="tzfw_id" property="tzfwId" />
+		<result column="tzfw_mc" property="tzfwMc" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		tzfw_id, tzfw_mc
+	</sql>
+	
+	<!-- 分页查询 -->
+	<select id="getNoticeRangePageList" resultMap="BaseResultMap">
+	   select <include refid="Base_Column_List"></include>
+	   from tz_fw
+	   <if test="tzfwMc != null">
+          where tzfw_mc like '%${tzfwMc}%'
+       </if>
+	</select>
+	
+	<!-- 加载通知类型 -->
+	<select id="loadNoticeRange" parameterType="string" resultMap="BaseResultMap">
+	   select <include refid="Base_Column_List"></include>
+       from tz_fw
+       <if test="name != null">
+          where tzfw_mc like '%${name}%'
+       </if>
+	</select>
+	
+	<!--  根据主键查询信息  -->
+	<select id="selectById" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tz_fw
+		where tzfw_id = #{tzfwId}
+	</select>
+	
+	<!--  删除一条记录  -->
+	<delete id="deleteById" parameterType="java.lang.Integer">
+		delete from tz_fw
+		where tzfw_id = #{tzfwId}
+	</delete>
+	
+	<!--  添加一信息  -->
+	<insert id="insert" parameterType="noticeRange">
+		insert into tz_fw (tzfw_id, tzfw_mc)
+		values (#{tzfwId}, #{tzfwMc})
+	</insert>
+	
+	<!--  添加一信息，并且判断是否为空  -->
+	<insert id="insertSelective" parameterType="noticeRange">
+		insert into tz_fw
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="tzfwId != null">
+				tzfw_id,
+			</if>
+			<if test="tzfwMc != null">
+				tzfw_mc,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="tzfwId != null">
+				#{tzfwId},
+			</if>
+			<if test="tzfwMc != null">
+				#{tzfwMc},
+			</if>
+		</trim>
+	</insert>
+	
+	<!--  修改信息，并且判断是否为空  -->
+	<update id="updateByIdSelective" parameterType="noticeRange">
+		update tz_fw
+		<set>
+			<if test="tzfwMc != null">
+				tzfw_mc = #{tzfwMc},
+			</if>
+		</set>
+		where tzfw_id = #{tzfwId}
+	</update>
+	
+	<!--  修改信息   -->
+	<update id="updateById" parameterType="noticeRange">
+		update tz_fw
+		set tzfw_mc = #{tzfwMc}
+		where tzfw_id = #{tzfwId}
+	</update>
+</mapper>

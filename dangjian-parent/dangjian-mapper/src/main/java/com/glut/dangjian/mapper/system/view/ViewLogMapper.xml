@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.system.view.ViewLogMapper">
+	<resultMap id="BaseResultMap" type="com.glut.dangjian.entity.view.ViewLog">
+		<result column="id" property="id" />
+		<result column="login_ip" property="loginIp" />
+		<result column="type" property="type" />
+		<result column="operation" property="operation" />
+		<result column="create_time" property="createTime" />
+		<result column="remark" property="remark" />
+		<result column="user_id" property="yhxxId" />
+		<result column="user_mc" property="yhxxXm" />
+		<result column="yhxx_id" property="yhxxId" />
+		<result column="yhxx_xm" property="yhxxXm" />
+	</resultMap>
+
+	<sql id="all_column">
+		id, login_ip, `type`, operation, create_time, remark,
+		user_id,user_mc,yhxx_id,yhxx_xm
+	</sql>
+	
+	<select id="getLogPageList"  parameterType="viewLog" resultMap="BaseResultMap">
+        select <include refid="all_column" />
+        from view_log
+        <where>
+        <if test="operation != null">
+			and operation like "%"#{operation}"%"
+		</if>
+
+		<if test="type != null">
+			and type = #{type}
+		</if>
+		<if test="createTime != null">
+			and create_time &gt; #{createTime}
+		</if>
+		<if test="endTime != null">
+			and create_time  &lt;  #{endTime}
+		</if>
+		</where>
+
+        
+    </select>
+	
+
+	<insert id="insert" parameterType="viewLog">
+		insert into view_log (id, login_ip, type,
+		operation, create_time, remark,
+		user_id, user_mc, yhxx_id,
+		yhxx_xm)
+		values (#{id}, #{loginIp}, #{type},
+		#{operation}, #{createTime}, #{remark},
+		#{userId}, #{userMc}, #{yhxxId},
+		#{yhxxXm})
+	</insert>
+	<insert id="insertSelective" parameterType="viewLog">
+		insert into view_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="loginIp != null">
+				login_ip,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="operation != null">
+				operation,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="userMc != null">
+				user_mc,
+			</if>
+			<if test="yhxxId != null">
+				yhxx_id,
+			</if>
+			<if test="yhxxXm != null">
+				yhxx_xm,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id},
+			</if>
+			<if test="loginIp != null">
+				#{loginIp},
+			</if>
+			<if test="type != null">
+				#{type},
+			</if>
+			<if test="operation != null">
+				#{operation},
+			</if>
+			<if test="createTime != null">
+				#{createTime},
+			</if>
+			<if test="remark != null">
+				#{remark},
+			</if>
+			<if test="userId != null">
+				#{userId},
+			</if>
+			<if test="userMc != null">
+				#{userMc},
+			</if>
+			<if test="yhxxId != null">
+				#{yhxxId},
+			</if>
+			<if test="yhxxXm != null">
+				#{yhxxXm},
+			</if>
+		</trim>
+	</insert>
+</mapper>

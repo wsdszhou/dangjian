@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.other.view.ViewPartyinfoMapper">
+  <resultMap id="BaseResultMap" type="viewPartyinfo">
+    <result column="id"  property="id" />
+    <result column="sqsj"  property="sqsj" />
+    <result column="spsj"  property="spsj" />
+    <result column="rdsj"  property="rdsj" />
+    <result column="ms"  property="ms" />
+    <result column="zrsj"  property="zrsj" />
+    <result column="zcdd"  property="zcdd" />
+    <result column="zt"  property="zt" />
+    <result column="result"  property="result" />
+    <result column="bmdm"  property="bmdm" />
+    <result column="zbdm"  property="zbdm" />
+    <result column="dnzwdm"  property="dnzwdm" />
+    <result column="zzmmdm"  property="zzmmdm" />
+    <result column="user_id"  property="userId" />
+    <result column="user_mc"  property="userMc" />
+    <result column="yhxx_id"  property="yhxxId" />
+    <result column="yhxx_xm"  property="yhxxXm" />
+    <result column="yhxx_xb"  property="yhxxXb" />
+    <result column="yhxx_csrq"  property="yhxxCsrq" />
+    <result column="yhxx_dhhm"  property="yhxxDhhm" />
+    <result column="yhxx_sjh"  property="yhxxSjh" />
+    <result column="yhxx_yx"  property="yhxxYx" />
+    <result column="yhxx_sfzh"  property="yhxxSfzh" />
+    <result column="xl_id"  property="xlId" />
+    <result column="xl_mc"  property="xlMc" />
+    <result column="zzmm_id"  property="zzmmId" />
+    <result column="zzmm_mc"  property="zzmmMc" />
+    <result column="jg_id"  property="jgId" />
+    <result column="js_szqx_mc"  property="jsSzqxMc" />
+    <result column="jg_szs_mc"  property="jgSzsMc" />
+    <result column="mz_id"  property="mzId" />
+    <result column="mz_mc"  property="mzMc" />
+    <result column="dnzw_id"  property="dnzwId" />
+    <result column="dnzw_mc"  property="dnzwMc" />
+    <result column="dnzw_jb"  property="dnzwJb" />
+    <result column="xzzw_id"  property="xzzwId" />
+    <result column="xzzw_mc"  property="xzzwMc" />
+    <result column="xzzw_jb"  property="xzzwJb" />
+    <result column="bm_id"  property="bmId" />
+    <result column="bm_mc"  property="bmMc" />
+    <result column="zb_id"  property="zbId" />
+    <result column="zb_mc"  property="zbMc" />
+  </resultMap>
+  
+  <sql id="all_column">
+	    id, rdsj,sqsj, spsj, ms, zrsj, zcdd, zt,result, bmdm, zbdm, dnzwdm, zzmmdm,
+	    user_id, user_mc, yhxx_id, yhxx_xm, yhxx_xb, yhxx_csrq, yhxx_dhhm, 
+	    yhxx_sjh, yhxx_yx, yhxx_sfzh, xl_id, xl_mc, zzmm_id, zzmm_mc, jg_id, js_szqx_mc,  dnzw_id,
+	    mz_id, mz_mc, dnzw_mc, dnzw_jb, xzzw_id, xzzw_mc, xzzw_jb, bm_id, bm_mc, zb_id, zb_mc
+  </sql>
+  
+  <!-- 根据noticeId查询党党籍信息 -->
+  <select id="getPartyByNoticeId" parameterType="string" resultMap="BaseResultMap">
+    select id, rdsj,sqsj, spsj, ms, zrsj, zcdd, zt,result, user_mc, yhxx_xm, yhxx_xb, yhxx_dhhm,  yhxx_sjh,
+        yhxx_yx, yhxx_sfzh, xl_mc, zzmm_mc, js_szqx_mc, mz_mc, dnzw_mc, dnzw_jb, xzzw_mc, xzzw_jb, bm_mc, zb_mc
+    from view_partyInfo
+    where id = (select lcxm_dxId from sp_lcxmb where lcxm_id = (
+                select tz_spId from tz_tzb where tz_id = #{noticeId} )  ) 
+  </select>
+  
+  <select id="getParty" parameterType="string" resultMap="BaseResultMap">
+    select id, rdsj,sqsj, spsj, ms, zrsj, zcdd, zt,result, user_mc, yhxx_xm, yhxx_xb, yhxx_dhhm,  yhxx_sjh,
+        yhxx_yx, yhxx_sfzh, xl_mc, zzmm_mc, js_szqx_mc, mz_mc, dnzw_mc, dnzw_jb, xzzw_mc, xzzw_jb, bm_mc, zb_mc
+    from view_partyInfo
+    where user_id = #{userId}
+  </select>
+  
+  <select id="getViewPartyinfoById" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="all_column"></include>
+    from view_partyInfo
+    where id = #{id}
+  </select>
+  
+  <select id="getViewPartyinfoByUserId" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="all_column"></include>
+    from view_partyInfo
+    where user_id = #{id}
+  </select>
+  
+  <!-- 分页查询 -->
+  <select id="getPageList" parameterType="viewPartyinfo" resultMap="BaseResultMap">
+    select <include refid="all_column"></include>
+    from view_partyInfo
+    where result != 2
+    <trim >
+        <if test="yhxxXm != null">
+            <if test="yhxxXm != '' ">
+	          and  yhxx_xm like "%"#{yhxxXm}"%" 
+	        </if>
+	    </if>
+	    <if test="yhxxXb != null">
+	        and yhxx_xb = #{yhxxXb}
+	    </if>
+	    <if test="xlId !=null">
+	        and  xl_id = #{xlId} 
+	    </if>
+	    <if test="zzmmId !=null">
+	        and  zzmm_id = #{zzmmId} 
+	    </if>
+	     <if test="jgId !=null">
+	        and  jg_id =  #{jgId} 
+	    </if>
+	    <if test="dnzwId !=null">
+	        and  dnzw_id =  #{dnzwId} 
+	    </if>
+	    <if test="dnzwId !=null">
+	        and  mz_id =  #{mzId} 
+	    </if>
+	    <if test="bmId !=null">
+	        and  bm_id = #{bmId} 
+	    </if>
+	    <if test="zbId !=null">
+	        and  zb_id =  #{zbId} 
+	    </if>
+	    <if test="xzzwId !=null">
+	        and  xzzw_id = #{xzzwId} 
+	    </if>
+    </trim>
+  </select>
+  
+  <insert id="insert" parameterType="viewPartyinfo">
+    insert into view_partyInfo (id, sqsj, spsj, rdsj, ms, 
+      zrsj, zcdd, zt, bmdm, 
+      zbdm, dnzwdm, zzmmdm, 
+      user_id, user_mc, yhxx_id, 
+      yhxx_xm, yhxx_xb, yhxx_csrq, 
+      yhxx_dhhm, yhxx_sjh, yhxx_yx, 
+      yhxx_sfzh, xl_id, xl_mc, 
+      zzmm_id, zzmm_mc, jg_id, 
+      js_szqx_mc, jg_szs_mc, mz_id, 
+      mz_mc, dnzw_id, dnzw_mc, 
+      dnzw_jb, xzzw_id, xzzw_mc, 
+      xzzw_jb, bm_id, bm_mc, 
+      zb_id, zb_mc)
+    values (#{id}, #{sqsj}, #{spsj}, #{rdsj}, #{ms}, 
+      #{zrsj}, #{zcdd}, #{zt}, #{bmdm}, 
+      #{zbdm}, #{dnzwdm}, #{zzmmdm}, 
+      #{userId}, #{userMc}, #{yhxxId}, 
+      #{yhxxXm}, #{yhxxXb}, #{yhxxCsrq,jdbcType=DATE}, 
+      #{yhxxDhhm}, #{yhxxSjh}, #{yhxxYx}, 
+      #{yhxxSfzh}, #{xlId}, #{xlMc}, 
+      #{zzmmId}, #{zzmmMc}, #{jgId}, 
+      #{jsSzqxMc}, #{jgSzsMc}, #{mzId}, 
+      #{mzMc}, #{dnzwId}, #{dnzwMc}, 
+      #{dnzwJb}, #{xzzwId}, #{xzzwMc}, 
+      #{xzzwJb}, #{bmId}, #{bmMc}, 
+      #{zbId}, #{zbMc})
+  </insert>
+  <insert id="insertSelective" parameterType="viewPartyinfo">
+    insert into view_partyInfo
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="sqsj != null">
+        sqsj,
+      </if>
+      <if test="spsj != null">
+        spsj,
+      </if>
+      <if test="rdsj != null">
+        rdsj,
+      </if>
+      <if test="ms != null">
+        ms,
+      </if>
+      <if test="zrsj != null">
+        zrsj,
+      </if>
+      <if test="zcdd != null">
+        zcdd,
+      </if>
+      <if test="zt != null">
+        zt,
+      </if>
+      <if test="bmdm != null">
+        bmdm,
+      </if>
+      <if test="zbdm != null">
+        zbdm,
+      </if>
+      <if test="dnzwdm != null">
+        dnzwdm,
+      </if>
+      <if test="zzmmdm != null">
+        zzmmdm,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="userMc != null">
+        user_mc,
+      </if>
+      <if test="yhxxId != null">
+        yhxx_id,
+      </if>
+      <if test="yhxxXm != null">
+        yhxx_xm,
+      </if>
+      <if test="yhxxXb != null">
+        yhxx_xb,
+      </if>
+      <if test="yhxxCsrq != null">
+        yhxx_csrq,
+      </if>
+      <if test="yhxxDhhm != null">
+        yhxx_dhhm,
+      </if>
+      <if test="yhxxSjh != null">
+        yhxx_sjh,
+      </if>
+      <if test="yhxxYx != null">
+        yhxx_yx,
+      </if>
+      <if test="yhxxSfzh != null">
+        yhxx_sfzh,
+      </if>
+      <if test="xlId != null">
+        xl_id,
+      </if>
+      <if test="xlMc != null">
+        xl_mc,
+      </if>
+      <if test="zzmmId != null">
+        zzmm_id,
+      </if>
+      <if test="zzmmMc != null">
+        zzmm_mc,
+      </if>
+      <if test="jgId != null">
+        jg_id,
+      </if>
+      <if test="jsSzqxMc != null">
+        js_szqx_mc,
+      </if>
+      <if test="jgSzsMc != null">
+        jg_szs_mc,
+      </if>
+      <if test="mzId != null">
+        mz_id,
+      </if>
+      <if test="mzMc != null">
+        mz_mc,
+      </if>
+      <if test="dnzwId != null">
+        dnzw_id,
+      </if>
+      <if test="dnzwMc != null">
+        dnzw_mc,
+      </if>
+      <if test="dnzwJb != null">
+        dnzw_jb,
+      </if>
+      <if test="xzzwId != null">
+        xzzw_id,
+      </if>
+      <if test="xzzwMc != null">
+        xzzw_mc,
+      </if>
+      <if test="xzzwJb != null">
+        xzzw_jb,
+      </if>
+      <if test="bmId != null">
+        bm_id,
+      </if>
+      <if test="bmMc != null">
+        bm_mc,
+      </if>
+      <if test="zbId != null">
+        zb_id,
+      </if>
+      <if test="zbMc != null">
+        zb_mc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id},
+      </if>
+      <if test="sqsj != null">
+        #{sqsj},
+      </if><if test="spsj != null">
+        #{spsj},
+      </if>
+      <if test="rdsj != null">
+        #{rdsj},
+      </if>
+      <if test="ms != null">
+        #{ms},
+      </if>
+      <if test="zrsj != null">
+        #{zrsj},
+      </if>
+      <if test="zcdd != null">
+        #{zcdd},
+      </if>
+      <if test="zt != null">
+        #{zt},
+      </if>
+      <if test="bmdm != null">
+        #{bmdm},
+      </if>
+      <if test="zbdm != null">
+        #{zbdm},
+      </if>
+      <if test="dnzwdm != null">
+        #{dnzwdm},
+      </if>
+      <if test="zzmmdm != null">
+        #{zzmmdm},
+      </if>
+      <if test="userId != null">
+        #{userId},
+      </if>
+      <if test="userMc != null">
+        #{userMc},
+      </if>
+      <if test="yhxxId != null">
+        #{yhxxId},
+      </if>
+      <if test="yhxxXm != null">
+        #{yhxxXm},
+      </if>
+      <if test="yhxxXb != null">
+        #{yhxxXb},
+      </if>
+      <if test="yhxxCsrq != null">
+        #{yhxxCsrq,jdbcType=DATE},
+      </if>
+      <if test="yhxxDhhm != null">
+        #{yhxxDhhm},
+      </if>
+      <if test="yhxxSjh != null">
+        #{yhxxSjh},
+      </if>
+      <if test="yhxxYx != null">
+        #{yhxxYx},
+      </if>
+      <if test="yhxxSfzh != null">
+        #{yhxxSfzh},
+      </if>
+      <if test="xlId != null">
+        #{xlId},
+      </if>
+      <if test="xlMc != null">
+        #{xlMc},
+      </if>
+      <if test="zzmmId != null">
+        #{zzmmId},
+      </if>
+      <if test="zzmmMc != null">
+        #{zzmmMc},
+      </if>
+      <if test="jgId != null">
+        #{jgId},
+      </if>
+      <if test="jsSzqxMc != null">
+        #{jsSzqxMc},
+      </if>
+      <if test="jgSzsMc != null">
+        #{jgSzsMc},
+      </if>
+      <if test="mzId != null">
+        #{mzId},
+      </if>
+      <if test="mzMc != null">
+        #{mzMc},
+      </if>
+      <if test="dnzwId != null">
+        #{dnzwId},
+      </if>
+      <if test="dnzwMc != null">
+        #{dnzwMc},
+      </if>
+      <if test="dnzwJb != null">
+        #{dnzwJb},
+      </if>
+      <if test="xzzwId != null">
+        #{xzzwId},
+      </if>
+      <if test="xzzwMc != null">
+        #{xzzwMc},
+      </if>
+      <if test="xzzwJb != null">
+        #{xzzwJb},
+      </if>
+      <if test="bmId != null">
+        #{bmId},
+      </if>
+      <if test="bmMc != null">
+        #{bmMc},
+      </if>
+      <if test="zbId != null">
+        #{zbId},
+      </if>
+      <if test="zbMc != null">
+        #{zbMc},
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.background.other.VideoMapper">
+	
+	<resultMap id="BaseResultMap" type="sp">
+		<id column="sp_id" property="spId" />
+		<result column="sp_mc" property="spMc" />
+		<result column="sp_ms" property="spMs" />
+		<result column="sp_scsj" property="spScsj" />
+		<result column="sp_lj" property="spLj" />
+		<result column="sp_slt" property="spSlt" />
+		<association property="spScyhdm" javaType="viewYhxx">
+		      <id column="user_id" property="userId"/>
+              <result column="yhxx_xm"  property="yhxxXm" />
+        </association>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		sp_id, sp_mc, sp_ms, sp_scsj, sp_lj, sp_scyhdm, sp_slt
+	</sql>
+	
+	<!-- 获取单个人的视频 -->
+	<select id="getSingleVideo" parameterType="string" resultMap="BaseResultMap">
+	   select sp_id, sp_mc, sp_ms, sp_scsj, sp_lj, user_id, yhxx_xm, sp_slt
+        from sp, view_yhxx xx
+        where sp_id = #{videoId} and sp.sp_scyhdm = xx.user_id  
+	</select>
+	
+	<!-- 分页查询 -->
+	<select id="getPageList" useCache="false" resultMap="BaseResultMap">
+        select sp_id, sp_mc, sp_ms, sp_scsj, yhxx_xm, sp_slt
+        from sp, view_yhxx xx
+        where 
+            sp.sp_scyhdm = xx.user_id 
+    </select>
+	
+    <!--  分页查询,根据条件 -->
+	<select id="getVideoPageList" parameterType="sp" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from sp
+		where
+		<trim prefix="(" suffix=")" suffixOverrides="and">
+			<if test="spMc == null">
+				sp_mc like "%%" and
+			</if>
+			<if test="spMc != null">
+				sp_mc like "%"#{spMc}"%" and
+			</if>
+			<if test="spMs != null">
+				sp_ms like "%"#{spMs}"%" and
+			</if>
+		</trim>
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from sp
+		where sp_id = #{spId}
+	</select>
+	
+	<delete id="deleteBySpId">
+		delete from sp
+		where 
+		<foreach collection="spIds" item="spId" separator=" or ">
+		   sp_id = #{spId}
+		</foreach>
+	</delete>
+	
+	<insert id="insert" parameterType="sp">
+		insert into sp (sp_id, sp_mc,
+		sp_ms,
+		sp_scsj, sp_lj, sp_xwwjdm,
+		sp_scyhdm, sp_slt)
+		values (#{spId}, #{spMc},
+		#{spMs},
+		#{spScsj}, #{spLj}, #{spXwwjdm.xwfjId},
+		#{spScyhdm.userId},#{spSlt})
+	</insert>
+	
+	<insert id="insertSelective" parameterType="sp">
+		insert into sp
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="spId != null">
+				sp_id,
+			</if>
+			<if test="spMc != null">
+				sp_mc,
+			</if>
+			<if test="spMs != null">
+				sp_ms,
+			</if>
+			<if test="spScsj != null">
+				sp_scsj,
+			</if>
+			<if test="spLj != null">
+				sp_lj,
+			</if>
+			<if test="spXwwjdm != null">
+				<if test="spXwwjdm.xwfjId != null">
+	                sp_xwwjdm,
+	            </if>
+			</if>
+			<if test="spScyhdm != null">
+				<if test="spScyhdm.userId != null">
+	                sp_scyhdm,
+	            </if>
+			</if>
+			<if test="spSlt != null">
+                sp_slt,
+            </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="spId != null">
+				#{spId},
+			</if>
+			<if test="spMc != null">
+				#{spMc},
+			</if>
+			<if test="spMs != null">
+				#{spMs},
+			</if>
+			<if test="spScsj != null">
+				#{spScsj},
+			</if>
+			<if test="spLj != null">
+				#{spLj},
+			</if>
+			<if test="spXwwjdm != null">
+                <if test="spXwwjdm.xwfjId != null">
+                   #{spXwwjdm.xwfjId},
+                </if>
+            </if>
+            <if test="spScyhdm != null">
+                <if test="spScyhdm.userId != null">
+                    #{spScyhdm.userId},
+                </if>
+            </if>
+            <if test="spSlt != null">
+                #{spSlt},
+            </if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="sp">
+		update sp
+		<set>
+			<if test="spMc != null">
+				sp_mc = #{spMc},
+			</if>
+			<if test="spMs != null">
+				sp_ms = #{spMs},
+			</if>
+			<if test="spScsj != null">
+				sp_scsj = #{spScsj},
+			</if>
+			<if test="spLj != null">
+				sp_lj = #{spLj},
+			</if>
+			<if test="spSlt != null">
+                sp_slt = #{spSlt},
+            </if>
+			<if test="spXwwjdm.xwfjId != null">
+				sp_xwwjdm = #{spXwwjdm.xwfjId},
+			</if>
+			<if test="spScyhdm.userId != null">
+				sp_scyhdm = #{spScyhdm.userId},
+			</if>
+		</set>
+		where sp_id = #{spId}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="sp">
+		update sp
+		set sp_mc
+		= #{spMc},
+		sp_ms = #{spMs},
+		sp_scsj = #{spScsj},
+		sp_lj = #{spLj},
+		sp_slt = #{spSlt},
+		sp_xwwjdm = #{spXwwjdm.xwfjId},
+		sp_scyhdm = #{spScyhdm.userId}
+		where sp_id = #{spId}
+	</update>
+</mapper>

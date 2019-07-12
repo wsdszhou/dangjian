@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glut.dangjian.mapper.user.UserMapper">
+    <!-- 用户表全部字段 -->
+    <sql id="yhb_all_Column">
+		user_id, user_mc,user_mm, user_wx_id, user_wxm, user_flag, user_yhxxdm
+	</sql>
+
+    <!-- 用户视图所有字段 -->
+    <sql id="viewYhxx_all_column">
+       yhxx_id, yhxx_xmm, yhxx_xb, yhxx_csrq, yhxx_sjh, yhxx_mj, yhxx_yx, yhxx_sfzh, yhxx_ms, yhxx_da,
+       xl_id, xl_mc, zzmm_id, zzmm_mc, jg_id, js_szs_id, js_szqx_mc, jg_szs_mc, mz_id, mz_mc, dnzw_id,
+       dnzw_mc, dnzw_jb, xzzw_id, xzzw_mc, xzzw_jb, bm_id, bm_mc, zb_id, zb_mc, zb_ssbmdm, zb_lxdm,
+       zb_ms, user_id, user_mc, user_pwk, user_mm, user_wx_id, user_wxm, user_ms, user_cjrq, user_ztdm
+    </sql>
+    
+    <select id="getUserByuserName" parameterType="string" resultType="yhb">
+        select user_id, user_mc
+        from yhb
+        where user_mc = #{userMc}
+    </select>
+    
+    <!-- 修改头像 -->
+    <update id="updatePortrait">
+        update yh_xxb set yhxx_tx = #{portrait} where yhxx_id = ( 
+            select user_yhxxdm from yhb where user_id = #{userId} )
+    </update>
+    
+    <!-- 修改密码 -->
+    <update id="updatePassword">
+        update yhb set user_mm = #{newPassword} where user_id = #{userId}
+    </update>
+    
+    <!-- 获取用户密码 -->
+    <select id="getPaawordByUserId" parameterType="string" resultType="string">
+        select user_mm
+        from yhb
+        where user_id = #{userId}
+    </select>
+    
+    <update id="setPasswordByUserMc">
+        update yhb set user_mm = #{password} where user_mc = #{userMc}
+    </update>
+
+    <!-- 批量添加用户  -->
+    <insert id="batchAddUser" parameterType="userRole">
+        insert into yhb (user_id, user_mc, user_mm, user_ms, user_cjrq, user_ztdm, user_yhxxdm)
+        values
+        <foreach collection="yhbs" item="yh" separator=",">
+            (#{yh.userId}, #{yh.userMc}, #{yh.userMm}, #{yh.userMs}, #{yh.userCjrq}, #{yh.userZtdm}, #{yh.userYhxxdm} )
+        </foreach>
+    </insert>
+
+    <!-- 批量添加用户信息  -->
+    <insert id="batchAddUserInfo" parameterType="userRole">
+        insert into yh_xxb (yhxx_id, yhxx_xm, yhxx_xb, yhxx_csrq, yhxx_dhhm, yhxx_sjh, yhxx_yx, yhxx_sfzh,
+        yhxx_xldm, yhxx_zzmmdm, yhxx_jgdm, yhxx_mzdm, yhxx_dnzwdm, yhxx_xzzwdm, yhxx_bmdm, yhxx_zbdm, yhxx_mj)
+        values
+        <foreach collection="yhXxbs" item="yhXx" separator=",">
+            (#{yhXx.yhxxId  }, #{yhXx.yhxxXm  }, #{yhXx.yhxxXb  }, #{yhXx.yhxxCsrq  }, #{yhXx.yhxxDhhm  },
+            #{yhXx.yhxxSjh  }, #{yhXx.yhxxYx  }, #{yhXx.yhxxSfzh  }, #{yhXx.yhxxXldm.xlId  },
+            #{yhXx.yhxxZzmmdm.zzmmId  }, #{yhXx.yhxxJgdm.jgId  }, #{yhXx.yhxxMzdm.mzId  }, #{yhXx.yhxxDnzwdm.dnzwId  },
+            #{yhXx.yhxxXzzwdm.xzzwId  }, #{yhXx.yhxxBmdm.bmId  }, #{yhXx.yhxxZbdm.zbId  }, #{yhXx.yhxxMj  } )
+        </foreach>
+    </insert>
+
+    <!-- 添加用户角色 -->
+    <insert id="addUserRole" parameterType="userRole">
+        insert into yh_jsb (yh_id, js_id) values (#{userId}, #{roleId} )
+    </insert>
+
+    <!-- 根据用户UserId删除用户角色 -->
+    <delete id="deleteUserRoleByUserId">
+        delete from yh_jsb where yh_id = #{userId}
+    </delete>
+
+    <!-- 根据角色删除用户角色 -->
+    <delete id="deleteUserRoleByRoleId">
+        delete from yh_jsb where js_id = #{roleId}
+    </delete>
+
+    <!-- 根据用户名称获取用户表信息 -->
+    <select id="getYhByYhmc" parameterType="string" resultType="yhb">
+        select
+        <include refid="yhb_all_Column"></include>
+        from yhb
+        where user_mc = #{userMc}
+    </select>
+
+    <!-- 通过新闻发布人名称获取用户id -->
+    <select id="getUserIdByUserName" parameterType="java.lang.String" resultType="java.lang.String">
+       select user_id
+       from yhb yh, yh_xxb yhxx
+       where yh.user_yhxxdm = yhxx.yhxx_id and yhxx.yhxx_xmm =#{xwYhm}
+    </select>
+
+    <!-- 根据微信名称称获取用户表信息 -->
+    <select id="getYhByWxm" parameterType="java.lang.String" resultType="yhb">
+        select
+        <include refid="yhb_all_Column"/>
+        from yhb
+        where user_wxm=#{wxm}
+    </select>
+
+    <!-- 根据用户id查询到用户表 -->
+    <select id="findById" parameterType="java.lang.String" resultType="yhb">
+        select
+        <include refid="yhb_all_Column"/>
+        from yhb
+        where user_id = #{userId}
+    </select>
+
+    <!-- 修改用户密码 -->
+    <update id="updateYhPassword" parameterType="yhb">
+	   update yhb set user_mm = #{userMm} where user_id = #{userId} 
+	</update>
+
+    <!-- 删除用户通过id -->
+    <delete id="deleteUserById" parameterType="java.lang.String">
+		delete from yhb
+		where user_id = #{userId,jdbcType=VARCHAR}
+	</delete>
+
+    <!-- 删除用户信息表通过id -->
+    <delete id="deleteUserInfoById" parameterType="java.lang.String">
+        delete from yh_xxb
+        where yhxx_id = #{yhxxId,jdbcType=VARCHAR}
+    </delete>
+
+    <!-- 插入用户表 -->
+    <insert id="insertUser" parameterType="yhb">
+			insert into yhb (user_id, user_mc, user_mm,
+			user_wx_id,user_wxm, user_ms,user_cjrq, user_ztdm, user_yhxxdm)
+		values
+			(#{userId,jdbcType=VARCHAR}, #{userMc,jdbcType=VARCHAR},#{userMm,jdbcType=VARCHAR},
+			#{userWxId,jdbcType=VARCHAR},#{userWxm,jdbcType=VARCHAR}, #{userMs,jdbcType=VARCHAR},
+			#{userCjrq,jdbcType=TIMESTAMP}, #{userZtdm,jdbcType=INTEGER},#{userYhxxdm,jdbcType=VARCHAR})
+	</insert>
+
+    <!-- 插入用户表 -->
+    <insert id="insertUserIfNot" parameterType="yhb">
+        insert into yhb
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="userMc != null">
+                user_mc,
+            </if>
+            <if test="userMm != null">
+                user_mm,
+            </if>
+            <if test="userWxId != null">
+                user_wx_id,
+            </if>
+            <if test="userWxm != null">
+                user_wxm,
+            </if>
+            <if test="userMs != null">
+                user_ms,
+            </if>
+            <if test="userCjrq != null">
+                user_cjrq,
+            </if>
+            <if test="userZtdm != null">
+                user_ztdm,
+            </if>
+            <if test="userYhxxdm != null">
+                user_yhxxdm,
+            </if>
+            <if test="userFlag != null">
+                user_flag,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="userMc != null">
+                #{userMc,jdbcType=VARCHAR},
+            </if>
+            <if test="userMm != null">
+                #{userMm,jdbcType=VARCHAR},
+            </if>
+            <if test="userWxId != null">
+                #{userWxId,jdbcType=VARCHAR},
+            </if>
+            <if test="userWxm != null">
+                #{userWxm,jdbcType=VARCHAR},
+            </if>
+            <if test="userMs != null">
+                #{userMs,jdbcType=VARCHAR},
+            </if>
+            <if test="userCjrq != null">
+                #{userCjrq,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userZtdm != null">
+                #{userZtdm,jdbcType=INTEGER},
+            </if>
+            <if test="userYhxxdm != null">
+                #{userYhxxdm,jdbcType=VARCHAR},
+            </if>
+            <if test="userFlag != null">
+                #{userFlag}
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 插入用户信息表 -->
+    <insert id="insertUserInfoIfNot" parameterType="yhXxb">
+        insert into yh_xxb
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="yhxxId != null">
+                yhxx_id,
+            </if>
+            <if test="yhxxXm != null">
+                yhxx_xm,
+            </if>
+            <if test="yhxxXb != null">
+                yhxx_xb,
+            </if>
+            <if test="yhxxCsrq != null">
+                yhxx_csrq,
+            </if>
+            <if test="yhxxSjh != null">
+                yhxx_sjh,
+            </if>
+            <if test="yhxxYx != null">
+                yhxx_yx,
+            </if>
+            <if test="yhxxSfzh != null">
+                yhxx_sfzh,
+            </if>
+            <if test="yhxxMs != null">
+                yhxx_ms,
+            </if>
+            <if test="yhxxDa != null">
+                yhxx_da,
+            </if>
+            <if test="yhxxXldm != null">
+                yhxx_xldm,
+            </if>
+            <if test="yhxxZzmmdm != null">
+                yhxx_zzmmdm,
+            </if>
+            <if test="yhxxJgdm != null">
+                yhxx_jgdm,
+            </if>
+            <if test="yhxxMzdm != null">
+                yhxx_mzdm,
+            </if>
+            <if test="yhxxDnzwdm != null">
+                yhxx_dnzwdm,
+            </if>
+            <if test="yhxxXzzwdm != null">
+                yhxx_xzzwdm,
+            </if>
+            <if test="yhxxBmdm != null">
+                yhxx_bmdm,
+            </if>
+            <if test="yhxxZbdm != null">
+                yhxx_zbdm,
+            </if>
+            <if test="yhxxMj != null">
+                yhxx_mj,
+            </if>
+            <if test="yhxxTx != null">
+                yhxx_tx,
+            </if>
+            <if test="yhxxDhhm != null">
+                yhxx_dhhm,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="yhxxId != null">
+                #{yhxxId,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxXm != null">
+                #{yhxxXm,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxXb != null">
+                #{yhxxXb,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxCsrq != null">
+                #{yhxxCsrq,jdbcType=DATE},
+            </if>
+            <if test="yhxxSjh != null">
+                #{yhxxSjh,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxYx != null">
+                #{yhxxYx,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxSfzh != null">
+                #{yhxxSfzh,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxMs != null">
+                #{yhxxMs,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxDa != null">
+                #{yhxxDa,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxXldm != null">
+                #{yhxxXldm.xlId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxZzmmdm != null">
+                #{yhxxZzmmdm.zzmmId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxJgdm != null">
+                #{yhxxJgdm.jgId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxMzdm != null">
+                #{yhxxMzdm.mzId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxDnzwdm != null">
+                #{yhxxDnzwdm.dnzwId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxXzzwdm != null">
+                #{yhxxXzzwdm.xzzwId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxBmdm != null">
+                #{yhxxBmdm.bmId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxZbdm != null">
+                #{yhxxZbdm.zbId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxMj != null">
+                #{yhxxMj,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxTx != null">
+                #{yhxxTx,jdbcType=LONGVARBINARY},
+            </if>
+            <if test="yhxxDhhm != null">
+                #{ yhxxDhhm},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 修改用户信息 -->
+    <update id="updateUser" parameterType="yhb">
+        update yhb
+        <set>
+            <if test="userMc != null">
+                user_mc = #{userMc,jdbcType=VARCHAR},
+            </if>
+            <if test="userMm != null">
+                user_mm = #{userMm,jdbcType=VARCHAR},
+            </if>
+            <if test="userWxId != null">
+                user_wx_id = #{userWxId,jdbcType=VARCHAR},
+            </if>
+            <if test="userWxm != null">
+                user_wxm = #{userWxm,jdbcType=VARCHAR},
+            </if>
+            <if test="userMs != null">
+                user_ms = #{userMs,jdbcType=VARCHAR},
+            </if>
+            <if test="userCjrq != null">
+                user_cjrq = #{userCjrq,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userZtdm != null">
+                user_ztdm = #{userZtdm,jdbcType=INTEGER},
+            </if>
+            <if test="userYhxxdm != null">
+                user_yhxxdm = #{userYhxxdm,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where user_id = #{userId,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateUserInfo" parameterType="YhXxb">
+        update yh_xxb
+        <set>
+            <if test="yhxxXm != null">
+                yhxx_xm = #{yhxxXm,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxXb != null">
+                yhxx_xb = #{yhxxXb,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxCsrq != null">
+                yhxx_csrq = #{yhxxCsrq,jdbcType=DATE},
+            </if>
+            <if test="yhxxSjh != null">
+                yhxx_sjh = #{yhxxSjh,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxDhhm != null">
+                yhxx_dhhm = #{yhxxDhhm},
+            </if>
+            <if test="yhxxYx != null">
+                yhxx_yx = #{yhxxYx,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxSfzh != null">
+                yhxx_sfzh = #{yhxxSfzh,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxMs != null">
+                yhxx_ms = #{yhxxMs,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxDa != null">
+                yhxx_da = #{yhxxDa,jdbcType=VARCHAR},
+            </if>
+
+            <if test="yhxxXldm != null">
+                <if test="yhxxXldm.xlId != null">
+                    yhxx_xldm = #{yhxxXldm.xlId,jdbcType=INTEGER},
+                </if>
+            </if>
+
+            <if test="yhxxZzmmdm != null">
+                <if test="yhxxZzmmdm.zzmmId != null">
+                    yhxx_zzmmdm = #{yhxxZzmmdm.zzmmId,jdbcType=INTEGER},
+                </if>
+            </if>
+            <if test="yhxxJgdm != null">
+                <if test="yhxxJgdm.jgId != null">
+                    yhxx_jgdm = #{yhxxJgdm.jgId,jdbcType=INTEGER},
+                </if>
+            </if>
+            <if test="yhxxMzdm != null">
+                <if test="yhxxMzdm.mzId != null">
+                    yhxx_mzdm = #{yhxxMzdm.mzId,jdbcType=INTEGER},
+                </if>
+            </if>
+            <if test="yhxxDnzwdm.dnzwId != null">
+                yhxx_dnzwdm = #{yhxxDnzwdm.dnzwId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxXzzwdm.xzzwId != null">
+                yhxx_xzzwdm = #{yhxxXzzwdm.xzzwId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxBmdm.bmId != null">
+                yhxx_bmdm = #{yhxxBmdm.bmId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxZbdm.zbId != null">
+                yhxx_zbdm = #{yhxxZbdm.zbId,jdbcType=INTEGER},
+            </if>
+            <if test="yhxxMj != null">
+                yhxx_mj = #{yhxxMj,jdbcType=VARCHAR},
+            </if>
+            <if test="yhxxTx != null">
+                yhxx_tx = #{yhxxTx,jdbcType=LONGVARBINARY},
+            </if>
+        </set>
+        where yhxx_id = #{yhxxId,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

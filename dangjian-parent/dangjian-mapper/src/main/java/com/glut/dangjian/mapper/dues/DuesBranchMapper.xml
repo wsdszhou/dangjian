@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glut.dangjian.mapper.dues.DuesBranchMapper">
+    <resultMap id="BaseResultMap" type="viewDuesBranch">
+        <result column="college_id" property="collegeId"/>
+        <result column="branch_id" property="branchId"/>
+        <result column="branch_name" property="branchName"/>
+        <result column="branch_num" property="branchNum"/>
+        <result column="branch_rate" property="branchRate"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap1" type="duesBranch">
+        <result column="branch_id" property="branchId"/>
+        <result column="branch_name" property="branchName"/>
+        <result column="branch_num" property="branchNum"/>
+        <result column="branch_rate" property="branchRate"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        branch_id, branch_name, branch_num, branch_rate
+    </sql>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap1">
+        select <include refid="Base_Column_List" />
+        from dues_branch
+        where branch_id = #{branchId}
+    </select>
+
+    <select id="getDuesBranchById"  resultType="viewDuesBranch" resultMap="BaseResultMap">
+        select branch_id
+        from view_dues_college_branch
+        where spry_yh = #{userId} and spry_spgwdm =#{spgwId}
+    </select>
+
+    <select id="duesBranchPageList" parameterType="viewDuesBranch" resultMap="BaseResultMap" >
+        select college_id , branch_id ,branch_name, branch_num, branch_rate
+        from view_dues_college_branch
+        where college_id = #{collegeId}
+    </select>
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.glut.dangjian.mapper.branch.view.ViewBranchUserMapper">
+	<resultMap id="BaseResultMap" type="com.glut.dangjian.entity.branch.view.ViewBranchUser">
+		<result column="user_id" property="userId" />
+		<result column="user_mc" property="userMc" />
+		<result column="yhxx_xm" property="yhxxXm" />
+		<result column="yhxx_xb" property="yhxxXb" />
+		<result column="yhxx_csrq" property="yhxxCsrq" />
+		<result column="dnzw_id" property="dnzwId" />
+		<result column="dnzw_mc" property="dnzwMc" />
+		<result column="zb_id" property="zbId" />
+		<result column="zb_mc" property="zbMc" />
+		<result column="zb_ms" property="zbMs" />
+		<result column="zblx_id" property="zblxId" />
+		<result column="zblx_mc" property="zblxMc" />
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="xzzw_id" property="xzzwId" />
+        <result column="xzzw_mc" property="xzzwMc" />
+        <result column="xzzw_jb" property="xzzwJb" />
+	</resultMap>
+	
+	<sql id="all_column">
+	   distinct(zb_id), user_id, user_mc, yhxx_xm, yhxx_xb, yhxx_csrq, dnzw_id, dnzw_mc,
+	   zb_mc, zb_ms, zblx_id, zblx_mc, bm_id, bm_mc, xzzw_id, xzzw_mc, xzzw_jb
+	</sql>
+	
+	<!-- 根据用户id查询支部用户信息 -->
+	<select id="getBranchUserInfoByuserid" resultMap="BaseResultMap">
+	   select 
+	       distinct(user_id), yhxx_xm, yhxx_csrq, dnzw_mc, xzzw_mc, xzzw_jb
+	   from view_branch_user
+	   where zb_id = (select distinct(zb_id) from view_branch_user where  user_id = #{userId})
+	</select>
+	
+	<select id="getBranchUserPageList" resultMap="BaseResultMap">
+	   select <include refid="all_column"></include>
+	   from view_branch_user
+	   <trim prefix="where" suffixOverrides="and">
+	       <if test="branchId != null">
+                zb_id = #{branchId}  and
+            </if>
+            <if test="viewBranchUser != null">
+	            <if test="viewBranchUser.yhxxXb != null">
+	                yhxx_xb= #{viewBranchUser.yhxxXb}  and
+	            </if>
+            </if>
+            <if test="viewBranchUser != null">
+                <if test="viewBranchUser.yhxxXm != null">
+                    yhxx_xm like "%"#{viewBranchUser.yhxxXm}"%"  and
+                </if>
+            </if>
+            <if test="viewBranchUser.bmId != null">
+                bm_id = #{viewBranchUser.bmId}  and
+            </if>
+	   </trim> 
+	</select>
+	
+</mapper>

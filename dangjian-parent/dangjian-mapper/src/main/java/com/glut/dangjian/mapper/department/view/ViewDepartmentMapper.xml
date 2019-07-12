@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.glut.dangjian.mapper.department.view.ViewDepartmentMapper">
+	<resultMap id="BaseResultMap" type="viewDepartment">
+		<result column="bm_id" property="bmId" />
+		<result column="bm_mc" property="bmMc" />
+		<result column="bm_js" property="bmJs" />
+		<result column="bm_cjsj" property="bmCjsj" />
+		<result column="bm_xgsj" property="bmXgsj" />
+		<result column="bm_logo" property="bmLogo" />
+		<result column="secretaryId" property="secretaryid" />
+		<result column="secretaryName" property="secretaryname" />
+		<result column="deanId" property="deanid" />
+		<result column="deanName" property="deanname" />
+	</resultMap>
+	
+	<!-- 获取部门视图 -->
+	<select id="getDeptInfoByUserId" parameterType="string" resultMap="BaseResultMap">
+	   select bm_id, bm_mc, bm_js, bm_cjsj, bm_xgsj, bm_logo, secretaryId, secretaryName, deanId, deanName
+	   from view_department
+	   where bm_id = ( select bm_id from view_yhxx where user_id = #{userId}) 
+	</select>
+	
+	<insert id="insert" parameterType="viewDepartment">
+		insert into view_department (bm_id, bm_mc, bm_js,
+		bm_cjsj, bm_xgsj, bm_logo,
+		secretaryId, secretaryName, deanId,
+		deanName)
+		values (#{bmId}, #{bmMc}, #{bmJs},
+		#{bmCjsj}, #{bmXgsj}, #{bmLogo},
+		#{secretaryid}, #{secretaryname}, #{deanid},
+		#{deanname})
+	</insert>
+	
+	<insert id="insertSelective" parameterType="viewDepartment">
+		insert into view_department
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bmId != null">
+				bm_id,
+			</if>
+			<if test="bmMc != null">
+				bm_mc,
+			</if>
+			<if test="bmJs != null">
+				bm_js,
+			</if>
+			<if test="bmCjsj != null">
+				bm_cjsj,
+			</if>
+			<if test="bmXgsj != null">
+				bm_xgsj,
+			</if>
+			<if test="bmLogo != null">
+				bm_logo,
+			</if>
+			<if test="secretaryid != null">
+				secretaryId,
+			</if>
+			<if test="secretaryname != null">
+				secretaryName,
+			</if>
+			<if test="deanid != null">
+				deanId,
+			</if>
+			<if test="deanname != null">
+				deanName,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bmId != null">
+				#{bmId},
+			</if>
+			<if test="bmMc != null">
+				#{bmMc},
+			</if>
+			<if test="bmJs != null">
+				#{bmJs},
+			</if>
+			<if test="bmCjsj != null">
+				#{bmCjsj},
+			</if>
+			<if test="bmXgsj != null">
+				#{bmXgsj},
+			</if>
+			<if test="bmLogo != null">
+				#{bmLogo},
+			</if>
+			<if test="secretaryid != null">
+				#{secretaryid},
+			</if>
+			<if test="secretaryname != null">
+				#{secretaryname},
+			</if>
+			<if test="deanid != null">
+				#{deanid},
+			</if>
+			<if test="deanname != null">
+				#{deanname},
+			</if>
+		</trim>
+	</insert>
+</mapper>
